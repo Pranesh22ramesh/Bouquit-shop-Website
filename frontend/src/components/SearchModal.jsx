@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { FiX, FiSearch, FiShoppingCart } from "react-icons/fi";
 import axios from "../api/axios";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 import { toast } from "react-hot-toast";
 
 const SearchModal = ({ isOpen, onClose }) => {
@@ -10,6 +11,9 @@ const SearchModal = ({ isOpen, onClose }) => {
     const [results, setResults] = useState([]);
     const [loading, setLoading] = useState(false);
     const { addItem } = useCart();
+    const { isAuthenticated } = useAuth();
+    const navigate = useNavigate();
+    const location = useLocation();
 
     useEffect(() => {
         if (isOpen) {
@@ -45,6 +49,12 @@ const SearchModal = ({ isOpen, onClose }) => {
     }, [query]);
 
     const handleAddToCart = (product) => {
+        if (!isAuthenticated) {
+            toast.error("Please login to add to cart");
+            onClose();
+            navigate("/login", { state: { from: location.pathname } });
+            return;
+        }
         addItem({
             ...product,
             customization: {

@@ -1,5 +1,8 @@
 // src/components/LikeButton.jsx
 import React, { useEffect, useState } from "react";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate, useLocation } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const STORAGE_KEY = "midhunya_liked_photos_v1";
 
@@ -20,6 +23,9 @@ export function saveLikedSet(set) {
 
 const LikeButton = ({ id, size = 5, onChange }) => {
   const [liked, setLiked] = useState(false);
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const set = getLikedSet();
@@ -28,6 +34,11 @@ const LikeButton = ({ id, size = 5, onChange }) => {
 
   const toggle = (e) => {
     e.stopPropagation();
+    if (!isAuthenticated) {
+      toast.error("Please login to like this product");
+      navigate("/login", { state: { from: location.pathname } });
+      return;
+    }
     const set = getLikedSet();
     if (set.has(id)) {
       set.delete(id);

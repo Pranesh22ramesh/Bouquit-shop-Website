@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { userService } from "../api/userService";
 import { hexToColorName } from "../utils/colorUtils";
+import { toast } from "react-hot-toast";
 
 const PriceINR = ({ amount }) => (
   <span className="font-semibold">₹{amount?.toLocaleString("en-IN") || 0}</span>
@@ -18,7 +19,7 @@ const CartPage = () => {
   const [editNote, setEditNote] = useState("");
   const [whatsappPopupUrl, setWhatsappPopupUrl] = useState(null);
   
-  const { user, updateUser } = useAuth();
+  const { user, updateUser, isAuthenticated } = useAuth();
   const [showAddressModal, setShowAddressModal] = useState(false);
   const [contactInfo, setContactInfo] = useState({ phone: user?.phone || "", address: user?.address || "" });
 
@@ -49,6 +50,11 @@ const CartPage = () => {
   };
 
   const handleWhatsAppOrder = () => {
+    if (!isAuthenticated) {
+      toast.error("Please login to order products");
+      navigate("/login", { state: { from: "/cart" } });
+      return;
+    }
     if (!contactInfo.phone || !contactInfo.address) {
        setShowAddressModal(true);
        return;

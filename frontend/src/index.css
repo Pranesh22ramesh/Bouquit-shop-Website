@@ -1,0 +1,189 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Poppins:wght@300;400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    html {
+        scroll-behavior: smooth;
+    }
+    
+    body {
+        @apply bg-floralBg text-gray-800 antialiased overflow-x-hidden custom-scrollbar;
+        font-family: "Poppins", system-ui, sans-serif;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        font-family: "Cormorant Garamond", Georgia, serif;
+    }
+}
+
+@layer components {
+    .glass-panel {
+        @apply bg-white/70 backdrop-blur-md border border-white/40 shadow-glass;
+    }
+
+    .glass-premium {
+        @apply bg-white/60 backdrop-blur-xl border border-white/50 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] hover:shadow-[0_8px_32px_0_rgba(31,38,135,0.15)] transition-all duration-300;
+    }
+
+    .btn-primary {
+        @apply bg-gradient-to-r from-pink-500 to-rose-600 text-white px-6 py-2.5 rounded-full font-medium transition-all shadow-lg shadow-pink-500/30 hover:shadow-pink-500/50 active:scale-95 hover:scale-105;
+    }
+    .btn-outline {
+        @apply border-2 border-pink-400 text-pink-700 px-6 py-2.5 rounded-full font-medium hover:bg-pink-50 transition-all active:scale-95 hover:scale-105 hover:border-pink-500;
+    }
+
+    .card-hover {
+        @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-2;
+    }
+
+    .btn-luxury {
+        @apply inline-flex min-h-14 items-center justify-center gap-2 rounded-full bg-[linear-gradient(135deg,#D94672,#F78FB3)] px-7 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(217,70,114,0.3)] transition duration-500 hover:scale-[1.04] hover:shadow-[0_16px_40px_rgba(217,70,114,0.4)] active:scale-[0.98];
+    }
+
+    .btn-luxury-outline {
+        @apply inline-flex min-h-14 items-center justify-center rounded-full border border-[#D9D2CC] bg-white/45 px-7 text-sm font-semibold text-[#2D2D2D] backdrop-blur transition duration-300 hover:border-[#E85D8E] hover:bg-white dark:border-zinc-700 dark:bg-white/5 dark:text-white dark:hover:border-[#F472B6];
+    }
+}
+
+@layer utilities {
+    .text-shadow {
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .text-shadow-lg {
+        text-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        @apply bg-gray-300 rounded-full hover:bg-gray-400;
+    }
+
+    /* Dark mode specific */
+    .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+        @apply bg-gray-700 hover:bg-gray-600;
+    }
+}
+
+/* Additional Animations */
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes bounce-subtle {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-5px);
+    }
+}
+
+@keyframes pulse-glow {
+
+    0%,
+    100% {
+        box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.4);
+    }
+
+    50% {
+        box-shadow: 0 0 20px 10px rgba(244, 63, 94, 0);
+    }
+}
+
+.animate-slideInLeft {
+    animation: slideInLeft 0.6s ease-out both;
+}
+
+.animate-slideInRight {
+    animation: slideInRight 0.6s ease-out both;
+}
+
+.animate-scaleIn {
+    animation: scaleIn 0.5s ease-out both;
+}
+
+.animate-bounce-subtle {
+    animation: bounce-subtle 2s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.hero-petal {
+    position: absolute;
+    z-index: 1;
+    width: 18px;
+    height: 26px;
+    border-radius: 70% 30% 70% 30%;
+    background: linear-gradient(145deg, rgba(232, 93, 142, 0.5), rgba(247, 143, 179, 0.16));
+    filter: blur(0.2px);
+    animation: petal-float 8s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes petal-float {
+    0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+    50% { transform: translate3d(18px, 34px, 0) rotate(120deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

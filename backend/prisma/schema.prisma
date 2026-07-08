@@ -1,0 +1,172 @@
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum ProductBadge {
+  NORMAL
+  NEW_ARRIVAL
+  OFFER
+}
+
+enum Availability {
+  AVAILABLE
+  UNAVAILABLE
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  DELIVERED
+  CANCELLED
+}
+
+model User {
+  id                  String               @id @default(uuid())
+  fullName            String
+  email               String               @unique
+  phoneNumber         String?
+  passwordHash        String
+  role                Role                 @default(USER)
+  address             String?
+  isActive            Boolean              @default(true)
+  likes               Like[]
+  wishlistItems       WishlistItem[]
+  cartItems           CartItem[]
+  reviews             Review[]
+  orders              Order[]
+  activities          ActivityLog[]
+  refreshTokens       RefreshToken[]
+  passwordResetTokens PasswordResetToken[]
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  tokenHash String   @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime @default(now())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Like {
+  id        String   @id @default(uuid())
+  productId String
+  createdAt DateTime @default(now())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+}
+
+model WishlistItem {
+  id              String   @id @default(uuid())
+  productId       String
+  productSnapshot Json?
+  createdAt       DateTime @default(now())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+}
+
+model CartItem {
+  id              String   @id @default(uuid())
+  productId       String
+  quantity        Int      @default(1)
+  customization   Json?
+  productSnapshot Json?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Order {
+  id              String      @id @default(uuid())
+  status          OrderStatus @default(PENDING)
+  paymentMethod   String
+  itemsPrice      Decimal     @db.Decimal(10, 2)
+  taxPrice        Decimal     @db.Decimal(10, 2)
+  shippingPrice   Decimal     @db.Decimal(10, 2)
+  totalPrice      Decimal     @db.Decimal(10, 2)
+  shippingAddress Json
+  deliveryDate    DateTime?
+  orderItems      Json
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  userId          String
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  productId String?
+  userName  String
+  rating    Int
+  comment   String
+  image     String?
+  isHidden  Boolean  @default(false)
+  isPinned  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ActivityLog {
+  id           String   @id @default(uuid())
+  action       String
+  resourceType String?
+  resourceId   String?
+  details      Json?
+  createdAt    DateTime @default(now())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ContentSection {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  data      Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Product {
+  id                  String       @id @default(uuid())
+  name                String
+  category            String
+  price               Decimal      @db.Decimal(10, 2)
+  offerPrice          Decimal?     @db.Decimal(10, 2)
+  description         String       @default("")
+  image               String?
+  badge               ProductBadge @default(NORMAL)
+  availability        Availability @default(AVAILABLE)
+  featured            Boolean      @default(false)
+  customizedAvailable Boolean      @default(true)
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+}

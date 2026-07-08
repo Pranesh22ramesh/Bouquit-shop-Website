@@ -8,6 +8,7 @@ import axios from "../api/axios.js";
 import toast from "react-hot-toast";
 import ReviewForm from "./ReviewForm.jsx";
 import ReviewList from "./ReviewList.jsx";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const COLOR_OPTIONS = [
   "Classic Red",
@@ -35,6 +36,9 @@ const ProductModal = ({ product, open, onClose }) => {
   const { user } = useAuth();
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { isAuthenticated } = useAuth();
   const [selectedVariant, setSelectedVariant] = useState("classic");
   const [reviews, setReviews] = useState([]);
 
@@ -156,6 +160,12 @@ const ProductModal = ({ product, open, onClose }) => {
   }, [product, primaryColor, secondaryColors, selectedFlowers, stones, quantity]);
 
   const handleAddToCart = () => {
+    if (!isAuthenticated) {
+      toast.error("Please login to add to cart");
+      onClose();
+      navigate("/login", { state: { from: location.pathname } });
+      return;
+    }
     const id = `cart_${Date.now()}`;
     const payload = {
       id,

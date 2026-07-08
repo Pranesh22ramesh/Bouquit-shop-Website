@@ -24,7 +24,7 @@ const defaultCustomization = {
 const ProductDetailsPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, updateUser } = useAuth();
+  const { user, updateUser, isAuthenticated } = useAuth();
   const { addItem } = useCart();
   
   const [product, setProduct] = useState(null);
@@ -70,6 +70,11 @@ const ProductDetailsPage = () => {
   const totalPrice = (basePrice + extrasPrice) * custom.quantity;
 
   const handleAddToCart = () => {
+    if (!isAuthenticated) {
+      toast.error("Please login to add to cart");
+      navigate("/login", { state: { from: `/product/${id}` } });
+      return;
+    }
     if (!product) return;
     try {
       addItem({
@@ -98,6 +103,11 @@ const ProductDetailsPage = () => {
   };
 
   const handleBuyNow = () => {
+    if (!isAuthenticated) {
+      toast.error("Please login to order products");
+      navigate("/login", { state: { from: `/product/${id}` } });
+      return;
+    }
     if (!contactInfo.phone || !contactInfo.address) {
        setShowAddressModal(true);
        return;

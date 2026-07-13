@@ -16,6 +16,27 @@ import { galleryService } from "../api/galleryService";
 import { SITE_EVENTS, subscribeToSiteEvent } from "../lib/siteEvents";
 import { subscribeToTable } from "../lib/supabaseRealtime";
 
+const defaultHomeCategoryTiles = [
+  { id: "bouquets", name: "Bouquets", note: "For every little love story", image: "/gallery/bouquet/bouquet12.jpg" },
+  { id: "hairstyles", name: "Hairstyles", note: "Floral accents for graceful styling", image: "/gallery/hairstyle/hairstyle_1.jpg" },
+  { id: "bridal-flowers", name: "Bridal Flowers", note: "Made for your moment", image: "/gallery/bridal/flower11.jpg" },
+  { id: "gift-arrangements", name: "Gift Arrangements", note: "A joy to give", image: "/gallery/bouquet/bouquet13.jpg" },
+];
+
+const defaultHomeInspirationTiles = [
+  { id: "rose-stories", src: "/gallery/bouquet/bouquet1.jpg", label: "Rose stories", className: "sm:row-span-2" },
+  { id: "bridal-details", src: "/gallery/bridal/flower12.jpg", label: "Bridal details", className: "" },
+  { id: "floral-traditions", src: "/gallery/bouquet/bouquet4.jpg", label: "Floral traditions", className: "" },
+  { id: "gifts-with-heart", src: "/gallery/bouquet/bouquet10.jpg", label: "Gifts with heart", className: "sm:col-span-2" },
+];
+
+const defaultHomeFallbackProductImages = [
+  "/gallery/bouquet/bouquet1.jpg",
+  "/gallery/bouquet/bouquet4.jpg",
+  "/gallery/bouquet/bouquet13.jpg",
+  "/gallery/bouquet/bouquet7.jpg",
+];
+
 const defaultContent = {
   heroText: "Flowers that make every moment unforgettable",
   heroDescription:
@@ -25,9 +46,14 @@ const defaultContent = {
   primaryButtonLink: "/gallery",
   secondaryButtonLabel: "Plan your event",
   secondaryButtonLink: "/contact",
-  banners: [],
+  homeImagesEditableVersion: 1,
+  banners: ["/gallery/bouquet/bouquet13.jpg"],
   featuredProductIds: [],
   promotionalSections: [],
+  categoryTiles: defaultHomeCategoryTiles,
+  eventImage: "/gallery/bouquet/bouquet6.jpg",
+  inspirationTiles: defaultHomeInspirationTiles,
+  fallbackProductImages: defaultHomeFallbackProductImages,
   features: ["Handcrafted daily", "Same-day delivery", "Made to order"],
   floatingBadgeTitle: "Wrapped beautifully",
   floatingBadgeSubtitle: "Ready to make their day",
@@ -38,20 +64,6 @@ const fallbackProducts = [
   { _id: "pastel-wrap", name: "Pastel Poetry", category: "Hand-tied Bouquet", price: 1499, image: "/gallery/bouquet/bouquet4.jpg", badge: "New" },
   { _id: "celebration", name: "The Celebration Edit", category: "Luxury Arrangement", price: 2499, image: "/gallery/bouquet/bouquet13.jpg", badge: "Signature" },
   { _id: "rose-love", name: "Endless Romance", category: "Rose Bouquet", price: 1299, image: "/gallery/bouquet/bouquet7.jpg", badge: "Popular" },
-];
-
-const categories = [
-  { name: "Bouquets", note: "For every little love story", image: "/gallery/bouquet/bouquet12.jpg" },
-  { name: "Bridal Flowers", note: "Made for your moment", image: "/gallery/bridal/flower11.jpg" },
-  { name: "Elegant Centerpieces", note: "Tradition, beautifully renewed", image: "/gallery/bouquet/bouquet10.jpg" },
-  { name: "Gift Arrangements", note: "A joy to give", image: "/gallery/bouquet/bouquet13.jpg" },
-];
-
-const galleryTiles = [
-  { src: "/gallery/bouquet/bouquet1.jpg", label: "Rose stories", className: "sm:row-span-2" },
-  { src: "/gallery/bridal/flower12.jpg", label: "Bridal details", className: "" },
-  { src: "/gallery/bouquet/bouquet4.jpg", label: "Floral traditions", className: "" },
-  { src: "/gallery/bouquet/bouquet10.jpg", label: "Gifts with heart", className: "sm:col-span-2" },
 ];
 
 const reviews = [
@@ -76,13 +88,17 @@ const SectionHeading = ({ eyebrow, title, copy, align = "center" }) => (
 );
 
 const ProductCard = ({ product }) => {
-  const image = product.image || product.images?.[0] || "/gallery/bouquet/bouquet1.jpg";
+  const image = product.image || product.images?.[0] || "";
   const price = Number(product.offerPrice || product.price || product.basePrice || 0);
 
   return (
     <motion.article whileHover={{ y: -8 }} transition={{ duration: 0.25 }} className="group overflow-hidden rounded-[22px] border border-[#E8E5E0] bg-white shadow-[0_14px_40px_rgba(73,50,42,0.07)] dark:border-zinc-800 dark:bg-[#1E1E1E]">
       <div className="relative aspect-[4/5] overflow-hidden bg-[#F8F2EF]">
-        <img src={image} alt={product.name || product.title} className="h-full w-full object-cover transition duration-700 group-hover:scale-105" loading="lazy" />
+        {image ? (
+          <img src={image} alt={product.name || product.title} className="h-full w-full object-cover transition duration-700 group-hover:scale-105" loading="lazy" />
+        ) : (
+          <div className="grid h-full place-items-center bg-[#F8F2EF] text-sm text-[#9A8E86] dark:bg-zinc-800 dark:text-zinc-400">No image</div>
+        )}
         <span className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#9B6D28] backdrop-blur dark:bg-zinc-900/85">
           {product.badge || (product.offerPrice ? "Special price" : "Fresh daily")}
         </span>
@@ -142,8 +158,24 @@ const HomePage = () => {
     return () => unsubscribers.forEach((unsubscribe) => unsubscribe?.());
   }, []);
 
-  const products = useMemo(() => (featuredProducts.length ? featuredProducts : fallbackProducts), [featuredProducts]);
-  const heroImage = content.banners?.[0] || "/gallery/bouquet/bouquet13.jpg";
+  const categoryTiles = useMemo(
+    () => (content.categoryTiles?.length ? content.categoryTiles : defaultHomeCategoryTiles),
+    [content.categoryTiles]
+  );
+  const inspirationTiles = useMemo(
+    () => (content.inspirationTiles?.length ? content.inspirationTiles : defaultHomeInspirationTiles),
+    [content.inspirationTiles]
+  );
+  const products = useMemo(() => {
+    if (featuredProducts.length) return featuredProducts;
+    const fallbackImages = content.fallbackProductImages?.length ? content.fallbackProductImages : defaultHomeFallbackProductImages;
+    return fallbackProducts.map((product, index) => ({
+      ...product,
+      image: fallbackImages[index] || "",
+    }));
+  }, [content.fallbackProductImages, featuredProducts]);
+  const heroImage = content.banners?.[0] || "";
+  const eventImage = content.eventImage || "";
 
   return (
     <div className="overflow-hidden bg-[#FFF9F6] text-[#2D2D2D] transition-colors dark:bg-[#121212] dark:text-[#F5F5F5]">
@@ -182,7 +214,11 @@ const HomePage = () => {
           <motion.div initial={{ opacity: 0, scale: 0.94 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.95, delay: 0.15 }} className="relative mx-auto w-full max-w-[720px] lg:ml-auto">
             <div className="absolute -left-8 top-16 h-48 w-48 rounded-full bg-[#E85D8E]/15 blur-3xl" />
             <div className="relative ml-auto aspect-[4/5] max-h-[720px] overflow-hidden rounded-[160px_160px_32px_32px] border-[10px] border-white/60 bg-white shadow-[0_30px_80px_rgba(94,62,52,0.18)] dark:border-white/5 dark:bg-[#1E1E1E] sm:border-[14px]">
-              <img src={heroImage} alt="Midhunyas signature floral arrangement" className="h-full w-full object-cover" />
+              {heroImage ? (
+                <img src={heroImage} alt="Midhunyas signature floral arrangement" className="h-full w-full object-cover" />
+              ) : (
+                <div className="grid h-full place-items-center bg-[#F8F2EF] text-sm text-[#9A8E86] dark:bg-zinc-800 dark:text-zinc-400">Hero image not set</div>
+              )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-white/10" />
             </div>
             <div className="absolute -bottom-5 left-0 flex items-center gap-3 rounded-2xl border border-white/70 bg-white/85 p-4 pr-6 shadow-xl backdrop-blur-xl dark:border-white/10 dark:bg-zinc-900/85">
@@ -212,11 +248,15 @@ const HomePage = () => {
       <motion.section {...reveal} className="mx-auto max-w-7xl px-5 py-24 sm:px-8 sm:py-28">
         <SectionHeading eyebrow="Find your flowers" title="Made for life's beautiful moments" copy="From a quiet thank-you to the grandest celebration, find flowers that say it just right." />
         <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {categories.map((category, index) => (
-            <motion.div key={category.name} whileHover={{ y: -8 }} transition={{ duration: 0.25 }}>
+          {categoryTiles.map((category, index) => (
+            <motion.div key={category.id || category.name || index} whileHover={{ y: -8 }} transition={{ duration: 0.25 }}>
               <Link to="/gallery" className="group block">
                 <div className="relative aspect-[4/5] overflow-hidden rounded-[22px] bg-white shadow-[0_14px_36px_rgba(73,50,42,0.08)]">
-                  <img src={category.image} alt={category.name} className="h-full w-full object-cover transition duration-700 group-hover:scale-105" loading="lazy" />
+                  {category.image ? (
+                    <img src={category.image} alt={category.name} className="h-full w-full object-cover transition duration-700 group-hover:scale-105" loading="lazy" />
+                  ) : (
+                    <div className="grid h-full place-items-center bg-[#F8F2EF] text-sm text-[#9A8E86] dark:bg-zinc-800 dark:text-zinc-400">No image</div>
+                  )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/5 to-transparent" />
                   <div className="absolute inset-x-0 bottom-0 p-6 text-white">
                     <span className="mb-3 block text-[10px] font-semibold uppercase tracking-[0.22em] text-white/70">0{index + 1}</span>
@@ -246,7 +286,11 @@ const HomePage = () => {
       <section id="events" className="mx-auto grid max-w-7xl scroll-mt-24 gap-12 px-5 py-24 sm:px-8 sm:py-28 lg:grid-cols-2 lg:items-center">
         <motion.div {...reveal} className="relative">
           <div className="aspect-[5/6] overflow-hidden rounded-[120px_24px_24px_24px] bg-[#F6F1EB]">
-            <img src="/gallery/bouquet/bouquet6.jpg" alt="Bespoke flower arrangement" className="h-full w-full object-cover" loading="lazy" />
+            {eventImage ? (
+              <img src={eventImage} alt="Bespoke flower arrangement" className="h-full w-full object-cover" loading="lazy" />
+            ) : (
+              <div className="grid h-full place-items-center bg-[#F8F2EF] text-sm text-[#9A8E86] dark:bg-zinc-800 dark:text-zinc-400">Event image not set</div>
+            )}
           </div>
           <div className="absolute -bottom-7 -right-2 hidden w-52 rounded-2xl border border-[#E8E5E0] bg-white p-5 shadow-xl dark:border-zinc-700 dark:bg-[#1E1E1E] sm:block">
             <p className="text-4xl text-[#D4AF37]">“</p><p className="-mt-3 text-sm leading-6">Every bloom, chosen to belong to your story.</p>
@@ -281,9 +325,13 @@ const HomePage = () => {
       <motion.section {...reveal} className="mx-auto max-w-7xl px-5 py-24 sm:px-8 sm:py-28">
         <SectionHeading eyebrow="The Midhunyas edit" title="A little floral inspiration" copy="Real flowers, handcrafted for real celebrations in and around Karur." />
         <div className="mt-12 grid auto-rows-[250px] gap-4 sm:grid-cols-3 sm:auto-rows-[230px]">
-          {galleryTiles.map((tile) => (
-            <Link key={tile.src} to="/gallery" className={`group relative overflow-hidden rounded-[22px] ${tile.className}`}>
-              <img src={tile.src} alt={tile.label} className="h-full w-full object-cover transition duration-700 group-hover:scale-105" loading="lazy" />
+          {inspirationTiles.map((tile, index) => (
+            <Link key={tile.id || tile.src || index} to="/gallery" className={`group relative overflow-hidden rounded-[22px] ${tile.className || ""}`}>
+              {tile.src ? (
+                <img src={tile.src} alt={tile.label} className="h-full w-full object-cover transition duration-700 group-hover:scale-105" loading="lazy" />
+              ) : (
+                <div className="grid h-full place-items-center bg-[#F8F2EF] text-sm text-[#9A8E86] dark:bg-zinc-800 dark:text-zinc-400">No image</div>
+              )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
               <p className="absolute bottom-5 left-5 text-2xl font-medium text-white">{tile.label}</p>
             </Link>

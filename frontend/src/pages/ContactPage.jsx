@@ -4,6 +4,7 @@ import FloatingWhatsApp from "../components/FloatingWhatsApp";
 import { SITE_EVENTS, subscribeToSiteEvent } from "../lib/siteEvents";
 import { subscribeToTable } from "../lib/supabaseRealtime";
 import { FiMapPin, FiPhone, FiMail, FiInstagram, FiFacebook, FiYoutube, FiClock } from "react-icons/fi";
+import { DEFAULT_GOOGLE_MAP_EMBED_URL, toGoogleMapsEmbedUrl } from "../utils/googleMaps";
 
 const defaultContent = {
   title: "Contact Us",
@@ -18,7 +19,7 @@ const defaultContent = {
   facebookUrl: "",
   youtubeUrl: "",
   address: "Karur, Tamil Nadu, India",
-  googleMapUrl: "https://www.google.com/maps?q=10.9601,78.0766&z=16&output=embed",
+  googleMapUrl: DEFAULT_GOOGLE_MAP_EMBED_URL,
 };
 
 const ContactPage = () => {
@@ -64,6 +65,8 @@ const ContactPage = () => {
       }),
     []
   );
+
+  const mapEmbedUrl = toGoogleMapsEmbedUrl(content.googleMapUrl || content.address);
 
   return (
     <div className={`min-h-screen px-4 py-10 ${isDarkMode ? "bg-gray-900 text-white" : "bg-[#fff9f7] text-slate-900"}`}>
@@ -148,7 +151,7 @@ const ContactPage = () => {
           </section>
 
           <section className={`overflow-hidden rounded-[2rem] border shadow-lg ${isDarkMode ? "border-gray-700 bg-gray-800" : "border-rose-100 bg-white"}`}>
-            <iframe title="Store location" src={content.googleMapUrl} className="h-[480px] w-full border-0" loading="lazy" />
+            <iframe title="Store location" src={mapEmbedUrl} className="h-[480px] w-full border-0" loading="lazy" />
           </section>
         </div>
       </div>

@@ -69,11 +69,11 @@ const GalleryPage = () => {
         sort: sortOption,
       });
       
-      let fetchedProducts = data.products || [];
+      let fetchedProducts = [...(data.products || [])];
       const order = ["bouquets", "hairstyles", "bridal flowers"];
       fetchedProducts.sort((a, b) => {
-        const catA = (a.category || "").toLowerCase();
-        const catB = (b.category || "").toLowerCase();
+        const catA = String(a?.category || "").toLowerCase();
+        const catB = String(b?.category || "").toLowerCase();
         const indexA = order.findIndex(o => catA.includes(o));
         const indexB = order.findIndex(o => catB.includes(o));
         

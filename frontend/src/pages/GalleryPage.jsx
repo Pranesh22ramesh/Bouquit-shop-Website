@@ -68,7 +68,22 @@ const GalleryPage = () => {
         filter: filterOption !== "all" ? filterOption : undefined,
         sort: sortOption,
       });
-      setProducts(data.products || []);
+      
+      let fetchedProducts = data.products || [];
+      const order = ["bouquets", "hairstyles", "bridal flowers"];
+      fetchedProducts.sort((a, b) => {
+        const catA = (a.category || "").toLowerCase();
+        const catB = (b.category || "").toLowerCase();
+        const indexA = order.findIndex(o => catA.includes(o));
+        const indexB = order.findIndex(o => catB.includes(o));
+        
+        if (indexA === -1 && indexB === -1) return 0;
+        if (indexA === -1) return 1;
+        if (indexB === -1) return -1;
+        return indexA - indexB;
+      });
+      
+      setProducts(fetchedProducts);
     } catch (error) {
       toast.error(error.response?.data?.message || "Could not load products. Please try again.");
     } finally { setIsFetching(false); }

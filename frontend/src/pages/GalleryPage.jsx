@@ -70,21 +70,26 @@ const GalleryPage = () => {
       });
       
       let fetchedProducts = [...(data.products || [])];
-      const order = ["bouquets", "hairstyles", "bridal flowers"];
-      fetchedProducts.sort((a, b) => {
-        const catA = String(a?.category || "").toLowerCase();
-        const catB = String(b?.category || "").toLowerCase();
-        const indexA = order.findIndex(o => catA.includes(o));
-        const indexB = order.findIndex(o => catB.includes(o));
-        
-        if (indexA === -1 && indexB === -1) return 0;
-        if (indexA === -1) return 1;
-        if (indexB === -1) return -1;
-        return indexA - indexB;
-      });
+      
+      if (activeCategory === "all" && sortOption === "latest") {
+        const order = ["bouquet", "hair", "bridal"];
+        fetchedProducts.sort((a, b) => {
+          const catA = String(a?.category || "").toLowerCase();
+          const catB = String(b?.category || "").toLowerCase();
+          
+          let indexA = order.findIndex(o => catA.includes(o));
+          let indexB = order.findIndex(o => catB.includes(o));
+          
+          if (indexA === -1) indexA = 999;
+          if (indexB === -1) indexB = 999;
+          
+          return indexA - indexB;
+        });
+      }
       
       setProducts(fetchedProducts);
     } catch (error) {
+      console.error("Gallery Fetch Error:", error);
       toast.error(error.response?.data?.message || "Could not load products. Please try again.");
     } finally { setIsFetching(false); }
   };
@@ -180,12 +185,12 @@ const GalleryPage = () => {
               </div>
             </div>
 
-            {isFetching ? (
+            {isFetching && products.length === 0 ? (
               <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
                 {Array.from({ length: 8 }).map((_, index) => <div key={index} className={`h-80 animate-pulse rounded-xl ${isDarkMode ? "bg-gray-700" : "bg-gray-200"}`} />)}
               </div>
             ) : products.length ? (
-              <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+              <div className={`mt-6 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 transition-opacity duration-200 ${isFetching ? "opacity-50 pointer-events-none" : "opacity-100"}`}>
                 {products.map((item, index) => (
                   <article key={item._id} onClick={() => navigate(`/product/${item._id}`)} style={{ animationDelay: `${index * 0.05}s` }} className={`group relative cursor-pointer overflow-hidden rounded-xl shadow-md transition hover:-translate-y-1 hover:shadow-xl ${isDarkMode ? "border border-gray-700 bg-gray-800" : "bg-white"} ${item.status === "Unavailable" ? "opacity-60 grayscale-[.5]" : ""}`}>
                     <div className="relative aspect-[4/5] overflow-hidden">

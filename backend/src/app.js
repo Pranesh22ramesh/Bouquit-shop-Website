@@ -23,10 +23,13 @@ const app = express();
 app.use(helmet());
 app.use(
   cors({
-    origin: [
-      "https://karurflowershop.vercel.app",
-      "http://localhost:5173"
-    ],
+    origin: function (origin, callback) {
+      if (!origin || origin.startsWith('http://localhost:') || origin === 'https://karurflowershop.vercel.app') {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true,
   })
 );

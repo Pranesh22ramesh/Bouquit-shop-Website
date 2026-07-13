@@ -17,6 +17,31 @@ const availabilityMap = {
   Unavailable: Availability.UNAVAILABLE,
 };
 
+const CATEGORY_ORDER = ['bouquets', 'hairstyles', 'bridalflowers'];
+
+const normalizeCategoryName = (category = '') =>
+  String(category)
+    .toLowerCase()
+    .replace(/&/g, 'and')
+    .replace(/[^a-z0-9]/g, '');
+
+const getCategoryPriority = (category) => {
+  const normalized = normalizeCategoryName(category);
+  if (normalized === 'bouquet' || normalized === 'bouquets') return 0;
+  if (normalized === 'hairstyle' || normalized === 'hairstyles' || normalized === 'hair') return 1;
+  if (normalized === 'bridalflower' || normalized === 'bridalflowers' || normalized === 'bridal') return 2;
+  const index = CATEGORY_ORDER.indexOf(normalized);
+  return index === -1 ? Number.MAX_SAFE_INTEGER : index;
+};
+
+const getCategoryDisplayLabel = (category) => {
+  const normalized = normalizeCategoryName(category);
+  if (normalized === 'bouquet' || normalized === 'bouquets') return 'Bouquets';
+  if (normalized === 'hairstyle' || normalized === 'hairstyles' || normalized === 'hair') return 'Hairstyles';
+  if (normalized === 'bridalflower' || normalized === 'bridalflowers' || normalized === 'bridal') return 'Bridal Flowers';
+  return category;
+};
+
 const TRANSIENT_DATABASE_ERRORS = new Set(['P1001', 'P1002', 'P2024']);
 
 const runProductQuery = async (operation, maxAttempts = 3) => {
@@ -139,7 +164,13 @@ const listCategories = async () => {
   return categories
     .map((entry) => entry.category?.trim())
     .filter(Boolean)
-    .map((category) => ({ value: category, label: category }));
+    .sort((a, b) => {
+      const priorityA = getCategoryPriority(a);
+      const priorityB = getCategoryPriority(b);
+      if (priorityA !== priorityB) return priorityA - priorityB;
+      return a.localeCompare(b);
+    })
+    .map((category) => ({ value: category, label: getCategoryDisplayLabel(category) }));
 };
 
 const getProductById = async (id) => {

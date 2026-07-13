@@ -11,6 +11,28 @@ import { FaEdit, FaTrash, FaPlus, FaImage, FaKey, FaSave, FaChartBar, FaThumbtac
 import ProductFormModal from "../components/ProductFormModal";
 import AdminProductCard from "../components/AdminProductCard";
 import DeleteProductDialog from "../components/DeleteProductDialog";
+import { toGoogleMapsEmbedUrl } from "../utils/googleMaps";
+
+const defaultHomeCategoryTiles = [
+  { id: "bouquets", name: "Bouquets", note: "For every little love story", image: "/gallery/bouquet/bouquet12.jpg" },
+  { id: "hairstyles", name: "Hairstyles", note: "Floral accents for graceful styling", image: "/gallery/hairstyle/hairstyle_1.jpg" },
+  { id: "bridal-flowers", name: "Bridal Flowers", note: "Made for your moment", image: "/gallery/bridal/flower11.jpg" },
+  { id: "gift-arrangements", name: "Gift Arrangements", note: "A joy to give", image: "/gallery/bouquet/bouquet13.jpg" },
+];
+
+const defaultHomeInspirationTiles = [
+  { id: "rose-stories", src: "/gallery/bouquet/bouquet1.jpg", label: "Rose stories", className: "sm:row-span-2" },
+  { id: "bridal-details", src: "/gallery/bridal/flower12.jpg", label: "Bridal details", className: "" },
+  { id: "floral-traditions", src: "/gallery/bouquet/bouquet4.jpg", label: "Floral traditions", className: "" },
+  { id: "gifts-with-heart", src: "/gallery/bouquet/bouquet10.jpg", label: "Gifts with heart", className: "sm:col-span-2" },
+];
+
+const defaultHomeFallbackProductImages = [
+  "/gallery/bouquet/bouquet1.jpg",
+  "/gallery/bouquet/bouquet4.jpg",
+  "/gallery/bouquet/bouquet13.jpg",
+  "/gallery/bouquet/bouquet7.jpg",
+];
 
 const createDefaultHomeContent = () => ({
   heroText: "",
@@ -26,6 +48,10 @@ const createDefaultHomeContent = () => ({
   banners: [],
   featuredProductIds: [],
   promotionalSections: [],
+  categoryTiles: defaultHomeCategoryTiles,
+  eventImage: "/gallery/bouquet/bouquet6.jpg",
+  inspirationTiles: defaultHomeInspirationTiles,
+  fallbackProductImages: defaultHomeFallbackProductImages,
 });
 
 const createDefaultAboutContent = () => ({
@@ -88,6 +114,10 @@ const AdminDashboardPage = () => {
   const [aboutContent, setAboutContent] = useState(createDefaultAboutContent());
   const [contactContent, setContactContent] = useState(createDefaultContactContent());
   const [homeBannerFiles, setHomeBannerFiles] = useState([]);
+  const [homeCategoryImageFiles, setHomeCategoryImageFiles] = useState({});
+  const [homeEventImageFile, setHomeEventImageFile] = useState(null);
+  const [homeInspirationImageFiles, setHomeInspirationImageFiles] = useState({});
+  const [homeFallbackProductImageFiles, setHomeFallbackProductImageFiles] = useState({});
   const [aboutHeroFile, setAboutHeroFile] = useState(null);
   const [aboutGalleryFiles, setAboutGalleryFiles] = useState([]);
 
@@ -266,14 +296,47 @@ const AdminDashboardPage = () => {
     }
   };
 
+  const buildHomeFilePayload = () => {
+    const payload = { bannerFiles: homeBannerFiles };
+
+    if (homeEventImageFile) payload.homeEventImageFile = homeEventImageFile;
+    Object.entries(homeCategoryImageFiles).forEach(([index, file]) => {
+      if (file) payload[`homeCategoryImage_${index}`] = file;
+    });
+    Object.entries(homeInspirationImageFiles).forEach(([index, file]) => {
+      if (file) payload[`homeInspirationImage_${index}`] = file;
+    });
+    Object.entries(homeFallbackProductImageFiles).forEach(([index, file]) => {
+      if (file) payload[`homeFallbackProductImage_${index}`] = file;
+    });
+
+    return payload;
+  };
+
+  const updateHomeListItem = (collection, index, field, value) =>
+    setHomeContent((current) => {
+      const nextItems = [...(current[collection] || [])];
+      nextItems[index] = { ...(nextItems[index] || {}), [field]: value };
+      return { ...current, [collection]: nextItems };
+    });
+
+  const updateHomeFallbackImage = (index, value) =>
+    setHomeContent((current) => {
+      const nextImages = [...(current.fallbackProductImages || [])];
+      nextImages[index] = value;
+      return { ...current, fallbackProductImages: nextImages };
+    });
+
   const saveHomeContent = async (event) => {
     event.preventDefault();
     try {
-      const updated = await contentService.update("home-highlight", homeContent, {
-        bannerFiles: homeBannerFiles,
-      });
+      const updated = await contentService.update("home-highlight", homeContent, buildHomeFilePayload());
       setHomeContent({ ...createDefaultHomeContent(), ...(updated || {}) });
       setHomeBannerFiles([]);
+      setHomeCategoryImageFiles({});
+      setHomeEventImageFile(null);
+      setHomeInspirationImageFiles({});
+      setHomeFallbackProductImageFiles({});
       toast.success("Home content updated");
       await fetchAnalytics();
     } catch (error) {
@@ -641,6 +704,24 @@ const AdminDashboardPage = () => {
                   </div>
                 </div>
 
+                <div className="space-y-3 rounded-xl border border-gray-200 p-4 dark:border-gray-700">
+                  <div className="flex flex-col gap-1">
+                    <h3 className="font-semibold dark:text-white">Event / Atelier Image</h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">This controls the large image in the wedding/event section on the Home page.</p>
+                  </div>
+                  {homeContent.eventImage && <img src={homeContent.eventImage} alt="Home event section" className="h-44 w-full max-w-md rounded-xl object-cover" />}
+                  {homeEventImageFile && <p className="text-xs font-medium text-emerald-600">{homeEventImageFile.name} ready to upload.</p>}
+                  <div className="flex flex-wrap gap-2">
+                    <label className="cursor-pointer rounded-lg bg-rose-50 px-4 py-2 text-sm font-semibold text-rose-600">
+                      Upload / Replace Image
+                      <input type="file" accept="image/*" className="hidden" onChange={(e) => setHomeEventImageFile(e.target.files?.[0] || null)} />
+                    </label>
+                    <button type="button" onClick={() => { setHomeContent({ ...homeContent, eventImage: "" }); setHomeEventImageFile(null); }} className="rounded-lg border border-red-200 px-4 py-2 text-sm font-semibold text-red-500">
+                      Remove Image
+                    </button>
+                  </div>
+                </div>
+
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <h3 className="font-semibold dark:text-white">Home Banner Posters</h3>
@@ -664,6 +745,47 @@ const AdminDashboardPage = () => {
                   {homeBannerFiles.length > 0 && <p className="text-xs text-gray-500">{homeBannerFiles.length} new banner file(s) ready to upload.</p>}
                 </div>
 
+                <div className="space-y-3">
+                  <div>
+                    <h3 className="font-semibold dark:text-white">Home Category Card Images</h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Upload, replace, or remove the images used in the category cards.</p>
+                  </div>
+                  <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                    {(homeContent.categoryTiles || []).map((tile, index) => (
+                      <div key={tile.id || index} className="rounded-xl border border-gray-200 p-3 dark:border-gray-700">
+                        {tile.image ? (
+                          <img src={tile.image} alt={tile.name || "Home category"} className="h-28 w-full rounded-lg object-cover" />
+                        ) : (
+                          <div className="grid h-28 place-items-center rounded-lg bg-gray-100 text-xs text-gray-400 dark:bg-gray-700">No image</div>
+                        )}
+                        {homeCategoryImageFiles[index] && <p className="mt-2 text-xs font-medium text-emerald-600">{homeCategoryImageFiles[index].name} ready.</p>}
+                        <input className="mt-3 w-full rounded border p-2 text-sm dark:bg-gray-700 dark:border-gray-600" placeholder="Card title" value={tile.name || ""} onChange={(e) => updateHomeListItem("categoryTiles", index, "name", e.target.value)} />
+                        <input className="mt-2 w-full rounded border p-2 text-sm dark:bg-gray-700 dark:border-gray-600" placeholder="Card subtitle" value={tile.note || ""} onChange={(e) => updateHomeListItem("categoryTiles", index, "note", e.target.value)} />
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          <label className="cursor-pointer rounded-lg bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-600">
+                            Upload / Replace
+                            <input type="file" accept="image/*" className="hidden" onChange={(e) => setHomeCategoryImageFiles((current) => ({ ...current, [index]: e.target.files?.[0] || null }))} />
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              updateHomeListItem("categoryTiles", index, "image", "");
+                              setHomeCategoryImageFiles((current) => {
+                                const next = { ...current };
+                                delete next[index];
+                                return next;
+                              });
+                            }}
+                            className="rounded-lg border border-red-200 px-3 py-2 text-xs font-semibold text-red-500"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
                 <div>
                   <h3 className="font-semibold dark:text-white">Manage Featured Products</h3>
                   <div className="mt-3 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
@@ -683,6 +805,85 @@ const AdminDashboardPage = () => {
                         />
                         <span className="text-sm dark:text-gray-200">{product.name}</span>
                       </label>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <div>
+                    <h3 className="font-semibold dark:text-white">Most-Loved Fallback Images</h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">These are used only when no featured products are available. Product images themselves are managed in the Products tab.</p>
+                  </div>
+                  <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                    {(homeContent.fallbackProductImages || defaultHomeFallbackProductImages).map((image, index) => (
+                      <div key={index} className="rounded-xl border border-gray-200 p-3 dark:border-gray-700">
+                        {image ? (
+                          <img src={image} alt={`Fallback product ${index + 1}`} className="h-28 w-full rounded-lg object-cover" />
+                        ) : (
+                          <div className="grid h-28 place-items-center rounded-lg bg-gray-100 text-xs text-gray-400 dark:bg-gray-700">No image</div>
+                        )}
+                        {homeFallbackProductImageFiles[index] && <p className="mt-2 text-xs font-medium text-emerald-600">{homeFallbackProductImageFiles[index].name} ready.</p>}
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          <label className="cursor-pointer rounded-lg bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-600">
+                            Upload / Replace
+                            <input type="file" accept="image/*" className="hidden" onChange={(e) => setHomeFallbackProductImageFiles((current) => ({ ...current, [index]: e.target.files?.[0] || null }))} />
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              updateHomeFallbackImage(index, "");
+                              setHomeFallbackProductImageFiles((current) => {
+                                const next = { ...current };
+                                delete next[index];
+                                return next;
+                              });
+                            }}
+                            className="rounded-lg border border-red-200 px-3 py-2 text-xs font-semibold text-red-500"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <div>
+                    <h3 className="font-semibold dark:text-white">Home Inspiration Gallery Images</h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Controls the image grid near the bottom of the Home page.</p>
+                  </div>
+                  <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                    {(homeContent.inspirationTiles || []).map((tile, index) => (
+                      <div key={tile.id || index} className="rounded-xl border border-gray-200 p-3 dark:border-gray-700">
+                        {tile.src ? (
+                          <img src={tile.src} alt={tile.label || "Home inspiration"} className="h-28 w-full rounded-lg object-cover" />
+                        ) : (
+                          <div className="grid h-28 place-items-center rounded-lg bg-gray-100 text-xs text-gray-400 dark:bg-gray-700">No image</div>
+                        )}
+                        {homeInspirationImageFiles[index] && <p className="mt-2 text-xs font-medium text-emerald-600">{homeInspirationImageFiles[index].name} ready.</p>}
+                        <input className="mt-3 w-full rounded border p-2 text-sm dark:bg-gray-700 dark:border-gray-600" placeholder="Image label" value={tile.label || ""} onChange={(e) => updateHomeListItem("inspirationTiles", index, "label", e.target.value)} />
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          <label className="cursor-pointer rounded-lg bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-600">
+                            Upload / Replace
+                            <input type="file" accept="image/*" className="hidden" onChange={(e) => setHomeInspirationImageFiles((current) => ({ ...current, [index]: e.target.files?.[0] || null }))} />
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              updateHomeListItem("inspirationTiles", index, "src", "");
+                              setHomeInspirationImageFiles((current) => {
+                                const next = { ...current };
+                                delete next[index];
+                                return next;
+                              });
+                            }}
+                            className="rounded-lg border border-red-200 px-3 py-2 text-xs font-semibold text-red-500"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -815,8 +1016,18 @@ const AdminDashboardPage = () => {
                   <textarea rows="3" className="w-full border p-2 rounded dark:bg-gray-700 dark:border-gray-600" value={contactContent.address || ""} onChange={(e) => setContactContent({ ...contactContent, address: e.target.value })} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1 dark:text-gray-300">Google Map URL</label>
-                  <input className="w-full border p-2 rounded dark:bg-gray-700 dark:border-gray-600" value={contactContent.googleMapUrl || ""} onChange={(e) => setContactContent({ ...contactContent, googleMapUrl: e.target.value })} />
+                  <label className="block text-sm font-medium mb-1 dark:text-gray-300">Google Maps Link or Embed Code</label>
+                  <textarea
+                    rows="3"
+                    className="w-full border p-2 rounded dark:bg-gray-700 dark:border-gray-600"
+                    placeholder='Paste a Google Maps share link, place URL, or full <iframe src="..."> embed code'
+                    value={contactContent.googleMapUrl || ""}
+                    onChange={(e) => setContactContent({ ...contactContent, googleMapUrl: e.target.value })}
+                  />
+                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">The Contact page converts this automatically into an embeddable map.</p>
+                  <div className="mt-3 overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700">
+                    <iframe title="Contact map preview" src={toGoogleMapsEmbedUrl(contactContent.googleMapUrl || contactContent.address)} className="h-64 w-full border-0" loading="lazy" />
+                  </div>
                 </div>
                 <button type="submit" className="mt-4 px-6 py-2 bg-rose-600 text-white rounded-lg flex items-center gap-2 hover:bg-rose-700">
                   <FaSave /> Save Contact Content

@@ -7,6 +7,16 @@ import axios from "../api/axios";
 import { hexToColorName } from "../utils/colorUtils";
 import { toast } from "react-hot-toast";
 
+const toAbsoluteImageUrl = (image) => {
+  if (!image || typeof window === "undefined") return "";
+
+  try {
+    return new URL(image, window.location.origin).href;
+  } catch {
+    return image;
+  }
+};
+
 const CheckoutPage = () => {
   const { items, subtotal, tax, delivery, grandTotal, clearCart } = useCart();
   const { user, isAuthenticated } = useAuth();
@@ -62,7 +72,7 @@ const CheckoutPage = () => {
           product: productId,
           name: productObj?.name || item.title || "Product",
           qty: item.quantity,
-          image: productObj?.image || item.image || item.src || "",
+          image: productObj?.image || item.image || item.src || item.thumbnail || "",
           price: productObj?.price || item.price || 0,
           customization: item.customization || {}
         };
@@ -113,7 +123,9 @@ const CheckoutPage = () => {
     message += `*Items:*\n`;
     
     completedOrder.orderItems.forEach(item => {
+      const imageUrl = toAbsoluteImageUrl(item.image || item.thumbnail);
       message += `- ${item.name} (Qty: ${item.qty}) = ₹${item.price * item.qty}\n`;
+      if (imageUrl) message += `   Product Image: ${imageUrl}\n`;
       if (item.customization) {
         if (item.customization.mainColor) {
           const c1 = hexToColorName(item.customization.mainColor);
@@ -291,7 +303,7 @@ const CheckoutPage = () => {
                 const productObj = item.productId && typeof item.productId === 'object' ? item.productId : null;
                 const name = productObj?.name || item.title || "Product";
                 const price = productObj?.price || item.price || 0;
-                const image = productObj?.image || item.image || "";
+                const image = productObj?.image || item.image || item.src || item.thumbnail || "";
 
                 return (
                   <div key={idx} className="flex gap-4 border-b border-gray-100 pb-4 last:border-0 last:pb-0">

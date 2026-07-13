@@ -91,6 +91,11 @@ const CartPage = () => {
         if (item.customization.notes) message += `   Note: ${item.customization.notes}\n`;
         if (item.customization.referencePreview) message += `   (⚠️ Has Reference Photo - Will send separately)\n`;
       }
+      const imageUrl = product.image || product.src || product.thumbnail;
+      if (imageUrl) {
+        const absoluteImageUrl = imageUrl.startsWith("http") ? imageUrl : window.location.origin + imageUrl;
+        message += `   Product Image: ${absoluteImageUrl}\n`;
+      }
       message += `\n`;
     });
 

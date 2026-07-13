@@ -45,7 +45,16 @@ const GalleryPage = () => {
   const fetchCategories = async () => {
     try {
       const data = await galleryService.categories();
-      setCategories([{ key: "all", label: "All" }, ...data.map((item) => ({ key: item.value, label: item.label }))]);
+      const order = ["Bouquets", "Hairstyles", "Bridal Flowers"];
+      const sortedData = data.sort((a, b) => {
+        const indexA = order.indexOf(a.label);
+        const indexB = order.indexOf(b.label);
+        if (indexA === -1 && indexB === -1) return a.label.localeCompare(b.label);
+        if (indexA === -1) return 1;
+        if (indexB === -1) return -1;
+        return indexA - indexB;
+      });
+      setCategories([{ key: "all", label: "All" }, ...sortedData.map((item) => ({ key: item.value, label: item.label }))]);
     } catch (error) { console.error("Failed to load categories", error); }
   };
 

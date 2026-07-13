@@ -1,34 +1,11 @@
-datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
-}
-
 generator client {
   provider = "prisma-client-js"
 }
 
-enum Role {
-  USER
-  ADMIN
-}
-
-enum ProductBadge {
-  NORMAL
-  NEW_ARRIVAL
-  OFFER
-}
-
-enum Availability {
-  AVAILABLE
-  UNAVAILABLE
-}
-
-enum OrderStatus {
-  PENDING
-  PROCESSING
-  DELIVERED
-  CANCELLED
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -38,28 +15,28 @@ model User {
   phoneNumber         String?
   passwordHash        String
   role                Role                 @default(USER)
-  address             String?
   isActive            Boolean              @default(true)
-  likes               Like[]
-  wishlistItems       WishlistItem[]
-  cartItems           CartItem[]
-  reviews             Review[]
-  orders              Order[]
-  activities          ActivityLog[]
-  refreshTokens       RefreshToken[]
-  passwordResetTokens PasswordResetToken[]
   createdAt           DateTime             @default(now())
   updatedAt           DateTime             @updatedAt
+  address             String?
+  activities          ActivityLog[]
+  cartItems           CartItem[]
+  likes               Like[]
+  orders              Order[]
+  passwordResetTokens PasswordResetToken[]
+  refreshTokens       RefreshToken[]
+  reviews             Review[]
+  wishlistItems       WishlistItem[]
 }
 
 model RefreshToken {
-  id        String   @id @default(uuid())
-  tokenHash String   @unique
+  id        String    @id @default(uuid())
+  tokenHash String    @unique
   expiresAt DateTime
   revokedAt DateTime?
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model PasswordResetToken {
@@ -113,11 +90,11 @@ model Order {
   shippingPrice   Decimal     @db.Decimal(10, 2)
   totalPrice      Decimal     @db.Decimal(10, 2)
   shippingAddress Json
-  deliveryDate    DateTime?
   orderItems      Json
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
   userId          String
+  deliveryDate    DateTime?
   user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
@@ -169,4 +146,27 @@ model Product {
   customizedAvailable Boolean      @default(true)
   createdAt           DateTime     @default(now())
   updatedAt           DateTime     @updatedAt
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum ProductBadge {
+  NORMAL
+  NEW_ARRIVAL
+  OFFER
+}
+
+enum Availability {
+  AVAILABLE
+  UNAVAILABLE
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  DELIVERED
+  CANCELLED
 }

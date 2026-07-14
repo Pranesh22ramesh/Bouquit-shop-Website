@@ -67,16 +67,12 @@ const Navbar = () => {
   return (
     <>
       <SearchModal isOpen={showSearch} onClose={() => setShowSearch(false)} />
-      <header className={`sticky top-0 z-50 border-b transition-all duration-300 ${shell} ${isScrolled ? "h-[76px]" : "h-[104px]"}`}>
+      <header className={`sticky top-0 z-50 border-b transition-all duration-300 ${shell} ${isScrolled ? "h-[72px]" : "h-[96px]"}`}>
         <div className="mx-auto flex h-full max-w-[1440px] items-center justify-between px-5 sm:px-8 xl:px-14">
           <button type="button" onClick={() => setShowMobileMenu(true)} className="grid h-10 w-10 place-items-center text-xl lg:hidden" aria-label="Open navigation"><FiMenu /></button>
 
-          <Link to="/" className="group flex items-center gap-3" aria-label="Midhunyas home">
-            <img src="/logo.png" alt="Midhunyas Petals Logo" className={`w-auto object-contain transition-all duration-300 group-hover:rotate-12 rounded-full border border-[#D4AF37]/45 bg-white dark:bg-zinc-800 p-0.5 ${isScrolled ? "h-10" : "h-14"}`} />
-            <span>
-              <span className="block font-serif text-[25px] font-semibold leading-5 tracking-[0.08em] text-[#2D2D2D] dark:text-white">MIDHUNYAS</span>
-              <span className="mt-1 block text-[8px] font-medium uppercase tracking-[0.33em] text-[#9B8273] dark:text-zinc-400">Flowers & gifting</span>
-            </span>
+          <Link to="/" className="group flex items-center" aria-label="Midhunyas home">
+            <img src="/logo.png" alt="Midhunyas Petals Logo" className={`w-auto object-contain transition-all duration-300 group-hover:scale-105 dark:brightness-125 dark:drop-shadow-[0_0_2px_rgba(255,255,255,0.5)] ${isScrolled ? "h-[48px]" : "h-[64px]"}`} />
           </Link>
 
           <nav className="hidden items-center gap-8 lg:flex xl:gap-10">

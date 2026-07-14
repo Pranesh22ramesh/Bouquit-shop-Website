@@ -67,12 +67,12 @@ const Navbar = () => {
   return (
     <>
       <SearchModal isOpen={showSearch} onClose={() => setShowSearch(false)} />
-      <header className={`sticky top-0 z-50 h-20 border-b transition-all duration-300 ${shell}`}>
+      <header className={`sticky top-0 z-50 border-b transition-all duration-300 ${shell} ${isScrolled ? "h-[76px]" : "h-[104px]"}`}>
         <div className="mx-auto flex h-full max-w-[1440px] items-center justify-between px-5 sm:px-8 xl:px-14">
           <button type="button" onClick={() => setShowMobileMenu(true)} className="grid h-10 w-10 place-items-center text-xl lg:hidden" aria-label="Open navigation"><FiMenu /></button>
 
           <Link to="/" className="group flex items-center" aria-label="Midhunyas home">
-            <img src="/logo.png" alt="Midhunyas Petals Logo" className="h-16 w-auto object-contain transition duration-300 group-hover:scale-105 dark:brightness-125 dark:drop-shadow-[0_0_2px_rgba(255,255,255,0.5)]" />
+            <img src="/logo.png" alt="Midhunyas Petals Logo" className={`w-auto object-contain transition-all duration-300 group-hover:scale-105 dark:brightness-125 dark:drop-shadow-[0_0_2px_rgba(255,255,255,0.5)] ${isScrolled ? "h-[60px]" : "h-[88px]"}`} />
           </Link>
 
           <nav className="hidden items-center gap-8 lg:flex xl:gap-10">

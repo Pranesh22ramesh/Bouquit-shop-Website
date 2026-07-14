@@ -107,8 +107,20 @@ const updateUserStatus = asyncHandler(async (req, res) => {
   });
 });
 
+const adminUpdateUser = asyncHandler(async (req, res) => {
+  const updatedUser = await userService.adminUpdateUserDetails(req.user.id, req.params.id, {
+    fullName: req.body.fullName || req.body.name,
+    email: req.body.email,
+    phoneNumber: req.body.phoneNumber || req.body.mobile,
+    password: req.body.password,
+    role: req.body.role,
+  });
+  res.json({ message: 'User details updated successfully', user: updatedUser });
+});
+
 module.exports = {
   addToCart,
+  adminUpdateUser,
   cartValidators,
   deleteUser,
   getActivities,

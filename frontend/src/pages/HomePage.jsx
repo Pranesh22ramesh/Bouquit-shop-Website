@@ -15,6 +15,8 @@ import axios from "../api/axios";
 import { galleryService } from "../api/galleryService";
 import { SITE_EVENTS, subscribeToSiteEvent } from "../lib/siteEvents";
 import { subscribeToTable } from "../lib/supabaseRealtime";
+import SeoHead from "../seo/SeoHead.jsx";
+import { usePageSeo } from "../seo/useSeo.js";
 
 const defaultHomeCategoryTiles = [
   { id: "bouquets", name: "Bouquets", note: "For every little love story", image: "/gallery/bouquet/bouquet12.jpg" },
@@ -124,6 +126,7 @@ const ProductCard = ({ product }) => {
 };
 
 const HomePage = () => {
+  const pageSeo = usePageSeo('home');
   const [content, setContent] = useState(defaultContent);
   const [featuredProducts, setFeaturedProducts] = useState([]);
 
@@ -179,6 +182,7 @@ const HomePage = () => {
 
   return (
     <div className="overflow-hidden bg-[#FFF9F6] text-[#2D2D2D] transition-colors dark:bg-[#121212] dark:text-[#F5F5F5]">
+      <SeoHead seoOverride={pageSeo} breadcrumbs={[{ name: 'Home', url: '/' }]} />
       <section className="relative min-h-[calc(100vh-80px)] overflow-hidden bg-[linear-gradient(135deg,#FFF9F6,#FCEFF3,#F5F7F2)] dark:bg-[linear-gradient(135deg,#121212,#1d1519,#151a16)]">
         <span className="hero-petal left-[8%] top-[16%] rotate-12" />
         <span className="hero-petal left-[46%] top-[10%] -rotate-12 [animation-delay:1.8s]" />

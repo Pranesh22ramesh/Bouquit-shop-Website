@@ -19,6 +19,7 @@ router.get('/:id/activities', protect, adminOnly, userController.idParamValidato
 router.patch('/:id/status', protect, adminOnly, userController.idParamValidator, validateRequest, userController.updateUserStatus);
 router.put('/:id/password', protect, adminOnly, userController.idParamValidator.concat(userController.passwordValidators), validateRequest, userController.updatePassword);
 router.get('/:id', protect, adminOnly, userController.idParamValidator, validateRequest, userController.getUserById);
+router.put('/:id', protect, adminOnly, userController.idParamValidator, validateRequest, userController.adminUpdateUser);
 router.delete('/:id', protect, adminOnly, userController.idParamValidator, validateRequest, userController.deleteUser);
 
 module.exports = router;

@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import SeoHead from '../seo/SeoHead.jsx';
+import { usePageSeo } from '../seo/useSeo.js';
 import axios from "../api/axios";
 import FloatingWhatsApp from "../components/FloatingWhatsApp";
 import { SITE_EVENTS, subscribeToSiteEvent } from "../lib/siteEvents";

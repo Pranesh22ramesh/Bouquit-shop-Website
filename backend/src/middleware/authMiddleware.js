@@ -34,7 +34,7 @@ const protect = async (req, res, next) => {
 };
 
 const adminOnly = (req, res, next) => {
-  if (req.user?.role === 'ADMIN') return next();
+  if (req.user?.role === 'ADMIN' || req.user?.role === 'SUBADMIN') return next();
   return next(new ApiError(403, 'Admin access required'));
 };
 

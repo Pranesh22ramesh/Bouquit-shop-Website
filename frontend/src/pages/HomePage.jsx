@@ -40,7 +40,7 @@ const defaultHomeFallbackProductImages = [
 ];
 
 const defaultContent = {
-  heroText: "Crafting Eternal Memories",
+  heroText: "Crafting Your Eternal Memories",
   heroDescription:
     "Handcrafted bouquets, elegant garlands, and floral experiences tailored to your celebration. and We can deliver allover Tamilnadu",
   badgeText: "Karur's bespoke floral studio",
@@ -127,7 +127,15 @@ const ProductCard = ({ product }) => {
 
 const renderHeroText = (text) => {
   if (!text) return "";
-  if (text.toLowerCase().includes("crafting eternal memories")) {
+  const lower = text.toLowerCase();
+  if (lower.includes("crafting your eternal memories")) {
+    return (
+      <>
+        Crafting Your<br />Eternal Memories
+      </>
+    );
+  }
+  if (lower.includes("crafting eternal memories")) {
     return (
       <>
         Crafting Eternal<br />Memories

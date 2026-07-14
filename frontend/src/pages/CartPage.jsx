@@ -73,39 +73,73 @@ const CartPage = () => {
     }
 
     const phoneNumber = "919942071721";
-    let message = `Hello! I would like to place an order for the following items:\n\n`;
+    let message = `🌸 *MIDHUNYAS Petals — New Order* 🌸\n\n`;
+    message += `Hello! I would like to place an order for the following items:\n\n`;
+
+    let calculatedSubtotal = 0;
 
     items.forEach((item, index) => {
       const product = item.productId && typeof item.productId === 'object' ? item.productId : item;
       const name = product.name || product.title || "Product";
-      const price = product.price || product.unitPrice || 0;
-      message += `${index + 1}. *${name}* - ₹${price} x ${item.quantity}\n`;
+
+      // Correct base price (offer price takes priority)
+      const basePrice =
+        product?.offerPrice && product?.badge === "Offer"
+          ? Number(product.offerPrice)
+          : Number(product?.price || item.unitPrice || item.price || 0);
+
+      // Extras
+      const stonesExtra = item.customization?.stones ? 200 : 0;
+      const beadsExtra = item.customization?.beads ? 120 : 0;
+      const extrasPrice = stonesExtra + beadsExtra;
+      const unitTotal = basePrice + extrasPrice;
+      const lineTotal = unitTotal * (item.quantity || 1);
+      calculatedSubtotal += lineTotal;
+
+      // Product image URL
+      const rawImage = product.image || product.src || product.thumbnail || "";
+      const imageUrl = rawImage
+        ? rawImage.startsWith("http")
+          ? rawImage
+          : `${window.location.origin}${rawImage}`
+        : "";
+
+      message += `*${index + 1}. ${name}*\n`;
+      if (imageUrl) message += `   📷 Product Photo: ${imageUrl}\n`;
+      message += `   💰 Base Price: ₹${basePrice.toLocaleString("en-IN")}\n`;
+      if (stonesExtra) message += `   + Stones: ₹200\n`;
+      if (beadsExtra) message += `   + Beads: ₹120\n`;
+      message += `   🔢 Qty: ${item.quantity} × ₹${unitTotal.toLocaleString("en-IN")} = *₹${lineTotal.toLocaleString("en-IN")}*\n`;
+
       if (item.customization) {
         if (item.customization.mainColor) {
           const c1 = hexToColorName(item.customization.mainColor);
           const c2 = item.customization.secondaryColor ? hexToColorName(item.customization.secondaryColor) : "None";
-          message += `   Color: ${c1}/${c2}\n`;
+          message += `   🎨 Colours: ${c1} / ${c2}\n`;
         }
-        if (item.customization.stones) message += `   + Stones\n`;
-        if (item.customization.beads) message += `   + Beads\n`;
-        if (item.customization.notes) message += `   Note: ${item.customization.notes}\n`;
-        if (item.customization.referencePreview) message += `   (⚠️ Has Reference Photo - Will send separately)\n`;
-      }
-      const imageUrl = product.image || product.src || product.thumbnail;
-      if (imageUrl) {
-        const absoluteImageUrl = imageUrl.startsWith("http") ? imageUrl : window.location.origin + imageUrl;
-        message += `   Product Image: ${absoluteImageUrl}\n`;
+        if (item.customization.notes) message += `   📝 Note: ${item.customization.notes}\n`;
+        if (item.customization.referencePreview) message += `   ⚠️ Has Reference Photo — will send separately\n`;
       }
       message += `\n`;
     });
 
-    message += `--------------------------\n`;
-    message += `*Total Amount:* ₹${grandTotal}\n`;
+    // Correct totals
+    const calcTax = Math.round(calculatedSubtotal * 0.05);
+    const calcDelivery = calculatedSubtotal > 0 ? 50 : 0;
+    const calcGrandTotal = calculatedSubtotal + calcTax + calcDelivery;
+
+    message += `━━━━━━━━━━━━━━━━━━━━━━\n`;
+    message += `🧾 *ORDER SUMMARY*\n`;
+    message += `   Subtotal:  ₹${calculatedSubtotal.toLocaleString("en-IN")}\n`;
+    message += `   Tax (5%):  ₹${calcTax.toLocaleString("en-IN")}\n`;
+    message += `   Delivery:  ₹${calcDelivery.toLocaleString("en-IN")}\n`;
+    message += `   *Grand Total: ₹${calcGrandTotal.toLocaleString("en-IN")}*\n`;
+    message += `━━━━━━━━━━━━━━━━━━━━━━\n`;
 
     if (user) {
-      message += `\n*Customer Details:* \nName: ${user.name}\nEmail: ${user.email}\n`;
+      message += `\n👤 *Customer Details:*\nName: ${user.name}\nEmail: ${user.email}\n`;
     }
-    message += `Phone: ${phone}\nDelivery Address: ${address}\n`;
+    message += `📞 Phone: ${phone}\n📍 Delivery Address: ${address}\n`;
 
     const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     setWhatsappPopupUrl(url);
@@ -139,7 +173,19 @@ const CartPage = () => {
               const product = item.productId && typeof item.productId === 'object' ? item.productId : item;
               const name = product.name || product.title || "Product";
               const image = product.image || product.src || "";
-              const price = product.price || product.unitPrice || 0;
+
+              // Correct base price (offer takes priority)
+              const basePrice =
+                product?.offerPrice && product?.badge === "Offer"
+                  ? Number(product.offerPrice)
+                  : Number(product?.price || item.unitPrice || item.price || 0);
+
+              // Include extras in display price
+              const extrasPrice =
+                (item.customization?.stones ? 200 : 0) +
+                (item.customization?.beads ? 120 : 0);
+              const unitPrice = basePrice + extrasPrice;
+              const lineTotal = unitPrice * (item.quantity || 1);
 
               // ID for actions
               // If backend item, it has `_id`. BUT `updateQty` expects the cart item ID?
@@ -168,8 +214,13 @@ const CartPage = () => {
 
                   <div className="flex flex-row sm:flex-col justify-between items-end sm:gap-4">
                     <div className="text-right">
-                      <p className="text-sm opacity-60">Price</p>
-                      <PriceINR amount={price} />
+                      <p className="text-sm opacity-60">Unit Price</p>
+                      <PriceINR amount={unitPrice} />
+                      {item.quantity > 1 && (
+                        <p className="text-xs font-bold text-rose-600 mt-0.5">
+                          Total: <PriceINR amount={lineTotal} />
+                        </p>
+                      )}
                     </div>
 
                     <div className="flex items-center gap-3">

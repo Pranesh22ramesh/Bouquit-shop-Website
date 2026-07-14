@@ -13,7 +13,7 @@ async function main() {
       console.log("Found existing home-highlight content. Updating...");
       const updatedData = {
         ...existing.data,
-        heroText: "Crafting Eternal Memories",
+        heroText: "Crafting Your Eternal Memories",
         heroDescription: "Handcrafted bouquets, elegant garlands, and floral experiences tailored to your celebration. and We can deliver allover Tamilnadu"
       };
 

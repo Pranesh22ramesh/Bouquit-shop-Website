@@ -71,12 +71,8 @@ const Navbar = () => {
         <div className="mx-auto flex h-full max-w-[1440px] items-center justify-between px-5 sm:px-8 xl:px-14">
           <button type="button" onClick={() => setShowMobileMenu(true)} className="grid h-10 w-10 place-items-center text-xl lg:hidden" aria-label="Open navigation"><FiMenu /></button>
 
-          <Link to="/" className="group flex items-center gap-3" aria-label="Midhunyas home">
-            <span className="relative grid h-10 w-10 place-items-center rounded-full border border-[#D4AF37]/45 text-lg text-[#E85D8E] transition group-hover:rotate-12">✦</span>
-            <span>
-              <span className="block font-serif text-[25px] font-semibold leading-5 tracking-[0.08em]">MIDHUNYAS</span>
-              <span className="mt-1 block text-[8px] font-medium uppercase tracking-[0.33em] text-[#9B8273] dark:text-zinc-400">Flowers & gifting</span>
-            </span>
+          <Link to="/" className="group flex items-center" aria-label="Midhunyas home">
+            <img src="/logo.png" alt="Midhunyas Petals Logo" className="h-16 w-auto object-contain transition duration-300 group-hover:scale-105 dark:brightness-125 dark:drop-shadow-[0_0_2px_rgba(255,255,255,0.5)]" />
           </Link>
 
           <nav className="hidden items-center gap-8 lg:flex xl:gap-10">

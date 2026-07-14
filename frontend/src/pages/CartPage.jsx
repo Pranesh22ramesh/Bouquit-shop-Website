@@ -123,17 +123,8 @@ const CartPage = () => {
       message += `\n`;
     });
 
-    // Correct totals
-    const calcTax = Math.round(calculatedSubtotal * 0.05);
-    const calcDelivery = calculatedSubtotal > 0 ? 50 : 0;
-    const calcGrandTotal = calculatedSubtotal + calcTax + calcDelivery;
-
     message += `━━━━━━━━━━━━━━━━━━━━━━\n`;
-    message += `🧾 *ORDER SUMMARY*\n`;
-    message += `   Subtotal:  ₹${calculatedSubtotal.toLocaleString("en-IN")}\n`;
-    message += `   Tax (5%):  ₹${calcTax.toLocaleString("en-IN")}\n`;
-    message += `   Delivery:  ₹${calcDelivery.toLocaleString("en-IN")}\n`;
-    message += `   *Grand Total: ₹${calcGrandTotal.toLocaleString("en-IN")}*\n`;
+    message += `🧾 *ORDER TOTAL: ₹${calculatedSubtotal.toLocaleString("en-IN")}*\n`;
     message += `━━━━━━━━━━━━━━━━━━━━━━\n`;
 
     if (user) {
@@ -245,21 +236,13 @@ const CartPage = () => {
               <h2 className="text-xl font-bold mb-4">Order Summary</h2>
               <div className="space-y-3 text-sm border-b pb-4 opacity-80 border-gray-200/20">
                 <div className="flex justify-between">
-                  <span>Subtotal</span>
+                  <span>Items Total</span>
                   <PriceINR amount={subtotal} />
-                </div>
-                <div className="flex justify-between">
-                  <span>Tax (5%)</span>
-                  <PriceINR amount={tax} />
-                </div>
-                <div className="flex justify-between">
-                  <span>Delivery</span>
-                  <PriceINR amount={delivery} />
                 </div>
               </div>
               <div className="flex justify-between text-lg font-bold mt-4">
-                <span>Grand Total</span>
-                <PriceINR amount={grandTotal} />
+                <span>Total Amount</span>
+                <PriceINR amount={subtotal} />
               </div>
 
               <div className="mt-6 flex flex-col gap-3">

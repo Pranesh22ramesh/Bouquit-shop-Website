@@ -149,9 +149,9 @@ export const CartProvider = ({ children }) => {
     [items]
   );
 
-  const tax = Math.round(subtotal * 0.05);
-  const delivery = subtotal > 0 ? 50 : 0;
-  const grandTotal = subtotal + tax + delivery;
+  const tax = 0;
+  const delivery = 0;
+  const grandTotal = subtotal;
 
   return (
     <CartContext.Provider

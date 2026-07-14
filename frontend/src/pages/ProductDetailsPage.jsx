@@ -7,6 +7,7 @@ import { useAuth } from "../context/AuthContext";
 import { userService } from "../api/userService";
 import ProductReviewPanel from "../components/ProductReviewPanel";
 import { hexToColorName } from "../utils/colorUtils";
+import SeoHead from "../seo/SeoHead.jsx";
 
 const PriceINR = ({ amount }) => <span className="font-semibold">₹{Number(amount || 0).toLocaleString("en-IN")}</span>;
 
@@ -152,6 +153,22 @@ const ProductDetailsPage = () => {
 
   return (
     <div className={`min-h-screen pt-24 pb-12 transition-colors ${isDarkMode ? "bg-gray-900 text-gray-100" : "bg-[#fff9f7] text-gray-900"}`}>
+      <SeoHead
+        seoOverride={{
+          metaTitle: `${product.name} - MIDHUNYAS Petals | Flower Shop Karur`,
+          metaDescription: product.description || `Buy ${product.name} from MIDHUNYAS Petals, Karur's best flower shop. Handcrafted with care, available for custom orders.`,
+          keywords: `${product.name}, ${product.category}, flower shop karur, bouquet karur, MIDHUNYAS petals`,
+          ogImage: product.image || '',
+          ogTitle: `${product.name} - MIDHUNYAS Petals`,
+          schemaType: 'Product',
+        }}
+        product={product}
+        breadcrumbs={[
+          { name: 'Home', url: '/' },
+          { name: 'Gallery', url: '/gallery' },
+          { name: product.name },
+        ]}
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Breadcrumbs */}
@@ -298,11 +315,19 @@ const ProductDetailsPage = () => {
       {whatsappPopupUrl && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm" onClick={() => setWhatsappPopupUrl(null)}>
           <div onClick={(e) => e.stopPropagation()} className={`w-full max-w-md rounded-3xl p-8 text-center shadow-2xl transform scale-100 animate-scaleIn ${isDarkMode ? "bg-gray-800 text-gray-100" : "bg-white text-gray-800"}`}>
-            <div className="mx-auto mb-6 grid h-20 w-20 place-items-center rounded-full bg-green-100 text-4xl text-green-600">✓</div>
+            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
+              <svg className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
             <h3 className="text-2xl font-black">Almost there!</h3>
-            <p className="mt-3 text-sm text-gray-500 leading-relaxed">Continue to WhatsApp to share your requirements and place the order. We will respond promptly!</p>
+            <p className={`mt-3 text-sm leading-relaxed ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>
+              After placing the order in WhatsApp, please verify and confirm your order by making a call to this number:
+              <br/>
+              <span className="font-bold text-xl text-rose-600 mt-2 block">+91 9942071721</span>
+            </p>
             <div className="mt-8 flex justify-center gap-4">
-              <button onClick={() => setWhatsappPopupUrl(null)} className="flex-1 rounded-xl bg-gray-100 px-5 py-3 font-semibold text-gray-700 hover:bg-gray-200 transition">Cancel</button>
+              <button onClick={() => setWhatsappPopupUrl(null)} className={`flex-1 rounded-xl px-5 py-3 font-semibold transition ${isDarkMode ? "bg-gray-700 hover:bg-gray-600 text-white" : "bg-gray-100 hover:bg-gray-200 text-gray-700"}`}>Cancel</button>
               <button onClick={() => { window.open(whatsappPopupUrl, "_blank"); setWhatsappPopupUrl(null); }} className="flex-1 rounded-xl bg-green-600 px-5 py-3 font-semibold text-white shadow-lg shadow-green-600/30 hover:bg-green-700 transition">Open WhatsApp</button>
             </div>
           </div>

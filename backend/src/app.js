@@ -17,6 +17,7 @@ const contentRoutes = require('./routes/contentRoutes');
 const productRoutes = require('./routes/productRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const eventRoutes = require('./routes/eventRoutes');
+const seoRoutes = require('./routes/seoRoutes');
 
 const app = express();
 
@@ -60,6 +61,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/gallery', productRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/events', eventRoutes);
+app.use('/api/seo', seoRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

@@ -7,7 +7,7 @@ import { reviewService } from "../api/reviewService";
 import { adminService } from "../api/adminService";
 import { userService } from "../api/userService";
 import { toast } from "react-hot-toast";
-import { FaEdit, FaTrash, FaPlus, FaImage, FaKey, FaSave, FaChartBar, FaThumbtack, FaEyeSlash } from "react-icons/fa";
+import { FaEdit, FaTrash, FaPlus, FaImage, FaKey, FaSave, FaChartBar, FaThumbtack, FaEyeSlash, FaSearch, FaEye, FaGlobe, FaCheckCircle, FaExclamationTriangle, FaTimesCircle, FaInfoCircle } from "react-icons/fa";
 import ProductFormModal from "../components/ProductFormModal";
 import AdminProductCard from "../components/AdminProductCard";
 import DeleteProductDialog from "../components/DeleteProductDialog";
@@ -98,9 +98,9 @@ const AdminDashboardPage = () => {
   const [isDeletingProduct, setIsDeletingProduct] = useState(false);
 
   const [users, setUsers] = useState([]);
-  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [showEditUserModal, setShowEditUserModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [newPassword, setNewPassword] = useState("");
+  const [editUserForm, setEditUserForm] = useState({ name: "", email: "", phone: "", password: "", role: "user" });
   const [userFilters, setUserFilters] = useState({ search: "", role: "", status: "" });
   const [viewingUser, setViewingUser] = useState(null);
   const [loadingUserDetail, setLoadingUserDetail] = useState(false);
@@ -120,6 +120,19 @@ const AdminDashboardPage = () => {
   const [homeFallbackProductImageFiles, setHomeFallbackProductImageFiles] = useState({});
   const [aboutHeroFile, setAboutHeroFile] = useState(null);
   const [aboutGalleryFiles, setAboutGalleryFiles] = useState([]);
+
+  // SEO State
+  const [seoConfig, setSeoConfig] = useState(null);
+  const [seoPages, setSeoPages] = useState([]);
+  const [seoHealth, setSeoHealth] = useState(null);
+  const [seoSubTab, setSeoSubTab] = useState("global");
+  const [seoConfigForm, setSeoConfigForm] = useState({});
+  const [seoPageEditKey, setSeoPageEditKey] = useState(null);
+  const [seoPageForm, setSeoPageForm] = useState({});
+  const [seoSitemap, setSeoSitemap] = useState("");
+  const [seoRobots, setSeoRobots] = useState("");
+  const [seoLoading, setSeoLoading] = useState(false);
+  const [seoSaving, setSeoSaving] = useState(false);
 
   const isDarkMode = document.documentElement.classList.contains("dark");
 
@@ -200,6 +213,88 @@ const AdminDashboardPage = () => {
     fetchUsers();
   }, [isAdmin, userFilters.search, userFilters.role, userFilters.status]);
 
+  // SEO functions
+  const fetchSeoData = async () => {
+    setSeoLoading(true);
+    try {
+      const [configRes, pagesRes] = await Promise.all([
+        axios.get("/seo/config"),
+        axios.get("/seo/pages"),
+      ]);
+      setSeoConfig(configRes.data.config);
+      setSeoConfigForm(configRes.data.config);
+      setSeoPages(pagesRes.data.pages || []);
+    } catch (e) {
+      toast.error("Failed to load SEO data");
+    } finally {
+      setSeoLoading(false);
+    }
+  };
+
+  const fetchSeoHealth = async () => {
+    try {
+      const res = await axios.get("/seo/health");
+      setSeoHealth(res.data.health);
+    } catch (e) {}
+  };
+
+  const fetchSeoSitemap = async () => {
+    try {
+      const res = await axios.get("/seo/sitemap.xml");
+      setSeoSitemap(typeof res.data === "string" ? res.data : JSON.stringify(res.data, null, 2));
+    } catch (e) {}
+  };
+
+  const fetchSeoRobots = async () => {
+    try {
+      const res = await axios.get("/seo/robots.txt");
+      setSeoRobots(typeof res.data === "string" ? res.data : "");
+    } catch (e) {}
+  };
+
+  const saveSeoConfig = async (e) => {
+    e.preventDefault();
+    setSeoSaving(true);
+    try {
+      const res = await axios.put("/seo/config", seoConfigForm);
+      setSeoConfig(res.data.config);
+      toast.success("SEO settings saved!");
+    } catch (e) {
+      toast.error("Failed to save SEO settings");
+    } finally {
+      setSeoSaving(false);
+    }
+  };
+
+  const saveSeoPage = async (e) => {
+    e.preventDefault();
+    if (!seoPageEditKey) return;
+    setSeoSaving(true);
+    try {
+      const res = await axios.put(`/seo/pages/${seoPageEditKey}`, seoPageForm);
+      setSeoPages((prev) => prev.map((p) => p.pageKey === seoPageEditKey ? res.data.page : p));
+      setSeoPageEditKey(null);
+      setSeoPageForm({});
+      toast.success("Page SEO saved!");
+    } catch (e) {
+      toast.error("Failed to save page SEO");
+    } finally {
+      setSeoSaving(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!isAdmin || activeTab !== "seo") return;
+    fetchSeoData();
+    fetchSeoHealth();
+  }, [isAdmin, activeTab]);
+
+  useEffect(() => {
+    if (!isAdmin || activeTab !== "seo") return;
+    if (seoSubTab === "sitemap") fetchSeoSitemap();
+    if (seoSubTab === "sitemap") fetchSeoRobots();
+  }, [seoSubTab, activeTab]);
+
   if (!isAdmin) {
     return <div className="p-10 text-center text-red-500 font-bold text-xl">Access Denied. Admins only.</div>;
   }
@@ -253,17 +348,26 @@ const AdminDashboardPage = () => {
     }
   };
 
-  const handleChangePassword = async (event) => {
+  const handleEditUserSubmit = async (event) => {
     event.preventDefault();
-    if (newPassword.length < 8) return toast.error("Password must be at least 8 characters");
+    if (editUserForm.password && editUserForm.password.length < 8) {
+      return toast.error("Password must be at least 8 characters if provided");
+    }
     try {
-      await userService.updateUserPassword(selectedUser._id, newPassword);
-      toast.success("Password updated successfully");
-      setShowPasswordModal(false);
-      setNewPassword("");
+      await userService.adminUpdateUser(selectedUser._id, {
+        fullName: editUserForm.name,
+        email: editUserForm.email,
+        phoneNumber: editUserForm.phone,
+        password: editUserForm.password || undefined,
+        role: editUserForm.role,
+      });
+      toast.success("User details updated successfully");
+      setShowEditUserModal(false);
+      setEditUserForm({ name: "", email: "", phone: "", password: "", role: "user" });
       setSelectedUser(null);
+      await Promise.all([fetchUsers(), fetchAnalytics()]);
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to update password");
+      toast.error(error.response?.data?.message || "Failed to update user details");
     }
   };
 
@@ -470,7 +574,7 @@ const AdminDashboardPage = () => {
           <p className="text-xs text-gray-500 mt-1 uppercase tracking-wider font-semibold">Management Console</p>
         </div>
         <nav className="flex-1 p-4 space-y-2">
-          {["overview", "products", "content", "reviews", "users"].map((tab) => (
+          {["overview", "products", "content", "reviews", "users", "seo"].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -485,6 +589,7 @@ const AdminDashboardPage = () => {
               {tab === "content" && <FaEdit className="text-lg" />}
               {tab === "reviews" && <FaThumbtack className="text-lg" />}
               {tab === "users" && <FaKey className="text-lg" />}
+              {tab === "seo" && <FaGlobe className="text-lg" />}
               {tab}
             </button>
           ))}
@@ -511,7 +616,7 @@ const AdminDashboardPage = () => {
           
           {/* Mobile Tabs (Fallback) */}
           <div className="md:hidden flex overflow-x-auto gap-2 mb-6 pb-2">
-            {["overview", "products", "content", "reviews", "users"].map((tab) => (
+            {["overview", "products", "content", "reviews", "users", "seo"].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -1079,6 +1184,343 @@ const AdminDashboardPage = () => {
         </div>
       )}
 
+      {activeTab === "seo" && (
+        <div className="space-y-6">
+          {/* SEO Score Banner */}
+          {seoHealth && (
+            <div className={`rounded-2xl p-5 flex flex-col sm:flex-row items-center gap-4 ${seoHealth.score >= 80 ? "bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800" : seoHealth.score >= 60 ? "bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800" : "bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800"}`}>
+              <div className={`text-5xl font-black ${seoHealth.score >= 80 ? "text-emerald-600" : seoHealth.score >= 60 ? "text-amber-600" : "text-red-600"}`}>{seoHealth.score}</div>
+              <div className="flex-1">
+                <p className="font-bold text-gray-800 dark:text-white text-lg">SEO Health Score — Grade {seoHealth.grade}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{seoHealth.totalPages} pages · {seoHealth.productsWithImages}/{seoHealth.totalProducts} products with images</p>
+                {seoHealth.issues?.length > 0 && (
+                  <p className="text-xs text-gray-500 mt-1">{seoHealth.issues.length} issue(s) found — check Health tab to fix</p>
+                )}
+              </div>
+              <button onClick={fetchSeoHealth} className="px-4 py-2 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition">Refresh Score</button>
+            </div>
+          )}
+
+          {/* Sub-tab Navigation */}
+          <div className="flex flex-wrap gap-2">
+            {[
+              { key: "global", label: "⚙️ Global Settings" },
+              { key: "pages", label: "📄 Page SEO" },
+              { key: "sitemap", label: "🗺️ Sitemap & Robots" },
+              { key: "health", label: "🔍 Health Check" },
+            ].map(({ key, label }) => (
+              <button
+                key={key}
+                onClick={() => setSeoSubTab(key)}
+                className={`px-4 py-2 rounded-xl text-sm font-semibold transition ${seoSubTab === key ? "bg-rose-600 text-white shadow" : "bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50"}`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          {seoLoading && (
+            <div className="h-32 rounded-xl bg-gray-100 dark:bg-gray-700 animate-pulse" />
+          )}
+
+          {/* ── Global Settings ── */}
+          {!seoLoading && seoSubTab === "global" && (
+            <form onSubmit={saveSeoConfig} className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow p-6 space-y-6">
+              <h3 className="text-lg font-bold text-gray-800 dark:text-white">Business & SEO Configuration</h3>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {[
+                  ["businessName", "Business Name"],
+                  ["businessSlogan", "Tagline / Slogan"],
+                  ["address", "Address"],
+                  ["city", "City"],
+                  ["state", "State"],
+                  ["postalCode", "Postal Code"],
+                  ["phone", "Phone"],
+                  ["whatsapp", "WhatsApp"],
+                  ["email", "Email"],
+                  ["latitude", "Latitude (GPS)"],
+                  ["longitude", "Longitude (GPS)"],
+                  ["googleMapsUrl", "Google Maps URL"],
+                  ["siteUrl", "Website URL (Production)"],
+                  ["logoUrl", "Logo URL"],
+                  ["faviconUrl", "Favicon URL"],
+                  ["defaultOgImage", "Default OG Social Image URL"],
+                ].map(([field, label]) => (
+                  <label key={field} className="flex flex-col gap-1">
+                    <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">{label}</span>
+                    <input
+                      type="text"
+                      value={seoConfigForm[field] || ""}
+                      onChange={(e) => setSeoConfigForm((p) => ({ ...p, [field]: e.target.value }))}
+                      className="rounded-lg border border-gray-200 dark:border-gray-600 dark:bg-gray-700 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-rose-500"
+                    />
+                  </label>
+                ))}
+              </div>
+
+              <div className="border-t dark:border-gray-700 pt-4">
+                <h4 className="font-semibold text-gray-700 dark:text-gray-200 mb-3">🔍 Analytics & Verification</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {[
+                    ["ga4MeasurementId", "Google Analytics 4 ID (G-XXXXXX)"],
+                    ["gtmContainerId", "Google Tag Manager ID (GTM-XXXXX)"],
+                    ["gscVerificationCode", "Google Search Console Verification Code"],
+                    ["bingVerificationCode", "Bing Webmaster Verification Code"],
+                  ].map(([field, label]) => (
+                    <label key={field} className="flex flex-col gap-1">
+                      <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">{label}</span>
+                      <input
+                        type="text"
+                        value={seoConfigForm[field] || ""}
+                        onChange={(e) => setSeoConfigForm((p) => ({ ...p, [field]: e.target.value }))}
+                        className="rounded-lg border border-gray-200 dark:border-gray-600 dark:bg-gray-700 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-rose-500"
+                      />
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div className="border-t dark:border-gray-700 pt-4">
+                <h4 className="font-semibold text-gray-700 dark:text-gray-200 mb-3">📱 Social Media Links</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {[
+                    ["instagramUrl", "Instagram URL"],
+                    ["facebookUrl", "Facebook URL"],
+                    ["twitterHandle", "Twitter/X Handle (@username)"],
+                    ["facebookAppId", "Facebook App ID"],
+                  ].map(([field, label]) => (
+                    <label key={field} className="flex flex-col gap-1">
+                      <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">{label}</span>
+                      <input
+                        type="text"
+                        value={seoConfigForm[field] || ""}
+                        onChange={(e) => setSeoConfigForm((p) => ({ ...p, [field]: e.target.value }))}
+                        className="rounded-lg border border-gray-200 dark:border-gray-600 dark:bg-gray-700 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-rose-500"
+                      />
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div className="border-t dark:border-gray-700 pt-4">
+                <h4 className="font-semibold text-gray-700 dark:text-gray-200 mb-2">🤖 Custom Robots.txt Rules</h4>
+                <textarea
+                  rows={4}
+                  value={seoConfigForm.robotsCustomRules || ""}
+                  onChange={(e) => setSeoConfigForm((p) => ({ ...p, robotsCustomRules: e.target.value }))}
+                  placeholder="e.g. Disallow: /private/"
+                  className="w-full rounded-lg border border-gray-200 dark:border-gray-600 dark:bg-gray-700 px-3 py-2 text-sm font-mono outline-none focus:ring-2 focus:ring-rose-500"
+                />
+              </div>
+
+              <div className="flex justify-end">
+                <button type="submit" disabled={seoSaving} className="px-6 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-semibold rounded-xl transition shadow disabled:opacity-60">
+                  {seoSaving ? "Saving…" : "💾 Save SEO Settings"}
+                </button>
+              </div>
+            </form>
+          )}
+
+          {/* ── Page SEO Manager ── */}
+          {!seoLoading && seoSubTab === "pages" && (
+            <div className="space-y-4">
+              {!seoPageEditKey ? (
+                <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow overflow-hidden">
+                  <table className="w-full text-sm">
+                    <thead className="bg-gray-50 dark:bg-gray-700/50">
+                      <tr>
+                        <th className="px-4 py-3 text-left font-semibold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider">Page</th>
+                        <th className="px-4 py-3 text-left font-semibold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider">SEO Title</th>
+                        <th className="px-4 py-3 text-left font-semibold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider">Title Length</th>
+                        <th className="px-4 py-3 text-left font-semibold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider">Desc Length</th>
+                        <th className="px-4 py-3 text-left font-semibold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+                      {seoPages.map((page) => {
+                        const tLen = (page.metaTitle || "").length;
+                        const dLen = (page.metaDescription || "").length;
+                        const tOk = tLen >= 50 && tLen <= 65;
+                        const dOk = dLen >= 120 && dLen <= 165;
+                        return (
+                          <tr key={page.pageKey} className="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition">
+                            <td className="px-4 py-3 font-semibold text-gray-800 dark:text-white capitalize">{page.pageTitle || page.pageKey}</td>
+                            <td className="px-4 py-3 text-gray-600 dark:text-gray-300 max-w-xs truncate">{page.metaTitle}</td>
+                            <td className="px-4 py-3">
+                              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${tOk ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}`}>
+                                {tLen} chars
+                              </span>
+                            </td>
+                            <td className="px-4 py-3">
+                              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${dOk ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}`}>
+                                {dLen} chars
+                              </span>
+                            </td>
+                            <td className="px-4 py-3">
+                              <button
+                                onClick={() => { setSeoPageEditKey(page.pageKey); setSeoPageForm({ ...page }); }}
+                                className="px-3 py-1.5 bg-rose-50 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 rounded-lg text-xs font-semibold hover:bg-rose-100 transition"
+                              >
+                                Edit
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <form onSubmit={saveSeoPage} className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow p-6 space-y-5">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-bold text-gray-800 dark:text-white capitalize">Edit: {seoPageEditKey} Page SEO</h3>
+                    <button type="button" onClick={() => { setSeoPageEditKey(null); setSeoPageForm({}); }} className="text-gray-400 hover:text-gray-600 text-sm">← Back</button>
+                  </div>
+
+                  {[
+                    { field: "metaTitle", label: "Meta Title", hint: "50–60 chars ideal", max: 65 },
+                    { field: "metaDescription", label: "Meta Description", hint: "150–160 chars ideal", max: 165, textarea: true },
+                    { field: "keywords", label: "Keywords (comma separated)", hint: "" },
+                    { field: "ogTitle", label: "Open Graph Title", hint: "Shown on Facebook/WhatsApp" },
+                    { field: "ogDescription", label: "Open Graph Description", hint: "" },
+                    { field: "ogImage", label: "OG Image URL", hint: "1200×630px recommended" },
+                    { field: "canonicalUrl", label: "Canonical URL", hint: "Leave empty for auto" },
+                  ].map(({ field, label, hint, max, textarea }) => (
+                    <label key={field} className="flex flex-col gap-1">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">{label}</span>
+                        {hint && <span className="text-xs text-gray-400">{hint}</span>}
+                        {max && (
+                          <span className={`text-xs font-mono ${(seoPageForm[field] || "").length > max ? "text-red-500" : "text-gray-400"}`}>
+                            {(seoPageForm[field] || "").length}/{max}
+                          </span>
+                        )}
+                      </div>
+                      {textarea ? (
+                        <textarea
+                          rows={3}
+                          value={seoPageForm[field] || ""}
+                          onChange={(e) => setSeoPageForm((p) => ({ ...p, [field]: e.target.value }))}
+                          className="rounded-lg border border-gray-200 dark:border-gray-600 dark:bg-gray-700 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-rose-500 resize-none"
+                        />
+                      ) : (
+                        <input
+                          type="text"
+                          value={seoPageForm[field] || ""}
+                          onChange={(e) => setSeoPageForm((p) => ({ ...p, [field]: e.target.value }))}
+                          className="rounded-lg border border-gray-200 dark:border-gray-600 dark:bg-gray-700 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-rose-500"
+                        />
+                      )}
+                    </label>
+                  ))}
+
+                  <label className="flex flex-col gap-1">
+                    <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Robots Tag</span>
+                    <select
+                      value={seoPageForm.robots || "index, follow"}
+                      onChange={(e) => setSeoPageForm((p) => ({ ...p, robots: e.target.value }))}
+                      className="rounded-lg border border-gray-200 dark:border-gray-600 dark:bg-gray-700 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-rose-500"
+                    >
+                      <option value="index, follow">index, follow</option>
+                      <option value="noindex, follow">noindex, follow</option>
+                      <option value="index, nofollow">index, nofollow</option>
+                      <option value="noindex, nofollow">noindex, nofollow</option>
+                    </select>
+                  </label>
+
+                  <div className="flex justify-end gap-3 pt-2 border-t dark:border-gray-700">
+                    <button type="button" onClick={() => { setSeoPageEditKey(null); setSeoPageForm({}); }} className="px-4 py-2 border dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition text-sm">Cancel</button>
+                    <button type="submit" disabled={seoSaving} className="px-6 py-2 bg-rose-600 hover:bg-rose-700 text-white font-semibold rounded-lg transition shadow disabled:opacity-60 text-sm">
+                      {seoSaving ? "Saving…" : "Save Page SEO"}
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
+          )}
+
+          {/* ── Sitemap & Robots ── */}
+          {!seoLoading && seoSubTab === "sitemap" && (
+            <div className="space-y-4">
+              <div className="flex flex-wrap gap-3">
+                <a
+                  href="/api/seo/sitemap.xml"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-semibold transition shadow"
+                >
+                  🗺️ Open sitemap.xml
+                </a>
+                <a
+                  href="/api/seo/robots.txt"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-800 text-white rounded-xl text-sm font-semibold transition shadow"
+                >
+                  🤖 Open robots.txt
+                </a>
+              </div>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow p-4">
+                  <h4 className="font-semibold text-gray-700 dark:text-white mb-3 text-sm">sitemap.xml Preview</h4>
+                  <pre className="text-xs font-mono text-gray-600 dark:text-gray-300 overflow-auto max-h-80 bg-gray-50 dark:bg-gray-900 rounded-lg p-3 whitespace-pre-wrap">{seoSitemap || "Loading…"}</pre>
+                </div>
+                <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow p-4">
+                  <h4 className="font-semibold text-gray-700 dark:text-white mb-3 text-sm">robots.txt Preview</h4>
+                  <pre className="text-xs font-mono text-gray-600 dark:text-gray-300 overflow-auto max-h-80 bg-gray-50 dark:bg-gray-900 rounded-lg p-3 whitespace-pre-wrap">{seoRobots || "Loading…"}</pre>
+                </div>
+              </div>
+              <p className="text-xs text-gray-400">Sitemap auto-includes all AVAILABLE products. Edit your Custom Robots Rules in Global Settings.</p>
+            </div>
+          )}
+
+          {/* ── SEO Health Check ── */}
+          {!seoLoading && seoSubTab === "health" && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-bold text-gray-800 dark:text-white">SEO Issue Report</h3>
+                <button onClick={fetchSeoHealth} className="px-4 py-2 text-sm rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                  🔄 Re-run Check
+                </button>
+              </div>
+              {seoHealth ? (
+                <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow overflow-hidden">
+                  {seoHealth.issues?.length === 0 ? (
+                    <div className="p-8 text-center">
+                      <div className="text-4xl mb-2">🎉</div>
+                      <p className="font-bold text-emerald-600 text-lg">No SEO issues found!</p>
+                      <p className="text-gray-500 text-sm mt-1">Your site SEO looks great.</p>
+                    </div>
+                  ) : (
+                    <div className="divide-y divide-gray-100 dark:divide-gray-700">
+                      {seoHealth.issues.map((issue, i) => (
+                        <div key={i} className="flex items-start gap-4 px-5 py-4 hover:bg-gray-50 dark:hover:bg-gray-700/30 transition">
+                          <div className="mt-0.5 flex-shrink-0">
+                            {issue.severity === "error" && <FaTimesCircle className="text-red-500 text-lg" />}
+                            {issue.severity === "warning" && <FaExclamationTriangle className="text-amber-500 text-lg" />}
+                            {issue.severity === "info" && <FaInfoCircle className="text-blue-500 text-lg" />}
+                          </div>
+                          <div className="flex-1">
+                            <p className="font-semibold text-gray-800 dark:text-white text-sm">{issue.issue}</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Page: <span className="font-mono">{issue.page}</span></p>
+                          </div>
+                          <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${issue.severity === "error" ? "bg-red-100 text-red-700" : issue.severity === "warning" ? "bg-amber-100 text-amber-700" : "bg-blue-100 text-blue-700"}`}>
+                            {issue.severity}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="h-32 rounded-xl bg-gray-100 dark:bg-gray-700 animate-pulse" />
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
       {activeTab === "users" && (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden border border-gray-100 dark:border-gray-700">
           <div className="flex flex-col gap-3 border-b border-gray-100 p-4 dark:border-gray-700 md:flex-row md:items-center md:justify-between">
@@ -1147,10 +1589,10 @@ const AdminDashboardPage = () => {
                     <td className="p-4 text-gray-500 text-sm">{new Date(user.createdAt).toLocaleDateString()}</td>
                     <td className="p-4 flex justify-end gap-2">
                       <button onClick={() => openUserDetails(user)} className="rounded p-2 text-slate-600 transition hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700" title="View user details">
-                        <FaEdit />
+                        <FaEye />
                       </button>
-                      <button onClick={() => { setSelectedUser(user); setShowPasswordModal(true); }} className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded transition">
-                        <FaKey />
+                      <button onClick={() => { setSelectedUser(user); setEditUserForm({ name: user.name || user.fullName || "", email: user.email || "", phone: user.phoneNumber || user.phone || "", password: "", role: user.role?.toLowerCase() || "user" }); setShowEditUserModal(true); }} className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded transition" title="Edit User">
+                        <FaEdit />
                       </button>
                       <button
                         onClick={() => handleToggleUserStatus(user)}
@@ -1193,28 +1635,69 @@ const AdminDashboardPage = () => {
         onCancel={() => !isDeletingProduct && setProductToDelete(null)}
         onConfirm={handleDeleteProduct}
       />
+      {/* Edit User Modal */}
+      {showEditUserModal && selectedUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl dark:bg-gray-800">
+            <h2 className="text-xl font-bold mb-2 text-gray-800 dark:text-white">Edit User</h2>
+            <p className="text-sm text-gray-500 mb-6">Updating details for <strong>{selectedUser.email}</strong></p>
 
-      {showPasswordModal && selectedUser && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md shadow-2xl">
-            <h2 className="text-xl font-bold mb-2 text-gray-800 dark:text-white">Change Password</h2>
-            <p className="text-sm text-gray-500 mb-6">Updating password for <strong>{selectedUser.email}</strong></p>
-
-            <form onSubmit={handleChangePassword}>
-              <div className="mb-6">
-                <label className="block text-sm font-medium mb-1 dark:text-gray-300">New Password</label>
+            <form onSubmit={handleEditUserSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1 dark:text-gray-300">Name</label>
                 <input
-                  type="password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
+                  type="text"
+                  value={editUserForm.name}
+                  onChange={(e) => setEditUserForm({ ...editUserForm, name: e.target.value })}
                   className="w-full border dark:border-gray-600 dark:bg-gray-700 p-2.5 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none"
                   required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1 dark:text-gray-300">Email Address</label>
+                <input
+                  type="email"
+                  value={editUserForm.email}
+                  onChange={(e) => setEditUserForm({ ...editUserForm, email: e.target.value })}
+                  className="w-full border dark:border-gray-600 dark:bg-gray-700 p-2.5 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1 dark:text-gray-300">Mobile Number</label>
+                <input
+                  type="tel"
+                  value={editUserForm.phone}
+                  onChange={(e) => setEditUserForm({ ...editUserForm, phone: e.target.value })}
+                  className="w-full border dark:border-gray-600 dark:bg-gray-700 p-2.5 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none"
+                  placeholder="Optional"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1 dark:text-gray-300">Role</label>
+                <select
+                  value={editUserForm.role}
+                  onChange={(e) => setEditUserForm({ ...editUserForm, role: e.target.value })}
+                  className="w-full border dark:border-gray-600 dark:bg-gray-700 p-2.5 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none"
+                >
+                  <option value="user">User</option>
+                  <option value="subadmin">Subadmin</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1 dark:text-gray-300">New Password <span className="text-xs text-gray-500">(Leave blank to keep current)</span></label>
+                <input
+                  type="password"
+                  value={editUserForm.password}
+                  onChange={(e) => setEditUserForm({ ...editUserForm, password: e.target.value })}
+                  className="w-full border dark:border-gray-600 dark:bg-gray-700 p-2.5 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none"
                   minLength="8"
                 />
               </div>
-              <div className="flex justify-end gap-3">
-                <button type="button" onClick={() => { setShowPasswordModal(false); setNewPassword(""); }} className="px-4 py-2 border dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition">Cancel</button>
-                <button type="submit" className="px-4 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition shadow">Update Password</button>
+              <div className="flex justify-end gap-3 pt-4">
+                <button type="button" onClick={() => { setShowEditUserModal(false); setEditUserForm({ name: "", email: "", phone: "", password: "", role: "user" }); }} className="px-4 py-2 border dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition">Cancel</button>
+                <button type="submit" className="px-4 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition shadow">Save Changes</button>
               </div>
             </form>
           </div>

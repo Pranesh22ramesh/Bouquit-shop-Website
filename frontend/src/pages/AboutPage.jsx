@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import SeoHead from '../seo/SeoHead.jsx';
+import { usePageSeo } from '../seo/useSeo.js';
 import axios from "../api/axios";
 import { SITE_EVENTS, subscribeToSiteEvent } from "../lib/siteEvents";
 import { subscribeToTable } from "../lib/supabaseRealtime";

@@ -71,6 +71,11 @@ export const userService = {
     return data;
   },
 
+  async adminUpdateUser(id, payload) {
+    const { data } = await api.put(`/users/${id}`, payload);
+    return data;
+  },
+
   async deleteUser(id) {
     const { data } = await api.delete(`/users/${id}`);
     return data;

@@ -6,6 +6,8 @@ import { userService } from "../api/userService";
 import { useAuth } from "../context/AuthContext";
 import { SITE_EVENTS, subscribeToSiteEvent } from "../lib/siteEvents";
 import { subscribeToTable } from "../lib/supabaseRealtime";
+import SeoHead from "../seo/SeoHead.jsx";
+import { usePageSeo } from "../seo/useSeo.js";
 
 const PriceINR = ({ amount }) => <span className="font-semibold">₹{Number(amount || 0).toLocaleString("en-IN")}</span>;
 
@@ -22,6 +24,7 @@ const BookmarkIcon = ({ filled }) => (
 );
 
 const GalleryPage = () => {
+  const pageSeo = usePageSeo('gallery');
   const navigate = useNavigate();
   const { user, isAuthenticated, updateUser } = useAuth();
   const [products, setProducts] = useState([]);
@@ -141,6 +144,7 @@ const GalleryPage = () => {
 
   return (
     <div className={`min-h-screen transition-colors ${isDarkMode ? "bg-gray-900" : "bg-[#fff9f7]"}`}>
+      <SeoHead seoOverride={pageSeo} breadcrumbs={[{ name: 'Home', url: '/' }, { name: 'Gallery', url: '/gallery' }]} />
       <section className="relative h-[80vh] w-full overflow-hidden md:h-[85vh]">
         <div className="absolute inset-0 bg-cover bg-center bg-fixed" style={{ backgroundImage: "url('https://5258c99641bea1ec763a.b-cdn.net/wp-content/uploads/2024/06/wedding-flowers-budget-title-image.jpg')" }} />
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/40 to-black/60" />

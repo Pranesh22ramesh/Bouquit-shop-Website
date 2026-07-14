@@ -148,8 +148,64 @@ model Product {
   updatedAt           DateTime     @updatedAt
 }
 
+model SeoConfig {
+  id                    String   @id @default(uuid())
+  businessName          String   @default("MIDHUNYAS Petals")
+  businessSlogan        String   @default("Karur's Finest Flower Shop")
+  address               String   @default("Karur, Tamil Nadu, India")
+  city                  String   @default("Karur")
+  state                 String   @default("Tamil Nadu")
+  country               String   @default("India")
+  postalCode            String   @default("639001")
+  phone                 String   @default("+91 9942071721")
+  whatsapp              String   @default("+91 9942071721")
+  email                 String   @default("miudhunyas2012karur@gmail.com")
+  latitude              String   @default("10.9601")
+  longitude             String   @default("78.0766")
+  googleMapsUrl         String   @default("")
+  businessHours         Json?
+  logoUrl               String   @default("")
+  faviconUrl            String   @default("")
+  defaultOgImage        String   @default("")
+  ga4MeasurementId      String   @default("")
+  gtmContainerId        String   @default("")
+  gscVerificationCode   String   @default("")
+  bingVerificationCode  String   @default("")
+  facebookAppId         String   @default("")
+  instagramUrl          String   @default("")
+  facebookUrl           String   @default("")
+  twitterHandle         String   @default("")
+  siteUrl               String   @default("https://karurflowershop.vercel.app")
+  robotsCustomRules     String   @default("")
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}
+
+model SeoPage {
+  id               String   @id @default(uuid())
+  pageKey          String   @unique
+  pageTitle        String
+  metaTitle        String
+  metaDescription  String
+  keywords         String   @default("")
+  canonicalUrl     String   @default("")
+  robots           String   @default("index, follow")
+  ogTitle          String   @default("")
+  ogDescription    String   @default("")
+  ogImage          String   @default("")
+  twitterTitle     String   @default("")
+  twitterDescription String @default("")
+  twitterImage     String   @default("")
+  schemaType       String   @default("WebPage")
+  customJsonLd     String   @default("")
+  isActive         Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
 enum Role {
   USER
+  SUBADMIN
   ADMIN
 }
 

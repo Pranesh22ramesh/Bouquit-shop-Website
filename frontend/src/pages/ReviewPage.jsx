@@ -1,4 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
+import SeoHead from '../seo/SeoHead.jsx';
+import { usePageSeo } from '../seo/useSeo.js';
 import { toast } from "react-hot-toast";
 import ReviewList from "../components/ReviewList.jsx";
 import { useAuth } from "../context/AuthContext";

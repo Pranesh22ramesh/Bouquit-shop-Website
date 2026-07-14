@@ -294,8 +294,46 @@ const toggleWishlist = async (userId, productId) => {
   return user.wishlistItems.map((entry) => entry.productId);
 };
 
+const adminUpdateUserDetails = async (adminUserId, targetUserId, { fullName, email, phoneNumber, password, role }) => {
+  const payload = {};
+  
+  if (fullName) payload.fullName = fullName;
+  if (phoneNumber !== undefined) payload.phoneNumber = phoneNumber || null;
+  if (role) payload.role = role.toUpperCase();
+  
+  if (email) {
+    const normalizedEmail = String(email).toLowerCase();
+    const existing = await userRepository.findByEmail(normalizedEmail);
+    if (existing && existing.id !== targetUserId) {
+      throw new ApiError(409, 'Email address is already registered to another user');
+    }
+    payload.email = normalizedEmail;
+  }
+  
+  if (password) {
+    payload.passwordHash = await bcrypt.hash(password, 12);
+  }
+
+  const user = await prisma.user.update({
+    where: { id: targetUserId },
+    data: payload
+  });
+
+  await logActivity({
+    userId: adminUserId,
+    action: 'admin_updated_user',
+    resourceType: 'user',
+    resourceId: targetUserId,
+    details: { updatedFields: Object.keys(payload) },
+  });
+
+  pushEventToUser(targetUserId, 'profile.changed', { user: serializeUser(user) });
+  return serializeUser(user);
+};
+
 module.exports = {
   addCartItem,
+  adminUpdateUserDetails,
   deleteUser,
   getActivities,
   getActivitiesByUserId,

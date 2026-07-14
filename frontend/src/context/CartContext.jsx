@@ -135,10 +135,15 @@ export const CartProvider = ({ children }) => {
     () =>
       items.reduce((sum, item) => {
         const product = item.productId && typeof item.productId === "object" ? item.productId : null;
-        const unitPrice =
+        const baseUnitPrice =
           product?.offerPrice && product?.badge === "Offer"
             ? product.offerPrice
             : product?.price || item.unitPriceWithExtras || item.unitPrice || item.price || 0;
+        // Add customization extras
+        const extrasPrice =
+          (item.customization?.stones ? 200 : 0) +
+          (item.customization?.beads ? 120 : 0);
+        const unitPrice = baseUnitPrice + extrasPrice;
         return sum + unitPrice * (item.quantity || 1);
       }, 0),
     [items]

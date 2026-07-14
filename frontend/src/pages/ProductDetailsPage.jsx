@@ -132,14 +132,50 @@ const ProductDetailsPage = () => {
     const color1 = hexToColorName(custom.mainColor);
     const color2 = hexToColorName(custom.secondaryColor);
 
-    let message = `Hello! I would like to place an order.\n\n*Product:* ${product.name}\n*Total Price:* ₹${totalPrice}\n`;
-    message += `*Quantity:* ${custom.quantity}\n*Colours:* ${color1} / ${color2}\n`;
-    if (custom.stones) message += "+ Stones\n";
-    if (custom.beads) message += "+ Beads\n";
-    if (custom.notes) message += `*Note:* ${custom.notes}\n`;
-    if (user) message += `\n*Customer:* ${user.name}\n*Email:* ${user.email}\n`;
-    message += `*Phone:* ${phone}\n*Delivery Address:* ${address}\n`;
-    if (product.image) message += `\n*Product Image:* ${product.image.startsWith("http") ? product.image : window.location.origin + product.image}`;
+    // Resolve absolute product image URL
+    const rawImage = product.image || "";
+    const imageUrl = rawImage
+      ? rawImage.startsWith("http")
+        ? rawImage
+        : `${window.location.origin}${rawImage}`
+      : "";
+
+    // Price breakdown
+    const stonesExtra = custom.stones ? 200 : 0;
+    const beadsExtra = custom.beads ? 120 : 0;
+
+    let message = `🌸 *MIDHUNYAS Petals — New Order* 🌸\n\n`;
+    message += `Hello! I would like to place an order.\n\n`;
+
+    // Product image prominently at top
+    if (imageUrl) {
+      message += `📷 *Product Photo:*\n${imageUrl}\n\n`;
+    }
+
+    message += `🛍️ *Product:* ${product.name}\n`;
+    message += `📂 *Category:* ${product.category || "Flowers"}\n\n`;
+
+    // Price breakdown
+    message += `💰 *Price Breakdown:*\n`;
+    message += `   Base Price:     ₹${basePrice.toLocaleString("en-IN")}\n`;
+    if (stonesExtra) message += `   + Stones:       ₹200\n`;
+    if (beadsExtra)  message += `   + Beads:        ₹120\n`;
+    if (custom.quantity > 1) message += `   Unit Total:     ₹${(basePrice + stonesExtra + beadsExtra).toLocaleString("en-IN")}\n`;
+    message += `   🔢 Quantity:    ${custom.quantity}\n`;
+    message += `   *Order Total:  ₹${totalPrice.toLocaleString("en-IN")}*\n\n`;
+
+    // Customization
+    message += `🎨 *Customization:*\n`;
+    message += `   Primary Colour:   ${color1}\n`;
+    message += `   Secondary Colour: ${color2}\n`;
+    if (custom.stones) message += `   ✅ Stones Added\n`;
+    if (custom.beads)  message += `   ✅ Beads Added\n`;
+    if (custom.notes)  message += `   📝 Note: ${custom.notes}\n`;
+
+    // Customer details
+    if (user) message += `\n👤 *Customer:* ${user.name}\n✉️ *Email:* ${user.email}\n`;
+    message += `📞 *Phone:* ${phone}\n`;
+    message += `📍 *Delivery Address:* ${address}\n`;
     
     setWhatsappPopupUrl(`https://wa.me/919942071721?text=${encodeURIComponent(message)}`);
     setShowAddressModal(false);

@@ -40,9 +40,9 @@ const defaultHomeFallbackProductImages = [
 ];
 
 const defaultContent = {
-  heroText: "Flowers that make every moment unforgettable",
+  heroText: "Crafting Eternal Memories",
   heroDescription:
-    "Thoughtfully designed bouquets and florals, handcrafted in Karur with fresh seasonal blooms.",
+    "Handcrafted bouquets, elegant garlands, and floral experiences tailored to your celebration. and We can deliver allover Tamilnadu",
   badgeText: "Karur's bespoke floral studio",
   primaryButtonLabel: "Shop bouquets",
   primaryButtonLink: "/gallery",
@@ -125,6 +125,37 @@ const ProductCard = ({ product }) => {
   );
 };
 
+const renderHeroText = (text) => {
+  if (!text) return "";
+  if (text.toLowerCase().includes("crafting eternal memories")) {
+    return (
+      <>
+        Crafting Eternal<br />Memories
+      </>
+    );
+  }
+  return text;
+};
+
+const renderHeroDescription = (text) => {
+  if (!text) return "";
+  const regex = /(We can deliver all\s*over Tamil\s*nadu)/i;
+  const parts = text.split(regex);
+  if (parts.length > 1) {
+    return parts.map((part, index) => {
+      if (regex.test(part)) {
+        return (
+          <span key={index} className="font-semibold text-rose-600 dark:text-rose-400 bg-rose-500/10 dark:bg-rose-400/10 px-2.5 py-0.5 rounded-lg border border-rose-500/20 dark:border-rose-400/20 shadow-sm mx-1 inline-block">
+            {part}
+          </span>
+        );
+      }
+      return part;
+    });
+  }
+  return text;
+};
+
 const HomePage = () => {
   const pageSeo = usePageSeo('home');
   const [content, setContent] = useState(defaultContent);
@@ -195,9 +226,11 @@ const HomePage = () => {
               <span className="h-1.5 w-1.5 rounded-full bg-[#E85D8E]" /> {content.badgeText}
             </div>
             <h1 className="text-[clamp(3.35rem,7vw,7.25rem)] font-medium leading-[0.88] tracking-[-0.045em] text-[#2D2D2D] dark:text-white">
-              {content.heroText}
+              {renderHeroText(content.heroText)}
             </h1>
-            <p className="mt-7 max-w-xl text-base leading-8 text-[#655E5A] dark:text-zinc-300 sm:text-lg">{content.heroDescription}</p>
+            <p className="mt-7 max-w-xl text-base leading-8 text-[#655E5A] dark:text-zinc-300 sm:text-lg">
+              {renderHeroDescription(content.heroDescription)}
+            </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <Link to={content.primaryButtonLink || "/gallery"} className="btn-luxury">
                 {content.primaryButtonLabel || "Shop bouquets"} <FiArrowRight />

@@ -1,5 +1,5 @@
 // src/controllers/seoController.js
-const asyncHandler = require('../utils/asyncHandler');
+const { asyncHandler } = require('../utils/asyncHandler');
 const seoService = require('../services/seoService');
 
 const getConfig = asyncHandler(async (req, res) => {

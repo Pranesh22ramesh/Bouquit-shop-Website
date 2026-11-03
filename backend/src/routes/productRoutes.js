@@ -7,6 +7,7 @@ const productController = require('../controllers/productController');
 const router = express.Router();
 
 router.get('/', productController.listProducts);
+router.get('/categories', productController.listCategories);
 router.get('/categories/list', productController.listCategories);
 router.post('/', protect, adminOnly, upload.single('image'), productController.productValidators, validateRequest, productController.createProduct);
 router.get('/:id', productController.getProductById);

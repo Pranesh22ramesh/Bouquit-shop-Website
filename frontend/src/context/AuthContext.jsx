@@ -1,7 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { authService } from "../api/authService";
-import { clearAccessToken } from "../lib/authStorage";
+import { clearAccessToken, getAccessToken } from "../lib/authStorage";
 import { emitSiteEvent, SITE_EVENTS } from "../lib/siteEvents";
 import { startPrivateRealtime } from "../lib/privateRealtime";
 import { toast } from "react-hot-toast";
@@ -11,9 +11,12 @@ const AuthContext = createContext(null);
 export const AuthProvider = ({ children }) => {
   const queryClient = useQueryClient();
 
+  const hasToken = Boolean(getAccessToken());
+
   const { data: user = null, isLoading, refetch } = useQuery({
     queryKey: ["auth", "me"],
     queryFn: authService.me,
+    enabled: hasToken,
     retry: false,
     staleTime: 5 * 60 * 1000,
   });
@@ -111,10 +114,10 @@ export const AuthProvider = ({ children }) => {
             currentUser ? { ...currentUser, ...updates } : currentUser
           );
         },
-        loading: isLoading,
+        loading: hasToken && isLoading,
       }}
     >
-      {!isLoading && children}
+      {children}
     </AuthContext.Provider>
   );
 };

@@ -151,3 +151,4 @@ export const CarouselSlider = ({
 };
 
 export default CarouselSlider;
+

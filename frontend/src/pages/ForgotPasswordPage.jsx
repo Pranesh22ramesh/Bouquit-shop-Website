@@ -26,28 +26,28 @@ const ForgotPasswordPage = () => {
   };
 
   return (
-    <div className={`min-h-screen flex items-center justify-center p-4 transition-colors duration-300 ${isDarkMode ? "bg-gray-900" : "bg-rose-50/50"}`}>
-      <div className={`w-full max-w-md p-8 rounded-3xl shadow-2xl relative overflow-hidden ${isDarkMode ? "bg-gray-800 border border-gray-700" : "bg-white border border-rose-100"}`}>
+    <div className={`min-h-screen flex items-center justify-center p-4 transition-colors duration-300 ${isDarkMode ? "bg-[#171116]" : "bg-[#FAF5EF]"}`}>
+      <div className={`w-full max-w-md p-8 rounded-3xl shadow-2xl relative overflow-hidden ${isDarkMode ? "bg-[#261B22] border border-[#493640]" : "bg-white border border-[#E8DDD5]"}`}>
         <div className="text-center mb-8">
           <div className="text-4xl mb-4">💐</div>
-          <h1 className={`text-2xl font-bold font-serif ${isDarkMode ? "text-white" : "text-gray-900"}`}>
+          <h1 className={`text-2xl font-bold font-serif ${isDarkMode ? "text-[#FAF5EF]" : "text-[#30232A]"}`}>
             Forgot Password
           </h1>
-          <p className={`mt-2 text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
+          <p className={`mt-2 text-sm ${isDarkMode ? "text-[#8E7A83]" : "text-[#81747A]"}`}>
             Enter your email to receive a password reset link.
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>Email Address</label>
+            <label className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-[#FAF5EF]" : "text-[#30232A]"}`}>Email Address</label>
             <input 
               type="email" 
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className={`w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-rose-500 outline-none transition-all ${
-                isDarkMode ? "bg-gray-900/50 border-gray-600 text-white placeholder-gray-500" : "bg-gray-50 border-gray-200 text-gray-900"
+              className={`w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-[#651F3C] outline-none transition-all ${
+                isDarkMode ? "bg-[#171116] border-[#493640] text-white placeholder-[#8E7A83]" : "bg-[#FAF5EF] border-[#E8DDD5] text-[#30232A]"
               }`}
               placeholder="Enter your email"
             />
@@ -56,14 +56,14 @@ const ForgotPasswordPage = () => {
           <button 
             type="submit" 
             disabled={loading}
-            className="w-full bg-gradient-to-r from-rose-500 to-purple-600 text-white font-bold py-3 px-4 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50"
+            className="w-full bg-[#651F3C] hover:bg-[#4D172D] text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-[#651F3C]/20 transition-colors disabled:opacity-50"
           >
             {loading ? "Sending..." : "Send Reset Link"}
           </button>
         </form>
 
         <div className="mt-6 text-center">
-          <Link to="/login" className={`text-sm font-semibold hover:underline ${isDarkMode ? "text-rose-400" : "text-rose-600"}`}>
+          <Link to="/login" className={`text-sm font-semibold hover:underline ${isDarkMode ? "text-[#D5B36C]" : "text-[#651F3C]"}`}>
             Back to Login
           </Link>
         </div>

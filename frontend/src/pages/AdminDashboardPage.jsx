@@ -566,12 +566,12 @@ const AdminDashboardPage = () => {
   ];
 
   return (
-    <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900 font-sans">
+    <div className="flex min-h-screen bg-[#F7F2ED] dark:bg-[#171116] font-sans">
       {/* Sidebar (Desktop) */}
-      <aside className="w-64 flex-shrink-0 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 hidden md:flex flex-col">
-        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-          <h1 className="text-2xl font-bold text-rose-600 dark:text-rose-400 tracking-tight">Admin Portal</h1>
-          <p className="text-xs text-gray-500 mt-1 uppercase tracking-wider font-semibold">Management Console</p>
+      <aside className="w-64 flex-shrink-0 bg-[#30232A] border-r border-[#493640] hidden md:flex flex-col text-[#FAF5EF]">
+        <div className="p-6 border-b border-[#493640]">
+          <h1 className="text-2xl font-bold font-serif text-[#C5A15B] tracking-tight">Admin Portal</h1>
+          <p className="text-xs text-gray-500 mt-1 uppercase tracking-wider font-semibold">MIDHUNYAS Console</p>
         </div>
         <nav className="flex-1 p-4 space-y-2">
           {["overview", "products", "content", "reviews", "users", "seo"].map((tab) => (
@@ -580,8 +580,8 @@ const AdminDashboardPage = () => {
               onClick={() => setActiveTab(tab)}
               className={`w-full text-left px-4 py-3 rounded-xl font-medium capitalize transition flex items-center gap-3 ${
                 activeTab === tab
-                  ? "bg-rose-50 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400 shadow-sm"
-                  : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  ? "bg-[#651F3C] text-white shadow-md"
+                  : "text-[#FAF5EF]/75 hover:bg-white/10 hover:text-white"
               }`}
             >
               {tab === "overview" && <FaChartBar className="text-lg" />}
@@ -599,13 +599,13 @@ const AdminDashboardPage = () => {
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col min-w-0">
         {/* Top Header */}
-        <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex items-center justify-between sticky top-0 z-10 shadow-sm">
+        <header className="bg-white dark:bg-[#261B22] border-b border-[#E8DDD5] dark:border-[#493640] px-6 py-4 flex items-center justify-between sticky top-0 z-10 shadow-sm">
           <div className="flex items-center gap-4">
             {/* Mobile menu toggle could go here */}
             <h2 className="text-xl font-bold text-gray-800 dark:text-white capitalize">{activeTab}</h2>
           </div>
           <div className="flex items-center gap-4">
-            <div className="h-10 w-10 rounded-full bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center text-rose-600 dark:text-rose-400 font-bold border-2 border-rose-200 dark:border-rose-800 shadow-sm">
+            <div className="h-10 w-10 rounded-full bg-[#651F3C] flex items-center justify-center text-white font-bold border-2 border-[#C5A15B] shadow-sm">
               AD
             </div>
           </div>
@@ -622,7 +622,7 @@ const AdminDashboardPage = () => {
                 onClick={() => setActiveTab(tab)}
                 className={`px-4 py-2 whitespace-nowrap rounded-lg font-medium capitalize transition text-sm ${
                   activeTab === tab
-                    ? "bg-rose-600 text-white shadow-md"
+                    ? "bg-[#651F3C] text-white shadow-md"
                     : "bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700"
                 }`}
               >
@@ -647,10 +647,10 @@ const AdminDashboardPage = () => {
                         key={card.label}
                         className="relative overflow-hidden rounded-2xl bg-white p-6 shadow-sm border border-gray-100 dark:border-gray-700 dark:bg-gray-800 transition hover:shadow-md"
                       >
-                        <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-rose-50/50 dark:bg-gray-700/50 blur-2xl" />
+                        <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-[#F5EAE9]/50 dark:bg-gray-700/50 blur-2xl" />
                         <div className="relative flex items-center gap-4">
                           <span className={`flex h-12 w-12 items-center justify-center rounded-xl shadow-inner ${
-                            i % 2 === 0 ? "bg-rose-100 text-rose-600 dark:bg-rose-900/40 dark:text-rose-400" : "bg-emerald-100 text-emerald-600 dark:bg-emerald-900/40 dark:text-emerald-400"
+                            i % 2 === 0 ? "bg-rose-100 text-[#651F3C] dark:bg-rose-900/40 dark:text-[#D5B36C]" : "bg-emerald-100 text-emerald-600 dark:bg-emerald-900/40 dark:text-emerald-400"
                           }`}>
                             <FaChartBar className="text-xl" />
                           </span>
@@ -665,7 +665,7 @@ const AdminDashboardPage = () => {
               <section className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
                 <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
                   <div>
-                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-rose-500">Merchandising analyzer</p>
+                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#651F3C]">Merchandising analyzer</p>
                     <h3 className="mt-1 text-xl font-bold text-gray-900 dark:text-white">Order and review insights</h3>
                   </div>
                   <p className="text-xs text-gray-500 dark:text-gray-400">Latest, High Selling, Offered and Top Rated labels update automatically.</p>
@@ -677,7 +677,7 @@ const AdminDashboardPage = () => {
                         {item.image ? <img src={item.image} alt="" className="h-11 w-11 rounded-lg object-cover" /> : <div className="h-11 w-11 rounded-lg bg-gray-200 dark:bg-gray-700" />}
                         <div className="min-w-0"><p className="truncate text-sm font-semibold text-gray-900 dark:text-white">{item.name}</p><p className="text-[10px] text-gray-500">Score {item.score}</p></div>
                       </div>
-                      <div className="mt-3 flex flex-wrap gap-1">{(item.tags || []).map((tag) => <span key={tag} className="rounded-full bg-rose-100 px-2 py-0.5 text-[9px] font-semibold text-rose-700 dark:bg-rose-950/50 dark:text-rose-300">{tag}</span>)}</div>
+                      <div className="mt-3 flex flex-wrap gap-1">{(item.tags || []).map((tag) => <span key={tag} className="rounded-full bg-rose-100 px-2 py-0.5 text-[9px] font-semibold text-[#651F3C] dark:bg-rose-950/50 dark:text-[#D5B36C]">{tag}</span>)}</div>
                       <p className="mt-3 text-[10px] text-gray-500">{item.unitsSold} sold · {item.reviewCount} reviews · {item.averageRating || 0}★</p>
                     </article>
                   )) : <p className="col-span-full py-4 text-sm text-gray-500">Add products and receive orders or reviews to generate insights.</p>}
@@ -699,7 +699,7 @@ const AdminDashboardPage = () => {
                 setIsEditing(false);
                 setShowForm(true);
               }}
-              className="flex shrink-0 items-center gap-2 rounded-xl bg-rose-600 px-4 py-2.5 font-semibold text-white shadow-lg transition hover:bg-rose-700"
+              className="flex shrink-0 items-center gap-2 rounded-xl bg-[#651F3C] px-4 py-2.5 font-semibold text-white shadow-lg transition hover:bg-rose-700"
             >
               <FaPlus /> <span className="hidden sm:inline">Add Product</span><span className="sm:hidden">Add</span>
             </button>
@@ -744,7 +744,7 @@ const AdminDashboardPage = () => {
                 onClick={() => setContentTab(tab)}
                 className={`p-3 text-left rounded-lg transition capitalize ${
                   contentTab === tab
-                    ? "bg-rose-600 text-white"
+                    ? "bg-[#651F3C] text-white"
                     : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
                 }`}
               >
@@ -817,7 +817,7 @@ const AdminDashboardPage = () => {
                   {homeContent.eventImage && <img src={homeContent.eventImage} alt="Home event section" className="h-44 w-full max-w-md rounded-xl object-cover" />}
                   {homeEventImageFile && <p className="text-xs font-medium text-emerald-600">{homeEventImageFile.name} ready to upload.</p>}
                   <div className="flex flex-wrap gap-2">
-                    <label className="cursor-pointer rounded-lg bg-rose-50 px-4 py-2 text-sm font-semibold text-rose-600">
+                    <label className="cursor-pointer rounded-lg bg-[#F5EAE9] px-4 py-2 text-sm font-semibold text-[#651F3C]">
                       Upload / Replace Image
                       <input type="file" accept="image/*" className="hidden" onChange={(e) => setHomeEventImageFile(e.target.files?.[0] || null)} />
                     </label>
@@ -830,7 +830,7 @@ const AdminDashboardPage = () => {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <h3 className="font-semibold dark:text-white">Home Banner Posters</h3>
-                    <label className="cursor-pointer rounded-lg bg-rose-50 px-4 py-2 text-sm font-semibold text-rose-600">
+                    <label className="cursor-pointer rounded-lg bg-[#F5EAE9] px-4 py-2 text-sm font-semibold text-[#651F3C]">
                       Upload Posters
                       <input type="file" multiple accept="image/*" className="hidden" onChange={(e) => setHomeBannerFiles(Array.from(e.target.files || []))} />
                     </label>
@@ -867,7 +867,7 @@ const AdminDashboardPage = () => {
                         <input className="mt-3 w-full rounded border p-2 text-sm dark:bg-gray-700 dark:border-gray-600" placeholder="Card title" value={tile.name || ""} onChange={(e) => updateHomeListItem("categoryTiles", index, "name", e.target.value)} />
                         <input className="mt-2 w-full rounded border p-2 text-sm dark:bg-gray-700 dark:border-gray-600" placeholder="Card subtitle" value={tile.note || ""} onChange={(e) => updateHomeListItem("categoryTiles", index, "note", e.target.value)} />
                         <div className="mt-3 flex flex-wrap gap-2">
-                          <label className="cursor-pointer rounded-lg bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-600">
+                          <label className="cursor-pointer rounded-lg bg-[#F5EAE9] px-3 py-2 text-xs font-semibold text-[#651F3C]">
                             Upload / Replace
                             <input type="file" accept="image/*" className="hidden" onChange={(e) => setHomeCategoryImageFiles((current) => ({ ...current, [index]: e.target.files?.[0] || null }))} />
                           </label>
@@ -929,7 +929,7 @@ const AdminDashboardPage = () => {
                         )}
                         {homeFallbackProductImageFiles[index] && <p className="mt-2 text-xs font-medium text-emerald-600">{homeFallbackProductImageFiles[index].name} ready.</p>}
                         <div className="mt-3 flex flex-wrap gap-2">
-                          <label className="cursor-pointer rounded-lg bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-600">
+                          <label className="cursor-pointer rounded-lg bg-[#F5EAE9] px-3 py-2 text-xs font-semibold text-[#651F3C]">
                             Upload / Replace
                             <input type="file" accept="image/*" className="hidden" onChange={(e) => setHomeFallbackProductImageFiles((current) => ({ ...current, [index]: e.target.files?.[0] || null }))} />
                           </label>
@@ -969,7 +969,7 @@ const AdminDashboardPage = () => {
                         {homeInspirationImageFiles[index] && <p className="mt-2 text-xs font-medium text-emerald-600">{homeInspirationImageFiles[index].name} ready.</p>}
                         <input className="mt-3 w-full rounded border p-2 text-sm dark:bg-gray-700 dark:border-gray-600" placeholder="Image label" value={tile.label || ""} onChange={(e) => updateHomeListItem("inspirationTiles", index, "label", e.target.value)} />
                         <div className="mt-3 flex flex-wrap gap-2">
-                          <label className="cursor-pointer rounded-lg bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-600">
+                          <label className="cursor-pointer rounded-lg bg-[#F5EAE9] px-3 py-2 text-xs font-semibold text-[#651F3C]">
                             Upload / Replace
                             <input type="file" accept="image/*" className="hidden" onChange={(e) => setHomeInspirationImageFiles((current) => ({ ...current, [index]: e.target.files?.[0] || null }))} />
                           </label>
@@ -996,7 +996,7 @@ const AdminDashboardPage = () => {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <h3 className="font-semibold dark:text-white">Promotional Sections</h3>
-                    <button type="button" onClick={addPromoSection} className="rounded-lg border border-rose-200 px-4 py-2 text-sm font-semibold text-rose-600">
+                    <button type="button" onClick={addPromoSection} className="rounded-lg border border-[#E8DDD5] px-4 py-2 text-sm font-semibold text-[#651F3C]">
                       <FaPlus className="inline mr-2" /> Add Section
                     </button>
                   </div>
@@ -1013,7 +1013,7 @@ const AdminDashboardPage = () => {
                   ))}
                 </div>
 
-                <button type="submit" className="mt-4 px-6 py-2 bg-rose-600 text-white rounded-lg flex items-center gap-2 hover:bg-rose-700">
+                <button type="submit" className="mt-4 px-6 py-2 bg-[#651F3C] text-white rounded-lg flex items-center gap-2 hover:bg-rose-700">
                   <FaSave /> Save Home Content
                 </button>
               </form>
@@ -1037,7 +1037,7 @@ const AdminDashboardPage = () => {
                 <div className="space-y-3">
                   <h3 className="font-semibold dark:text-white">Hero Image</h3>
                   {aboutContent.heroImage && <img src={aboutContent.heroImage} alt="About hero" className="h-40 rounded-xl object-cover" />}
-                  <label className="cursor-pointer rounded-lg bg-rose-50 px-4 py-2 text-sm font-semibold text-rose-600 inline-flex">
+                  <label className="cursor-pointer rounded-lg bg-[#F5EAE9] px-4 py-2 text-sm font-semibold text-[#651F3C] inline-flex">
                     Upload Hero Image
                     <input type="file" accept="image/*" className="hidden" onChange={(e) => setAboutHeroFile(e.target.files?.[0] || null)} />
                   </label>
@@ -1057,7 +1057,7 @@ const AdminDashboardPage = () => {
                       ))}
                     </div>
                   )}
-                  <label className="cursor-pointer rounded-lg bg-rose-50 px-4 py-2 text-sm font-semibold text-rose-600 inline-flex">
+                  <label className="cursor-pointer rounded-lg bg-[#F5EAE9] px-4 py-2 text-sm font-semibold text-[#651F3C] inline-flex">
                     Upload Gallery Images
                     <input type="file" accept="image/*" multiple className="hidden" onChange={(e) => setAboutGalleryFiles(Array.from(e.target.files || []))} />
                   </label>
@@ -1066,7 +1066,7 @@ const AdminDashboardPage = () => {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <h3 className="font-semibold dark:text-white">Team Section</h3>
-                    <button type="button" onClick={addTeamMember} className="rounded-lg border border-rose-200 px-4 py-2 text-sm font-semibold text-rose-600">
+                    <button type="button" onClick={addTeamMember} className="rounded-lg border border-[#E8DDD5] px-4 py-2 text-sm font-semibold text-[#651F3C]">
                       <FaPlus className="inline mr-2" /> Add Team Member
                     </button>
                   </div>
@@ -1084,7 +1084,7 @@ const AdminDashboardPage = () => {
                   ))}
                 </div>
 
-                <button type="submit" className="mt-4 px-6 py-2 bg-rose-600 text-white rounded-lg flex items-center gap-2 hover:bg-rose-700">
+                <button type="submit" className="mt-4 px-6 py-2 bg-[#651F3C] text-white rounded-lg flex items-center gap-2 hover:bg-rose-700">
                   <FaSave /> Save About Content
                 </button>
               </form>
@@ -1134,7 +1134,7 @@ const AdminDashboardPage = () => {
                     <iframe title="Contact map preview" src={toGoogleMapsEmbedUrl(contactContent.googleMapUrl || contactContent.address)} className="h-64 w-full border-0" loading="lazy" />
                   </div>
                 </div>
-                <button type="submit" className="mt-4 px-6 py-2 bg-rose-600 text-white rounded-lg flex items-center gap-2 hover:bg-rose-700">
+                <button type="submit" className="mt-4 px-6 py-2 bg-[#651F3C] text-white rounded-lg flex items-center gap-2 hover:bg-rose-700">
                   <FaSave /> Save Contact Content
                 </button>
               </form>
@@ -1148,12 +1148,12 @@ const AdminDashboardPage = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
-                  <th className="p-4 border-b dark:border-gray-600">User</th>
-                  <th className="p-4 border-b dark:border-gray-600">Rating</th>
-                  <th className="p-4 border-b dark:border-gray-600">Comment</th>
-                  <th className="p-4 border-b dark:border-gray-600">Flags</th>
-                  <th className="p-4 border-b dark:border-gray-600 text-right">Actions</th>
+                <tr className="bg-[#30232A] text-white">
+                  <th className="p-4 border-b border-[#493640] text-white">User</th>
+                  <th className="p-4 border-b border-[#493640] text-white">Rating</th>
+                  <th className="p-4 border-b border-[#493640] text-white">Comment</th>
+                  <th className="p-4 border-b border-[#493640] text-white">Flags</th>
+                  <th className="p-4 border-b border-[#493640] text-white text-right">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -1212,7 +1212,7 @@ const AdminDashboardPage = () => {
               <button
                 key={key}
                 onClick={() => setSeoSubTab(key)}
-                className={`px-4 py-2 rounded-xl text-sm font-semibold transition ${seoSubTab === key ? "bg-rose-600 text-white shadow" : "bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50"}`}
+                className={`px-4 py-2 rounded-xl text-sm font-semibold transition ${seoSubTab === key ? "bg-[#651F3C] text-white shadow" : "bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50"}`}
               >
                 {label}
               </button>
@@ -1315,7 +1315,7 @@ const AdminDashboardPage = () => {
               </div>
 
               <div className="flex justify-end">
-                <button type="submit" disabled={seoSaving} className="px-6 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-semibold rounded-xl transition shadow disabled:opacity-60">
+                <button type="submit" disabled={seoSaving} className="px-6 py-2.5 bg-[#651F3C] hover:bg-[#4D172D] text-white font-semibold rounded-xl transition shadow disabled:opacity-60">
                   {seoSaving ? "Saving…" : "💾 Save SEO Settings"}
                 </button>
               </div>
@@ -1328,7 +1328,7 @@ const AdminDashboardPage = () => {
               {!seoPageEditKey ? (
                 <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow overflow-hidden">
                   <table className="w-full text-sm">
-                    <thead className="bg-gray-50 dark:bg-gray-700/50">
+                    <thead className="bg-[#30232A] text-white">
                       <tr>
                         <th className="px-4 py-3 text-left font-semibold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider">Page</th>
                         <th className="px-4 py-3 text-left font-semibold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider">SEO Title</th>
@@ -1360,7 +1360,7 @@ const AdminDashboardPage = () => {
                             <td className="px-4 py-3">
                               <button
                                 onClick={() => { setSeoPageEditKey(page.pageKey); setSeoPageForm({ ...page }); }}
-                                className="px-3 py-1.5 bg-rose-50 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 rounded-lg text-xs font-semibold hover:bg-rose-100 transition"
+                                className="px-3 py-1.5 bg-[#F5EAE9] dark:bg-rose-900/30 text-[#651F3C] dark:text-[#D5B36C] rounded-lg text-xs font-semibold hover:bg-rose-100 transition"
                               >
                                 Edit
                               </button>
@@ -1431,7 +1431,7 @@ const AdminDashboardPage = () => {
 
                   <div className="flex justify-end gap-3 pt-2 border-t dark:border-gray-700">
                     <button type="button" onClick={() => { setSeoPageEditKey(null); setSeoPageForm({}); }} className="px-4 py-2 border dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition text-sm">Cancel</button>
-                    <button type="submit" disabled={seoSaving} className="px-6 py-2 bg-rose-600 hover:bg-rose-700 text-white font-semibold rounded-lg transition shadow disabled:opacity-60 text-sm">
+                    <button type="submit" disabled={seoSaving} className="px-6 py-2 bg-[#651F3C] hover:bg-[#4D172D] text-white font-semibold rounded-lg transition shadow disabled:opacity-60 text-sm">
                       {seoSaving ? "Saving…" : "Save Page SEO"}
                     </button>
                   </div>
@@ -1528,14 +1528,14 @@ const AdminDashboardPage = () => {
               value={userFilters.search}
               onChange={(event) => setUserFilters((current) => ({ ...current, search: event.target.value }))}
               placeholder="Search users by name, email, or phone"
-              className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-rose-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white md:max-w-sm"
+              className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-[#651F3C] dark:border-gray-600 dark:bg-gray-700 dark:text-white md:max-w-sm"
             />
 
             <div className="flex gap-3">
               <select
                 value={userFilters.role}
                 onChange={(event) => setUserFilters((current) => ({ ...current, role: event.target.value }))}
-                className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-rose-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-[#651F3C] dark:border-gray-600 dark:bg-gray-700 dark:text-white"
               >
                 <option value="">All roles</option>
                 <option value="user">Users</option>
@@ -1544,7 +1544,7 @@ const AdminDashboardPage = () => {
               <select
                 value={userFilters.status}
                 onChange={(event) => setUserFilters((current) => ({ ...current, status: event.target.value }))}
-                className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-rose-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-[#651F3C] dark:border-gray-600 dark:bg-gray-700 dark:text-white"
               >
                 <option value="">All statuses</option>
                 <option value="active">Active</option>
@@ -1556,14 +1556,14 @@ const AdminDashboardPage = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
-                  <th className="p-4 border-b dark:border-gray-600">Name</th>
-                  <th className="p-4 border-b dark:border-gray-600">Email</th>
-                  <th className="p-4 border-b dark:border-gray-600">Role</th>
-                  <th className="p-4 border-b dark:border-gray-600">Status</th>
-                  <th className="p-4 border-b dark:border-gray-600">Activity</th>
-                  <th className="p-4 border-b dark:border-gray-600">Joined</th>
-                  <th className="p-4 border-b dark:border-gray-600 text-right">Actions</th>
+                <tr className="bg-[#30232A] text-white">
+                  <th className="p-4 border-b border-[#493640] text-white">Name</th>
+                  <th className="p-4 border-b border-[#493640] text-white">Email</th>
+                  <th className="p-4 border-b border-[#493640] text-white">Role</th>
+                  <th className="p-4 border-b border-[#493640] text-white">Status</th>
+                  <th className="p-4 border-b border-[#493640] text-white">Activity</th>
+                  <th className="p-4 border-b border-[#493640] text-white">Joined</th>
+                  <th className="p-4 border-b border-[#493640] text-white text-right">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -1697,7 +1697,7 @@ const AdminDashboardPage = () => {
               </div>
               <div className="flex justify-end gap-3 pt-4">
                 <button type="button" onClick={() => { setShowEditUserModal(false); setEditUserForm({ name: "", email: "", phone: "", password: "", role: "user" }); }} className="px-4 py-2 border dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition">Cancel</button>
-                <button type="submit" className="px-4 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition shadow">Save Changes</button>
+                <button type="submit" className="px-4 py-2 bg-[#651F3C] text-white rounded-lg hover:bg-rose-700 transition shadow">Save Changes</button>
               </div>
             </form>
           </div>
@@ -1722,8 +1722,8 @@ const AdminDashboardPage = () => {
             ) : (
               <div className="space-y-6">
                 <div className="grid gap-4 md:grid-cols-4">
-                  <div className="rounded-2xl bg-rose-50 p-4 text-sm text-rose-900">
-                    <p className="text-xs uppercase tracking-wide text-rose-500">Likes</p>
+                  <div className="rounded-2xl bg-[#F5EAE9] p-4 text-sm text-rose-900">
+                    <p className="text-xs uppercase tracking-wide text-[#651F3C]">Likes</p>
                     <p className="mt-2 text-2xl font-bold">{viewingUser.likes?.length || 0}</p>
                   </div>
                   <div className="rounded-2xl bg-amber-50 p-4 text-sm text-amber-900">
@@ -1751,7 +1751,7 @@ const AdminDashboardPage = () => {
                           <div key={order._id} className="rounded-xl border border-gray-100 p-4 dark:border-gray-700">
                             <div className="flex items-center justify-between text-sm">
                               <span className="font-semibold text-gray-900 dark:text-white">#{order._id.slice(-6).toUpperCase()}</span>
-                              <span className="text-rose-600 font-bold">₹{Number(order.totalPrice || 0).toLocaleString("en-IN")}</span>
+                              <span className="text-[#651F3C] font-bold">₹{Number(order.totalPrice || 0).toLocaleString("en-IN")}</span>
                             </div>
                             <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{new Date(order.createdAt).toLocaleString()}</p>
                             <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">{order.orderItems?.length || 0} items • {String(order.status || "").replaceAll("_", " ")}</p>
@@ -1848,7 +1848,7 @@ const AdminDashboardPage = () => {
               </div>
               <div className="flex justify-end gap-3">
                 <button type="button" onClick={() => setShowReviewModal(false)} className="px-4 py-2 border dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition">Cancel</button>
-                <button type="submit" className="px-4 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition shadow">Save Review</button>
+                <button type="submit" className="px-4 py-2 bg-[#651F3C] text-white rounded-lg hover:bg-rose-700 transition shadow">Save Review</button>
               </div>
             </form>
           </div>

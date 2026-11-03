@@ -47,8 +47,8 @@ export default function ToolbarDynamic({ onSearch }) {
         <div
           className={`transition-colors duration-200 rounded-full ${
             isOpen
-              ? 'border border-[#E8E5E0] bg-[#FFF9F6]/95 dark:border-zinc-800 dark:bg-[#121212]/95 shadow-lg backdrop-blur-xl'
-              : 'border border-transparent bg-transparent hover:bg-[#FCEFF3] dark:hover:bg-zinc-800/80'
+              ? 'border border-[#C5A15B]/50 bg-[#FAF5EF]/95 dark:border-[#493640] dark:bg-[#211820]/95 shadow-lg backdrop-blur-xl'
+              : 'border border-transparent bg-transparent hover:bg-[#F5EAE9] dark:hover:bg-[#261B22]/80'
           }`}
         >
           <motion.div
@@ -63,7 +63,7 @@ export default function ToolbarDynamic({ onSearch }) {
                   type="button"
                   onClick={() => setIsOpen(true)}
                   aria-label="Search flowers"
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-zinc-700 dark:text-zinc-200 hover:text-[#E85D8E] dark:hover:text-[#E85D8E] transition-colors"
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-[#651F3C] dark:text-[#D5B36C] hover:text-[#4D172D] dark:hover:text-[#C5A15B] transition-colors"
                 >
                   <FiSearch className="h-4 w-4" />
                 </button>
@@ -76,13 +76,13 @@ export default function ToolbarDynamic({ onSearch }) {
                       setQuery('');
                     }}
                     aria-label="Close search"
-                    className="w-8 h-8 rounded-full flex items-center justify-center text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-black/5 dark:hover:bg-white/10 transition-colors shrink-0"
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-[#651F3C] dark:text-[#D5B36C] hover:text-[#30232A] dark:hover:text-[#FAF5EF] hover:bg-black/5 dark:hover:bg-white/10 transition-colors shrink-0"
                   >
                     <FiArrowLeft className="h-4 w-4" />
                   </button>
                   <div className="relative w-full">
                     <input
-                      className="h-8 w-full bg-transparent px-2 text-xs text-zinc-900 placeholder-zinc-400 dark:text-zinc-100 dark:placeholder-zinc-500 outline-none"
+                      className="h-8 w-full bg-transparent px-2 text-xs text-[#30232A] placeholder-[#81747A] dark:text-[#FAF5EF] dark:placeholder-[#8E7A83] outline-none"
                       autoFocus
                       value={query}
                       onChange={(e) => setQuery(e.target.value)}

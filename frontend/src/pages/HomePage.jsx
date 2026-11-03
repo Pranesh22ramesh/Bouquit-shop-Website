@@ -84,15 +84,15 @@ const reveal = {
 
 const SectionHeading = ({ eyebrow, title, copy, align = "center" }) => (
   <div className={align === "left" ? "max-w-2xl" : "mx-auto max-w-2xl text-center"}>
-    <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.32em] text-[#C69236] dark:text-[#E9D8A6] flex items-center justify-center gap-2">
-      <span className="w-1.5 h-1.5 rounded-full bg-[#E85D8E] animate-ping" />
+    <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.32em] text-[#C5A15B] dark:text-[#D5B36C] flex items-center justify-center gap-2">
+      <span className="w-1.5 h-1.5 rounded-full bg-[#651F3C] animate-ping" />
       {eyebrow}
-      <span className="w-1.5 h-1.5 rounded-full bg-[#E85D8E] animate-ping" />
+      <span className="w-1.5 h-1.5 rounded-full bg-[#651F3C] animate-ping" />
     </p>
-    <h2 className="text-4xl font-medium leading-tight sm:text-5xl text-[#2D2D2D] dark:text-white">
+    <h2 className="text-4xl font-medium leading-tight sm:text-5xl text-[#30232A] dark:text-white">
       {title}
     </h2>
-    {copy && <p className="mt-4 leading-7 text-[#6E6864] dark:text-zinc-400 text-sm sm:text-base">{copy}</p>}
+    {copy && <p className="mt-4 leading-7 text-[#51454B] dark:text-zinc-400 text-sm sm:text-base">{copy}</p>}
   </div>
 );
 
@@ -104,9 +104,9 @@ const ProductCard = ({ product }) => {
     <motion.article
       whileHover={{ y: -10, scale: 1.015 }}
       transition={{ duration: 0.35, ease: "easeOut" }}
-      className="group relative overflow-hidden rounded-[26px] border border-white/80 bg-white/70 shadow-[0_15px_45px_rgba(219,39,119,0.08)] backdrop-blur-xl dark:border-purple-500/20 dark:bg-[#1A1522]/80 dark:shadow-[0_15px_45px_rgba(0,0,0,0.5)]"
+      className="group relative overflow-hidden rounded-[26px] border border-white/80 bg-white/70 shadow-[0_15px_45px_rgba(101,31,60,0.08)] backdrop-blur-xl dark:border-[#30232A]/20 dark:bg-[#1A1522]/80 dark:shadow-[0_15px_45px_rgba(0,0,0,0.5)]"
     >
-      <div className="relative aspect-[4/5] overflow-hidden bg-gradient-to-br from-pink-50/50 to-purple-50/50 dark:from-purple-950/20 dark:to-zinc-900">
+      <div className="relative aspect-[4/5] overflow-hidden bg-gradient-to-br from-[#FAF5EF]/50 to-[#D9B8B8]/50 dark:from-[#30232A]/20 dark:to-zinc-900">
         {image ? (
           <img
             src={image}
@@ -119,30 +119,30 @@ const ProductCard = ({ product }) => {
           <div className="grid h-full place-items-center bg-[#F8F2EF] text-sm text-[#9A8E86] dark:bg-zinc-800 dark:text-zinc-400">No image</div>
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/10 opacity-60 group-hover:opacity-40 transition-opacity" />
-        <span className="absolute left-4 top-4 rounded-full bg-white/90 px-3.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#9B6D28] backdrop-blur-md shadow-sm dark:bg-zinc-900/90 dark:text-amber-200">
+        <span className="absolute left-4 top-4 rounded-full bg-white/90 px-3.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#9B6D28] backdrop-blur-md shadow-sm dark:bg-zinc-900/90 dark:text-[#FAF5EF]">
           {product.badge || (product.offerPrice ? "Special" : "✦ Reverie")}
         </span>
         <Link
           to="/favorites"
           aria-label="Save to wishlist"
-          className="absolute right-4 top-4 grid h-10 w-10 place-items-center rounded-full bg-white/90 text-[#2D2D2D] shadow-md backdrop-blur transition hover:bg-[#E85D8E] hover:text-white dark:bg-zinc-900/90 dark:text-white"
+          className="absolute right-4 top-4 grid h-10 w-10 place-items-center rounded-full bg-white/90 text-[#30232A] shadow-md backdrop-blur transition hover:bg-[#651F3C] hover:text-white dark:bg-zinc-900/90 dark:text-white"
         >
           <FiHeart />
         </Link>
         <Link
           to="/gallery"
-          className="absolute inset-x-4 bottom-4 translate-y-4 rounded-full bg-white/95 py-3 text-center text-xs font-bold uppercase tracking-wider text-[#2D2D2D] opacity-0 shadow-xl backdrop-blur transition duration-300 group-hover:translate-y-0 group-hover:opacity-100 dark:bg-zinc-900/95 dark:text-white hover:bg-rose-500 hover:text-white"
+          className="absolute inset-x-4 bottom-4 translate-y-4 rounded-full bg-white/95 py-3 text-center text-xs font-bold uppercase tracking-wider text-[#30232A] opacity-0 shadow-xl backdrop-blur transition duration-300 group-hover:translate-y-0 group-hover:opacity-100 dark:bg-zinc-900/95 dark:text-white hover:bg-[#651F3C] hover:text-white"
         >
           View in Atelier
         </Link>
       </div>
       <div className="p-5">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#C69236] dark:text-[#E9D8A6]">{product.category || "Fresh blooms"}</p>
+        <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#C5A15B] dark:text-[#D5B36C]">{product.category || "Fresh blooms"}</p>
         <div className="mt-2 flex items-start justify-between gap-3">
-          <h3 className="text-xl font-medium text-[#2D2D2D] dark:text-white truncate">{product.name || product.title}</h3>
-          <p className="shrink-0 pt-1 text-sm font-bold text-[#E85D8E]">₹{price.toLocaleString("en-IN")}</p>
+          <h3 className="text-xl font-medium text-[#30232A] dark:text-white truncate">{product.name || product.title}</h3>
+          <p className="shrink-0 pt-1 text-sm font-bold text-[#651F3C]">₹{price.toLocaleString("en-IN")}</p>
         </div>
-        <Link to="/gallery" className="mt-4 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#2D2D2D] transition hover:text-[#E85D8E] dark:text-zinc-200">
+        <Link to="/gallery" className="mt-4 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#30232A] transition hover:text-[#651F3C] dark:text-zinc-200">
           Acquire Bloom <FiArrowRight />
         </Link>
       </div>
@@ -157,7 +157,7 @@ const renderHeroText = (text) => {
     return (
       <>
         Crafting Your<br />
-        <span className="bg-gradient-to-r from-rose-500 via-purple-500 to-amber-500 bg-clip-text text-transparent italic font-serif">
+        <span className="bg-gradient-to-r from-[#651F3C] via-[#C5A15B] to-[#D9B8B8] bg-clip-text text-transparent italic font-serif">
           Eternal Memories
         </span>
       </>
@@ -167,7 +167,7 @@ const renderHeroText = (text) => {
     return (
       <>
         Crafting<br />
-        <span className="bg-gradient-to-r from-rose-500 via-purple-500 to-amber-500 bg-clip-text text-transparent italic font-serif">
+        <span className="bg-gradient-to-r from-[#651F3C] via-[#C5A15B] to-[#D9B8B8] bg-clip-text text-transparent italic font-serif">
           Eternal Memories
         </span>
       </>
@@ -184,7 +184,7 @@ const renderHeroDescription = (text) => {
     return parts.map((part, index) => {
       if (regex.test(part)) {
         return (
-          <span key={index} className="font-semibold text-rose-600 dark:text-rose-400 bg-rose-500/10 dark:bg-rose-400/10 px-2.5 py-0.5 rounded-lg border border-rose-500/20 dark:border-rose-400/20 shadow-sm mx-1 inline-block">
+          <span key={index} className="font-semibold text-[#651F3C] dark:text-[#D9B8B8] bg-[#651F3C]/10 dark:bg-[#D9B8B8]/10 px-2.5 py-0.5 rounded-lg border border-[#651F3C]/20 dark:border-[#D9B8B8]/20 shadow-sm mx-1 inline-block">
             {part}
           </span>
         );
@@ -265,13 +265,13 @@ const HomePage = () => {
   }, [content.banners]);
 
   return (
-    <div className="relative overflow-hidden bg-[#FFF9F6] text-[#2D2D2D] transition-colors dark:bg-[#0E0C12] dark:text-[#F5F5F5]">
+    <div className="relative overflow-hidden bg-[#FAF5EF] text-[#30232A] transition-colors dark:bg-[#171116] dark:text-[#F5F5F5]">
       <SeoHead seoOverride={pageSeo} breadcrumbs={[{ name: 'Home', url: '/' }]} />
 
       {/* ── Surreal Ambient Glowing Orbs ── */}
-      <div className="surreal-orb top-[-100px] left-[15%] w-[450px] h-[450px] bg-rose-400/25 dark:bg-rose-600/20" />
-      <div className="surreal-orb top-[400px] right-[-100px] w-[550px] h-[550px] bg-purple-400/20 dark:bg-purple-700/25" />
-      <div className="surreal-orb top-[1400px] left-[-80px] w-[400px] h-[400px] bg-amber-300/20 dark:bg-amber-600/15" />
+      <div className="surreal-orb top-[-100px] left-[15%] w-[450px] h-[450px] bg-[#651F3C]/25 dark:bg-[#651F3C]/20" />
+      <div className="surreal-orb top-[400px] right-[-100px] w-[550px] h-[550px] bg-[#78836B]/20 dark:bg-[#78836B]/25" />
+      <div className="surreal-orb top-[1400px] left-[-80px] w-[400px] h-[400px] bg-[#C5A15B]/20 dark:bg-[#C5A15B]/15" />
 
       {/* ── 1. Surrealist Hero Section ── */}
       <section className="relative min-h-[calc(100vh-80px)] overflow-hidden bg-[radial-gradient(ellipse_at_50%_0%,rgba(253,242,248,0.8)_0%,rgba(255,249,246,0.95)_50%,rgba(245,243,255,0.7)_100%)] dark:bg-[radial-gradient(ellipse_at_50%_0%,rgba(45,20,50,0.5)_0%,rgba(14,12,18,0.95)_55%,rgba(20,15,30,0.9)_100%)]">
@@ -283,12 +283,12 @@ const HomePage = () => {
         <div className="mx-auto grid min-h-[calc(100vh-80px)] max-w-[1440px] items-center gap-10 px-5 py-14 sm:px-8 lg:grid-cols-[0.95fr_1.05fr] lg:px-12 lg:py-16 xl:px-20">
           <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.85 }} className="relative z-10 max-w-2xl">
             {/* Surreal Badge */}
-            <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-pink-200/60 bg-white/70 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.28em] text-[#936B53] shadow-md backdrop-blur-xl dark:border-purple-500/30 dark:bg-purple-950/40 dark:text-purple-200">
-              <span className="h-2 w-2 rounded-full bg-[#E85D8E] animate-ping" />
+            <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-[#D9B8B8]/60 bg-white/70 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.28em] text-[#78836B] shadow-md backdrop-blur-xl dark:border-[#30232A]/30 dark:bg-[#30232A]/40 dark:text-[#D9B8B8]">
+              <span className="h-2 w-2 rounded-full bg-[#651F3C] animate-ping" />
               ✦ {content.badgeText}
             </div>
 
-            <h1 className="text-[clamp(3.35rem,6.8vw,7rem)] font-medium leading-[0.92] tracking-[-0.04em] text-[#2D2D2D] dark:text-white">
+            <h1 className="text-[clamp(3.35rem,6.8vw,7rem)] font-medium leading-[0.92] tracking-[-0.04em] text-[#30232A] dark:text-white">
               {renderHeroText(content.heroText)}
             </h1>
 
@@ -322,9 +322,9 @@ const HomePage = () => {
             className="relative mx-auto w-full max-w-[700px] lg:ml-auto"
           >
             {/* Glowing Aurora Portal Aura */}
-            <div className="absolute -inset-4 rounded-[180px_180px_40px_40px] bg-gradient-to-tr from-pink-500/20 via-purple-500/20 to-amber-400/20 blur-2xl -z-10" />
+            <div className="absolute -inset-4 rounded-[180px_180px_40px_40px] bg-gradient-to-tr from-[#651F3C]/15 via-[#C5A15B]/15 to-[#D9B8B8]/15 blur-2xl -z-10" />
 
-            <div className="relative ml-auto aspect-[4/5] max-h-[720px] overflow-hidden rounded-[180px_180px_36px_36px] border-[10px] border-white/80 bg-white/20 shadow-[0_35px_90px_rgba(219,39,119,0.22)] backdrop-blur-xl dark:border-purple-400/20 dark:bg-purple-950/20 sm:border-[14px]">
+            <div className="relative ml-auto aspect-[4/5] max-h-[720px] overflow-hidden rounded-[180px_180px_36px_36px] border-[10px] border-white/80 bg-white/20 shadow-[0_35px_90px_rgba(101,31,60,0.22)] backdrop-blur-xl dark:border-[#651F3C]/20 dark:bg-[#30232A]/20 sm:border-[14px]">
               {heroSlides && heroSlides.length > 1 ? (
                 <CarouselSlider slides={heroSlides} />
               ) : heroImage ? (
@@ -342,8 +342,8 @@ const HomePage = () => {
             </div>
 
             {/* Floating Glassmorphic Pill */}
-            <div className="absolute -bottom-6 left-2 flex items-center gap-3.5 rounded-2xl border border-white/80 bg-white/85 p-4 pr-7 shadow-2xl backdrop-blur-2xl dark:border-purple-400/30 dark:bg-[#181324]/90">
-              <div className="grid h-12 w-12 place-items-center rounded-full bg-gradient-to-br from-pink-500 to-purple-600 text-white shadow-md">
+            <div className="absolute -bottom-6 left-2 flex items-center gap-3.5 rounded-2xl border border-white/80 bg-white/85 p-4 pr-7 shadow-2xl backdrop-blur-2xl dark:border-[#651F3C]/30 dark:bg-[#181324]/90">
+              <div className="grid h-12 w-12 place-items-center rounded-full bg-gradient-to-br from-[#651F3C] to-[#30232A] text-white shadow-md">
                 <FiGift className="text-xl" />
               </div>
               <div>
@@ -360,8 +360,8 @@ const HomePage = () => {
       </section>
 
       {/* ── 2. Feature Bar (The Realm of Wonders) ── */}
-      <section className="border-y border-pink-100/80 bg-white/60 dark:border-purple-900/30 dark:bg-[#14101D]/70 backdrop-blur-md">
-        <div className="mx-auto grid max-w-7xl grid-cols-2 divide-x divide-pink-100 dark:divide-purple-900/40 px-4 md:grid-cols-4">
+      <section className="border-y border-[#D9B8B8]/80 bg-white/60 dark:border-[#30232A]/30 dark:bg-[#211820]/70 backdrop-blur-md">
+        <div className="mx-auto grid max-w-7xl grid-cols-2 divide-x divide-[#D9B8B8] dark:divide-[#30232A]/40 px-4 md:grid-cols-4">
           {[
             [FiTruck, "Express Delivery", "Karur & All Tamil Nadu"],
             [FiGift, "Surreal Packaging", "Gilded Floral Wraps"],
@@ -369,7 +369,7 @@ const HomePage = () => {
             [FiShoppingBag, "Harvested Fresh", "Crafted in Reverie"],
           ].map(([Icon, title, note]) => (
             <div key={title} className="flex items-center gap-3.5 px-4 py-5 sm:px-7">
-              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-pink-100/60 dark:bg-purple-900/40 text-[#E85D8E] dark:text-purple-300">
+              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#D9B8B8]/60 dark:bg-[#30232A]/40 text-[#651F3C] dark:text-[#D9B8B8]">
                 <Icon className="text-lg" />
               </div>
               <div>
@@ -396,7 +396,7 @@ const HomePage = () => {
               transition={{ duration: 0.3 }}
             >
               <Link to="/gallery" className="group block">
-                <div className="relative aspect-[4/5] overflow-hidden rounded-[28px] border border-white/70 bg-white/40 shadow-[0_16px_40px_rgba(219,39,119,0.12)] backdrop-blur-xl dark:border-purple-500/20 dark:bg-purple-950/20">
+                <div className="relative aspect-[4/5] overflow-hidden rounded-[28px] border border-white/70 bg-white/40 shadow-[0_16px_40px_rgba(101,31,60,0.12)] backdrop-blur-xl dark:border-[#651F3C]/20 dark:bg-[#30232A]/20">
                   {category.image ? (
                     <img
                       src={category.image}
@@ -409,12 +409,12 @@ const HomePage = () => {
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                   <div className="absolute inset-x-0 bottom-0 p-6 text-white">
-                    <span className="mb-2 block text-[10px] font-bold uppercase tracking-[0.28em] text-pink-300">
+                    <span className="mb-2 block text-[10px] font-bold uppercase tracking-[0.28em] text-[#C5A15B]">
                       ✦ 0{index + 1}
                     </span>
                     <h3 className="text-2xl font-serif font-medium">{category.name}</h3>
                     <p className="mt-1 text-xs text-white/80 line-clamp-1">{category.note}</p>
-                    <span className="mt-4 inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-amber-200">
+                    <span className="mt-4 inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-[#FAF5EF]">
                       Enter Portal <FiArrowRight />
                     </span>
                   </div>
@@ -426,7 +426,7 @@ const HomePage = () => {
       </motion.section>
 
       {/* ── 4. The Favourites (Petals from the Ether) ── */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-rose-50/40 via-purple-50/30 to-transparent px-5 py-24 dark:from-purple-950/20 dark:via-zinc-950 dark:to-transparent sm:px-8 sm:py-28">
+      <section className="relative overflow-hidden bg-gradient-to-b from-[#FAF5EF]/40 via-[#D9B8B8]/30 to-transparent px-5 py-24 dark:from-[#30232A]/20 dark:via-zinc-950 dark:to-transparent sm:px-8 sm:py-28">
         <motion.div {...reveal} className="mx-auto max-w-7xl">
           <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
             <SectionHeading
@@ -435,7 +435,7 @@ const HomePage = () => {
               title="The Cherished Collections"
               copy="Living floral art requested time and again, crafted fresh for your celebration."
             />
-            <Link to="/gallery" className="inline-flex items-center gap-2 text-sm font-bold text-[#E85D8E] hover:underline">
+            <Link to="/gallery" className="inline-flex items-center gap-2 text-sm font-bold text-[#651F3C] hover:underline">
               View All Works <FiArrowRight />
             </Link>
           </div>
@@ -450,7 +450,7 @@ const HomePage = () => {
       {/* ── 5. The Surreal Botanical Atelier (Sculpting Living Petals) ── */}
       <section className="mx-auto grid max-w-7xl scroll-mt-24 gap-12 px-5 py-24 sm:px-8 sm:py-28 lg:grid-cols-2 lg:items-center">
         <motion.div {...reveal} className="relative">
-          <div className="aspect-[5/6] overflow-hidden rounded-[140px_28px_28px_28px] border-[8px] border-white/70 bg-white/30 shadow-[0_30px_70px_rgba(219,39,119,0.18)] backdrop-blur-xl dark:border-purple-500/20 dark:bg-purple-950/20">
+          <div className="aspect-[5/6] overflow-hidden rounded-[140px_28px_28px_28px] border-[8px] border-white/70 bg-white/30 shadow-[0_30px_70px_rgba(101,31,60,0.18)] backdrop-blur-xl dark:border-[#651F3C]/20 dark:bg-[#30232A]/20">
             {eventImage ? (
               <img
                 src={eventImage}
@@ -462,8 +462,8 @@ const HomePage = () => {
               <div className="grid h-full place-items-center bg-[#F8F2EF] text-sm text-[#9A8E86] dark:bg-zinc-800 dark:text-zinc-400">Atelier image not set</div>
             )}
           </div>
-          <div className="absolute -bottom-7 -right-2 hidden w-56 rounded-2xl border border-white/80 bg-white/90 p-5 shadow-2xl backdrop-blur-2xl dark:border-purple-500/30 dark:bg-[#1A1424]/90 sm:block">
-            <p className="text-3xl text-amber-500 font-serif">“</p>
+          <div className="absolute -bottom-7 -right-2 hidden w-56 rounded-2xl border border-white/80 bg-white/90 p-5 shadow-2xl backdrop-blur-2xl dark:border-[#651F3C]/30 dark:bg-[#1A1424]/90 sm:block">
+            <p className="text-3xl text-[#C5A15B] font-serif">"</p>
             <p className="-mt-2 text-xs leading-5 text-gray-700 dark:text-gray-300">
               Every petal is woven with intention, belonging to your sacred celebration.
             </p>
@@ -471,13 +471,13 @@ const HomePage = () => {
         </motion.div>
 
         <motion.div {...reveal} className="lg:pl-10">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-[#C69236] dark:text-[#E9D8A6]">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-[#C5A15B] dark:text-[#D5B36C]">
             ✦ The Botanical Atelier
           </p>
-          <h2 className="mt-4 text-4xl sm:text-5xl font-medium leading-[1.05] text-[#2D2D2D] dark:text-white">
-            Sculpting Dreams from <span className="bg-gradient-to-r from-rose-500 to-purple-600 bg-clip-text text-transparent italic font-serif">Living Petals</span>.
+          <h2 className="mt-4 text-4xl sm:text-5xl font-medium leading-[1.05] text-[#30232A] dark:text-white">
+            Sculpting Dreams from <span className="bg-gradient-to-r from-[#651F3C] to-[#30232A] bg-clip-text text-transparent italic font-serif">Living Petals</span>.
           </h2>
-          <p className="mt-6 max-w-lg leading-8 text-[#6E6864] dark:text-zinc-300">
+          <p className="mt-6 max-w-lg leading-8 text-[#51454B] dark:text-zinc-300">
             From heirloom-inspired bridal jadai and royal lotus dollars to atmospheric venue styling, we harmonize natural blooms into living poetry.
           </p>
           <div className="mt-8 grid gap-4 sm:grid-cols-2">
@@ -488,7 +488,7 @@ const HomePage = () => {
               "Express Setup Across Tamil Nadu"
             ].map((item) => (
               <p key={item} className="flex items-center gap-3 text-sm font-medium text-gray-700 dark:text-gray-200">
-                <span className="grid h-6 w-6 place-items-center rounded-full bg-pink-100 text-[#E85D8E] dark:bg-purple-950 dark:text-pink-300">
+                <span className="grid h-6 w-6 place-items-center rounded-full bg-[#D9B8B8] text-[#651F3C] dark:bg-[#30232A] dark:text-[#D9B8B8]">
                   <FiCheck className="text-xs" />
                 </span>
                 {item}
@@ -505,18 +505,18 @@ const HomePage = () => {
       <section className="px-5 py-10 sm:px-8">
         <motion.div
           {...reveal}
-          className="relative mx-auto max-w-7xl overflow-hidden rounded-[36px] bg-gradient-to-r from-[#2D1B36] via-[#1F1829] to-[#36182B] px-6 py-16 text-white shadow-[0_30px_80px_rgba(45,27,54,0.4)] sm:px-12 lg:px-20 lg:py-20 border border-purple-500/30"
+          className="relative mx-auto max-w-7xl overflow-hidden rounded-[36px] bg-gradient-to-r from-[#2D1B36] via-[#1F1829] to-[#36182B] px-6 py-16 text-white shadow-[0_30px_80px_rgba(45,27,54,0.4)] sm:px-12 lg:px-20 lg:py-20 border border-[#651F3C]/30"
         >
-          <div className="surreal-orb top-[-50px] right-[10%] w-[350px] h-[350px] bg-pink-500/30" />
-          <div className="surreal-orb bottom-[-50px] left-[10%] w-[400px] h-[400px] bg-purple-600/30" />
+          <div className="surreal-orb top-[-50px] right-[10%] w-[350px] h-[350px] bg-[#651F3C]/30" />
+          <div className="surreal-orb bottom-[-50px] left-[10%] w-[400px] h-[400px] bg-[#78836B]/30" />
 
           <div className="relative grid gap-10 lg:grid-cols-[1fr_auto] lg:items-center">
             <div className="max-w-3xl">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-pink-300">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-[#C5A15B]">
                 ✦ Your Imagination in Bloom
               </p>
               <h2 className="mt-4 text-3xl sm:text-5xl font-medium leading-tight">
-                Conjure a floral design that is <span className="italic font-serif text-pink-300">entirely yours</span>.
+                Conjure a floral design that is <span className="italic font-serif text-[#C5A15B]">entirely yours</span>.
               </h2>
               <p className="mt-5 max-w-2xl leading-7 text-white/80 text-sm sm:text-base">
                 Share your mood, colors, flowers, and message. Our master florists will handcraft your vision into a living masterpiece.
@@ -524,7 +524,7 @@ const HomePage = () => {
             </div>
             <Link
               to="/gallery"
-              className="inline-flex h-14 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-pink-500 via-rose-500 to-purple-600 px-8 text-sm font-bold uppercase tracking-wider text-white shadow-xl transition hover:scale-105"
+              className="inline-flex h-14 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#651F3C] via-[#C5A15B] to-[#D9B8B8] px-8 text-sm font-bold uppercase tracking-wider text-white shadow-xl transition hover:scale-105"
             >
               Start Creating <FiArrowRight />
             </Link>
@@ -544,7 +544,7 @@ const HomePage = () => {
             <Link
               key={tile.id || tile.src || index}
               to="/gallery"
-              className={`group relative overflow-hidden rounded-[26px] border border-white/60 dark:border-purple-500/20 shadow-md ${tile.className || ""}`}
+              className={`group relative overflow-hidden rounded-[26px] border border-white/60 dark:border-[#651F3C]/20 shadow-md ${tile.className || ""}`}
             >
               {tile.src ? (
                 <img
@@ -557,7 +557,7 @@ const HomePage = () => {
                 <div className="grid h-full place-items-center bg-[#F8F2EF] text-sm text-[#9A8E86] dark:bg-zinc-800 dark:text-zinc-400">No image</div>
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent" />
-              <p className="absolute bottom-5 left-5 text-xl font-serif font-medium text-white group-hover:text-pink-200 transition-colors">
+              <p className="absolute bottom-5 left-5 text-xl font-serif font-medium text-white group-hover:text-[#D9B8B8] transition-colors">
                 {tile.label}
               </p>
             </Link>
@@ -566,7 +566,7 @@ const HomePage = () => {
       </motion.section>
 
       {/* ── 8. Kind Words (Love Notes in Petals) ── */}
-      <section className="bg-white/40 px-5 py-24 dark:bg-[#120E1A]/40 backdrop-blur-md sm:px-8 sm:py-28 border-t border-pink-100/50 dark:border-purple-900/30">
+      <section className="bg-white/40 px-5 py-24 dark:bg-[#120E1A]/40 backdrop-blur-md sm:px-8 sm:py-28 border-t border-[#D9B8B8]/50 dark:border-[#30232A]/30">
         <motion.div {...reveal} className="mx-auto max-w-7xl">
           <SectionHeading
             eyebrow="Heartfelt Reveries"
@@ -577,17 +577,17 @@ const HomePage = () => {
             {reviews.map((review) => (
               <article
                 key={review.name}
-                className="rounded-[26px] border border-white/80 bg-white/70 p-7 shadow-lg backdrop-blur-xl dark:border-purple-500/20 dark:bg-[#1A1424]/80 sm:p-8"
+                className="rounded-[26px] border border-white/80 bg-white/70 p-7 shadow-lg backdrop-blur-xl dark:border-[#651F3C]/20 dark:bg-[#1A1424]/80 sm:p-8"
               >
-                <div className="flex gap-1 text-amber-400">
+                <div className="flex gap-1 text-[#C5A15B]">
                   {Array.from({ length: 5 }).map((_, i) => (
                     <FiStar key={i} fill="currentColor" />
                   ))}
                 </div>
                 <p className="mt-6 text-xl sm:text-2xl font-serif italic leading-8 text-gray-800 dark:text-gray-100">
-                  “{review.quote}”
+                  "{review.quote}"
                 </p>
-                <div className="mt-7 border-t border-pink-100 pt-5 dark:border-purple-900/40">
+                <div className="mt-7 border-t border-[#D9B8B8] pt-5 dark:border-[#30232A]/40">
                   <p className="text-sm font-bold text-gray-900 dark:text-white">{review.name}</p>
                   <p className="mt-0.5 text-xs text-[#8A817C] dark:text-zinc-400">{review.event}</p>
                 </div>
@@ -595,7 +595,7 @@ const HomePage = () => {
             ))}
           </div>
           <div className="mt-10 text-center">
-            <Link to="/reviews" className="inline-flex items-center gap-2 text-sm font-bold text-[#E85D8E] hover:underline">
+            <Link to="/reviews" className="inline-flex items-center gap-2 text-sm font-bold text-[#651F3C] hover:underline">
               Read Every Love Note <FiArrowRight />
             </Link>
           </div>
@@ -606,10 +606,10 @@ const HomePage = () => {
         <section className="mx-auto max-w-7xl px-5 pb-24 sm:px-8">
           <div className="grid gap-4 md:grid-cols-3">
             {content.promotionalSections.map((section) => (
-              <article key={section.id} className="rounded-[22px] border border-white/80 bg-white/70 p-7 shadow-md backdrop-blur-xl dark:border-purple-500/20 dark:bg-[#1A1424]">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#E85D8E]">Atelier Special</p>
+              <article key={section.id} className="rounded-[22px] border border-white/80 bg-white/70 p-7 shadow-md backdrop-blur-xl dark:border-[#651F3C]/20 dark:bg-[#1A1424]">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#651F3C]">Atelier Special</p>
                 <h3 className="mt-3 text-2xl font-serif">{section.title}</h3>
-                <p className="mt-3 text-sm leading-7 text-[#6E6864] dark:text-zinc-400">{section.description}</p>
+                <p className="mt-3 text-sm leading-7 text-[#51454B] dark:text-zinc-400">{section.description}</p>
               </article>
             ))}
           </div>

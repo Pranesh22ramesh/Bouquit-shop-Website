@@ -178,23 +178,23 @@ const ReviewPage = () => {
   };
 
   return (
-    <div className={`min-h-screen px-4 py-10 ${isDarkMode ? "bg-gray-900" : "bg-[#fff9f7]"}`}>
+    <div className={`min-h-screen px-4 py-10 transition-colors ${isDarkMode ? "bg-[#171116] text-[#FAF5EF]" : "bg-[#FAF5EF] text-[#30232A]"}`}>
       <div className="mx-auto max-w-5xl">
         <div className="mb-8">
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-rose-500">Customer stories</p>
-          <h1 className={`mt-2 text-3xl font-semibold ${isDarkMode ? "text-gray-100" : "text-rose-900"}`}>Reviews & Experiences</h1>
-          <p className={`mt-3 max-w-2xl text-sm leading-7 ${isDarkMode ? "text-gray-300" : "text-rose-700/80"}`}>
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[#C5A15B]">Customer stories</p>
+          <h1 className={`mt-2 text-3xl font-serif font-bold ${isDarkMode ? "text-[#FAF5EF]" : "text-[#651F3C]"}`}>Reviews & Experiences</h1>
+          <p className={`mt-3 max-w-2xl text-sm leading-7 ${isDarkMode ? "text-[#C9B8BF]" : "text-[#51454B]"}`}>
             Share your experience with our bridal flowers and bouquets. Pinned reviews appear first automatically.
           </p>
         </div>
 
-        <div className={`mb-8 rounded-[2rem] border p-6 shadow-lg ${isDarkMode ? "border-gray-700 bg-gray-800" : "border-rose-100 bg-white"}`}>
+        <div className={`mb-8 rounded-[2rem] border p-6 shadow-lg ${isDarkMode ? "border-[#493640] bg-[#261B22]" : "border-[#E8DDD5] bg-white shadow-sm"}`}>
           <div className="flex items-center justify-between gap-3">
-            <h2 className={`text-xl font-semibold ${isDarkMode ? "text-gray-100" : "text-rose-900"}`}>
+            <h2 className={`text-xl font-serif font-bold ${isDarkMode ? "text-[#FAF5EF]" : "text-[#651F3C]"}`}>
               {isEditing ? "Edit your review" : "Write a review"}
             </h2>
             {isEditing && (
-              <button type="button" onClick={resetForm} className="rounded-full border px-4 py-2 text-sm font-medium text-rose-600">
+              <button type="button" onClick={resetForm} className="rounded-full border border-[#E8DDD5] px-4 py-2 text-sm font-medium text-[#651F3C] hover:bg-[#F5EAE9]">
                 Cancel edit
               </button>
             )}
@@ -203,67 +203,67 @@ const ReviewPage = () => {
           <form className="mt-5 space-y-4" onSubmit={handleSubmit} noValidate>
             <div className="grid gap-4 md:grid-cols-2">
               <div>
-                <label className={`block text-sm font-medium ${isDarkMode ? "text-gray-200" : "text-rose-800"}`}>Your name</label>
+                <label className={`block text-sm font-medium ${isDarkMode ? "text-[#FAF5EF]" : "text-[#30232A]"}`}>Your name</label>
                 <input
                   name="author"
                   value={form.author}
                   onChange={handleChange}
-                  className={`mt-1 block w-full rounded-xl border px-3 py-2 text-sm outline-none ${errors.author ? "border-rose-400" : isDarkMode ? "border-gray-600 bg-gray-700/50 text-white" : "border-rose-100"}`}
+                  className={`mt-1 block w-full rounded-xl border px-3 py-2 text-sm outline-none ${errors.author ? "border-red-400" : isDarkMode ? "border-[#493640] bg-[#171116] text-white" : "border-[#E8DDD5] bg-[#FAF5EF] text-[#30232A] focus:border-[#651F3C]"}`}
                 />
-                {errors.author && <p className="mt-1 text-xs text-rose-400">{errors.author}</p>}
+                {errors.author && <p className="mt-1 text-xs text-red-500">{errors.author}</p>}
               </div>
               <div>
-                <label className={`block text-sm font-medium ${isDarkMode ? "text-gray-200" : "text-rose-800"}`}>Rating</label>
+                <label className={`block text-sm font-medium ${isDarkMode ? "text-[#FAF5EF]" : "text-[#30232A]"}`}>Rating</label>
                 <div className="mt-2 flex items-center gap-2">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <button
                       key={star}
                       type="button"
                       onClick={() => handleChange({ target: { name: "rating", value: star } })}
-                      className={`flex h-8 w-8 items-center justify-center rounded-full text-lg ${form.rating >= star ? "bg-amber-400 text-white" : "bg-rose-50 text-rose-300"}`}
+                      className={`flex h-8 w-8 items-center justify-center rounded-full text-lg transition-transform hover:scale-110 ${form.rating >= star ? "bg-[#C5A15B] text-white shadow-sm" : "bg-[#F5EAE9] text-[#81747A]"}`}
                     >
                       ★
                     </button>
                   ))}
                 </div>
-                {errors.rating && <p className="mt-1 text-xs text-rose-400">{errors.rating}</p>}
+                {errors.rating && <p className="mt-1 text-xs text-red-500">{errors.rating}</p>}
               </div>
             </div>
 
             <div>
-              <label className={`block text-sm font-medium ${isDarkMode ? "text-gray-200" : "text-rose-800"}`}>Your review</label>
+              <label className={`block text-sm font-medium ${isDarkMode ? "text-[#FAF5EF]" : "text-[#30232A]"}`}>Your review</label>
               <textarea
                 name="text"
                 rows={4}
                 value={form.text}
                 onChange={handleChange}
-                className={`mt-1 block w-full rounded-xl border px-3 py-2 text-sm outline-none ${errors.text ? "border-rose-400" : isDarkMode ? "border-gray-600 bg-gray-700/50 text-white" : "border-rose-100"}`}
+                className={`mt-1 block w-full rounded-xl border px-3 py-2 text-sm outline-none ${errors.text ? "border-red-400" : isDarkMode ? "border-[#493640] bg-[#171116] text-white" : "border-[#E8DDD5] bg-[#FAF5EF] text-[#30232A] focus:border-[#651F3C]"}`}
               />
-              {errors.text && <p className="mt-1 text-xs text-rose-400">{errors.text}</p>}
+              {errors.text && <p className="mt-1 text-xs text-red-500">{errors.text}</p>}
             </div>
 
             {!isEditing && (
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                <label className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-dashed border-rose-300 bg-rose-50 px-4 py-2 text-xs font-medium text-rose-700">
+                <label className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-dashed border-[#C5A15B]/50 bg-[#F5EAE9] px-4 py-2 text-xs font-medium text-[#651F3C] hover:bg-[#FAF5EF] transition">
                   Upload photo
                   <input type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
                 </label>
-                {form.imagePreview && <img src={form.imagePreview} alt="Review preview" className="h-20 w-20 rounded-xl object-cover" />}
+                {form.imagePreview && <img src={form.imagePreview} alt="Review preview" className="h-20 w-20 rounded-xl object-cover border border-[#E8DDD5]" />}
               </div>
             )}
 
             <button
               type="submit"
               disabled={submitting}
-              className="inline-flex items-center justify-center rounded-full bg-rose-700 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-rose-200 transition hover:bg-rose-800 disabled:opacity-70"
+              className="inline-flex items-center justify-center rounded-full bg-[#651F3C] hover:bg-[#4D172D] px-6 py-2.5 text-sm font-semibold text-white shadow-md shadow-[#651F3C]/20 transition disabled:opacity-70"
             >
               {submitting ? "Saving..." : isEditing ? "Update review" : "Submit review"}
             </button>
           </form>
         </div>
 
-        <div className={`rounded-[2rem] border p-6 shadow-md ${isDarkMode ? "border-gray-700 bg-gray-800/90" : "border-rose-100 bg-white/90"}`}>
-          <h2 className="mb-4 text-xl font-semibold text-rose-900">What others are saying</h2>
+        <div className={`rounded-[2rem] border p-6 shadow-md ${isDarkMode ? "border-[#493640] bg-[#261B22]/90" : "border-[#E8DDD5] bg-white/90"}`}>
+          <h2 className={`mb-4 text-xl font-serif font-bold ${isDarkMode ? "text-[#FAF5EF]" : "text-[#651F3C]"}`}>What others are saying</h2>
           <ReviewList reviews={reviews} currentUser={user} onDelete={handleDelete} onEdit={handleEdit} />
         </div>
       </div>

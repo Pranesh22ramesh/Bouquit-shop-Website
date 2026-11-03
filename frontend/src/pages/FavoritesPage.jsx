@@ -69,19 +69,19 @@ const FavoritesPage = () => {
     return (
       <div
         className={`min-h-[60vh] flex flex-col items-center justify-center text-center p-4 transition-colors duration-300 ${
-          isDarkMode ? "bg-[#171116] text-[#FAF5EF]" : "bg-[#FAF5EF] text-[#30232A]"
+          isDarkMode ? "bg-[#160F17] text-[#FAF5EE]" : "bg-[#FAF5EE] text-[#30232A]"
         }`}
       >
-        <div className="mb-6 inline-flex rounded-full border border-[#E8DDD5] dark:border-[#493640] p-1 text-sm bg-white dark:bg-[#261B22]">
+        <div className="mb-6 inline-flex rounded-full border border-[#E8DDD5] dark:border-[#493640] p-1 text-sm bg-white dark:bg-[#231722]">
           <button
             onClick={() => setActiveTab("likes")}
-            className={`rounded-full px-4 py-2 font-medium transition ${activeTab === "likes" ? "bg-[#651F3C] text-white shadow-sm" : "text-[#30232A] dark:text-[#FAF5EF]"}`}
+            className={`rounded-full px-4 py-2 font-medium transition ${activeTab === "likes" ? "bg-[#651F3C] text-white shadow-sm" : "text-[#30232A] dark:text-[#FAF5EE]"}`}
           >
             Likes ({likes.length})
           </button>
           <button
             onClick={() => setActiveTab("wishlist")}
-            className={`rounded-full px-4 py-2 font-medium transition ${activeTab === "wishlist" ? "bg-[#651F3C] text-white shadow-sm" : "text-[#30232A] dark:text-[#FAF5EF]"}`}
+            className={`rounded-full px-4 py-2 font-medium transition ${activeTab === "wishlist" ? "bg-[#651F3C] text-white shadow-sm" : "text-[#30232A] dark:text-[#FAF5EE]"}`}
           >
             Wishlist ({wishlist.length})
           </button>
@@ -98,26 +98,26 @@ const FavoritesPage = () => {
   }
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${isDarkMode ? "bg-[#171116] text-[#FAF5EF]" : "bg-[#FAF5EF] text-[#30232A]"}`}>
+    <div className={`min-h-screen transition-colors duration-300 ${isDarkMode ? "bg-[#160F17] text-[#FAF5EE]" : "bg-[#FAF5EE] text-[#30232A]"}`}>
       <div className="max-w-6xl mx-auto px-4 py-10">
         <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <h1 className={`text-3xl font-serif font-bold mb-2 ${isDarkMode ? "text-[#FAF5EF]" : "text-[#651F3C]"}`}>Saved Products</h1>
+            <h1 className={`text-3xl font-serif font-bold mb-2 ${isDarkMode ? "text-[#FAF5EE]" : "text-[#651F3C]"}`}>Saved Products</h1>
             <p className={`${isDarkMode ? "text-[#8E7A83]" : "text-[#81747A]"}`}>
               Likes and wishlist items stay tied to your account.
             </p>
           </div>
 
-          <div className="inline-flex rounded-full border border-[#E8DDD5] dark:border-[#493640] bg-white dark:bg-[#261B22] p-1 text-sm shadow-sm">
+          <div className="inline-flex rounded-full border border-[#E8DDD5] dark:border-[#493640] bg-white dark:bg-[#231722] p-1 text-sm shadow-sm">
             <button
               onClick={() => setActiveTab("likes")}
-              className={`rounded-full px-4 py-2 font-medium transition ${activeTab === "likes" ? "bg-[#651F3C] text-white shadow-sm" : "text-[#30232A] dark:text-[#FAF5EF]"}`}
+              className={`rounded-full px-4 py-2 font-medium transition ${activeTab === "likes" ? "bg-[#651F3C] text-white shadow-sm" : "text-[#30232A] dark:text-[#FAF5EE]"}`}
             >
               Likes ({likes.length})
             </button>
             <button
               onClick={() => setActiveTab("wishlist")}
-              className={`rounded-full px-4 py-2 font-medium transition ${activeTab === "wishlist" ? "bg-[#651F3C] text-white shadow-sm" : "text-[#30232A] dark:text-[#FAF5EF]"}`}
+              className={`rounded-full px-4 py-2 font-medium transition ${activeTab === "wishlist" ? "bg-[#651F3C] text-white shadow-sm" : "text-[#30232A] dark:text-[#FAF5EE]"}`}
             >
               Wishlist ({wishlist.length})
             </button>

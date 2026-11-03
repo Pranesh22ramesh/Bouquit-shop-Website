@@ -48,7 +48,7 @@ const CheckoutPage = () => {
 
   if (items.length === 0 && !showWhatsAppPopup) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#FAF5EF]">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#FAF5EE]">
         <h2 className="text-2xl font-serif font-bold text-[#651F3C] mb-4">Your cart is empty</h2>
         <button onClick={() => navigate("/gallery")} className="text-[#651F3C] hover:text-[#4D172D] underline font-medium">
           Go back to Gallery
@@ -152,12 +152,12 @@ const CheckoutPage = () => {
   const [isDarkMode] = React.useState(() => document.documentElement.classList.contains("dark"));
 
   return (
-    <div className={`min-h-screen py-10 transition-colors duration-300 ${isDarkMode ? "bg-[#171116] text-[#FAF5EF]" : "bg-[#FAF5EF] text-[#30232A]"}`}>
+    <div className={`min-h-screen py-10 transition-colors duration-300 ${isDarkMode ? "bg-[#160F17] text-[#FAF5EE]" : "bg-[#FAF5EE] text-[#30232A]"}`}>
       
       {/* WhatsApp Confirmation Popup */}
       {showWhatsAppPopup && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
-          <div className={`w-full max-w-lg rounded-3xl p-8 shadow-2xl text-center relative overflow-hidden ${isDarkMode ? "bg-[#261B22] text-[#FAF5EF] border border-[#493640]" : "bg-white text-[#30232A] border border-[#E8DDD5]"}`}>
+          <div className={`w-full max-w-lg rounded-3xl p-8 shadow-2xl text-center relative overflow-hidden ${isDarkMode ? "bg-[#231722] text-[#FAF5EE] border border-[#493640]" : "bg-white text-[#30232A] border border-[#E8DDD5]"}`}>
             
             <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <svg className="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

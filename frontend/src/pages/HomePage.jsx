@@ -104,9 +104,9 @@ const ProductCard = ({ product }) => {
     <motion.article
       whileHover={{ y: -10, scale: 1.015 }}
       transition={{ duration: 0.35, ease: "easeOut" }}
-      className="group relative overflow-hidden rounded-[26px] border border-white/80 bg-white/70 shadow-[0_15px_45px_rgba(101,31,60,0.08)] backdrop-blur-xl dark:border-[#30232A]/20 dark:bg-[#1A1522]/80 dark:shadow-[0_15px_45px_rgba(0,0,0,0.5)]"
+      className="group relative overflow-hidden rounded-[26px] border border-[#E8DDD5] bg-white shadow-[0_15px_45px_rgba(101,31,60,0.08)] backdrop-blur-xl dark:border-[#493640] dark:bg-[#231722] dark:shadow-[0_15px_45px_rgba(0,0,0,0.5)] hover:border-[#C5A15B]/70 transition-all duration-300"
     >
-      <div className="relative aspect-[4/5] overflow-hidden bg-gradient-to-br from-[#FAF5EF]/50 to-[#D9B8B8]/50 dark:from-[#30232A]/20 dark:to-zinc-900">
+      <div className="relative aspect-[4/5] overflow-hidden bg-gradient-to-br from-[#FAF5EE] to-[#F6ECE7] dark:from-[#211720] dark:to-[#160F17]">
         {image ? (
           <img
             src={image}
@@ -116,22 +116,22 @@ const ProductCard = ({ product }) => {
             decoding="async"
           />
         ) : (
-          <div className="grid h-full place-items-center bg-[#F8F2EF] text-sm text-[#9A8E86] dark:bg-zinc-800 dark:text-zinc-400">No image</div>
+          <div className="grid h-full place-items-center bg-[#FAF5EE] text-sm text-[#81747A] dark:bg-[#211720] dark:text-zinc-400">No image</div>
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/10 opacity-60 group-hover:opacity-40 transition-opacity" />
-        <span className="absolute left-4 top-4 rounded-full bg-white/90 px-3.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#9B6D28] backdrop-blur-md shadow-sm dark:bg-zinc-900/90 dark:text-[#FAF5EF]">
+        <span className="absolute left-4 top-4 rounded-full bg-white/95 px-3.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#651F3C] border border-[#C5A15B]/30 backdrop-blur-md shadow-sm dark:bg-[#1E1420]/95 dark:text-[#D5B36C] dark:border-[#493640]">
           {product.badge || (product.offerPrice ? "Special" : "✦ Reverie")}
         </span>
         <Link
           to="/favorites"
           aria-label="Save to wishlist"
-          className="absolute right-4 top-4 grid h-10 w-10 place-items-center rounded-full bg-white/90 text-[#30232A] shadow-md backdrop-blur transition hover:bg-[#651F3C] hover:text-white dark:bg-zinc-900/90 dark:text-white"
+          className="absolute right-4 top-4 grid h-10 w-10 place-items-center rounded-full bg-white/90 text-[#30232A] shadow-md backdrop-blur transition hover:bg-[#651F3C] hover:text-white dark:bg-[#1E1420]/90 dark:text-white"
         >
           <FiHeart />
         </Link>
         <Link
           to="/gallery"
-          className="absolute inset-x-4 bottom-4 translate-y-4 rounded-full bg-white/95 py-3 text-center text-xs font-bold uppercase tracking-wider text-[#30232A] opacity-0 shadow-xl backdrop-blur transition duration-300 group-hover:translate-y-0 group-hover:opacity-100 dark:bg-zinc-900/95 dark:text-white hover:bg-[#651F3C] hover:text-white"
+          className="absolute inset-x-4 bottom-4 translate-y-4 rounded-full bg-white/95 py-3 text-center text-xs font-bold uppercase tracking-wider text-[#30232A] opacity-0 shadow-xl backdrop-blur transition duration-300 group-hover:translate-y-0 group-hover:opacity-100 dark:bg-[#1E1420]/95 dark:text-white hover:bg-[#651F3C] hover:text-white"
         >
           View in Atelier
         </Link>
@@ -140,7 +140,7 @@ const ProductCard = ({ product }) => {
         <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#C5A15B] dark:text-[#D5B36C]">{product.category || "Fresh blooms"}</p>
         <div className="mt-2 flex items-start justify-between gap-3">
           <h3 className="text-xl font-medium text-[#30232A] dark:text-white truncate">{product.name || product.title}</h3>
-          <p className="shrink-0 pt-1 text-sm font-bold text-[#651F3C]">₹{price.toLocaleString("en-IN")}</p>
+          <p className="shrink-0 pt-1 text-sm font-bold text-[#651F3C] dark:text-[#D5B36C]">₹{price.toLocaleString("en-IN")}</p>
         </div>
         <Link to="/gallery" className="mt-4 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#30232A] transition hover:text-[#651F3C] dark:text-zinc-200">
           Acquire Bloom <FiArrowRight />
@@ -157,7 +157,7 @@ const renderHeroText = (text) => {
     return (
       <>
         Crafting Your<br />
-        <span className="bg-gradient-to-r from-[#651F3C] via-[#C5A15B] to-[#D9B8B8] bg-clip-text text-transparent italic font-serif">
+        <span className="bg-gradient-to-r from-[#651F3C] via-[#C5A15B] to-[#78836B] bg-clip-text text-transparent italic font-serif">
           Eternal Memories
         </span>
       </>
@@ -167,7 +167,7 @@ const renderHeroText = (text) => {
     return (
       <>
         Crafting<br />
-        <span className="bg-gradient-to-r from-[#651F3C] via-[#C5A15B] to-[#D9B8B8] bg-clip-text text-transparent italic font-serif">
+        <span className="bg-gradient-to-r from-[#651F3C] via-[#C5A15B] to-[#78836B] bg-clip-text text-transparent italic font-serif">
           Eternal Memories
         </span>
       </>
@@ -184,7 +184,7 @@ const renderHeroDescription = (text) => {
     return parts.map((part, index) => {
       if (regex.test(part)) {
         return (
-          <span key={index} className="font-semibold text-[#651F3C] dark:text-[#D9B8B8] bg-[#651F3C]/10 dark:bg-[#D9B8B8]/10 px-2.5 py-0.5 rounded-lg border border-[#651F3C]/20 dark:border-[#D9B8B8]/20 shadow-sm mx-1 inline-block">
+          <span key={index} className="font-semibold text-[#651F3C] dark:text-[#D5B36C] bg-[#651F3C]/10 dark:bg-[#C5A15B]/10 px-2.5 py-0.5 rounded-lg border border-[#651F3C]/20 dark:border-[#C5A15B]/20 shadow-sm mx-1 inline-block">
             {part}
           </span>
         );
@@ -265,16 +265,18 @@ const HomePage = () => {
   }, [content.banners]);
 
   return (
-    <div className="relative overflow-hidden bg-[#FAF5EF] text-[#30232A] transition-colors dark:bg-[#171116] dark:text-[#F5F5F5]">
+    <div className="relative overflow-hidden bg-[#FAF5EE] text-[#30232A] transition-colors dark:bg-[#160F17] dark:text-[#F5F5F5]">
       <SeoHead seoOverride={pageSeo} breadcrumbs={[{ name: 'Home', url: '/' }]} />
 
       {/* ── Surreal Ambient Glowing Orbs ── */}
-      <div className="surreal-orb top-[-100px] left-[15%] w-[450px] h-[450px] bg-[#651F3C]/25 dark:bg-[#651F3C]/20" />
-      <div className="surreal-orb top-[400px] right-[-100px] w-[550px] h-[550px] bg-[#78836B]/20 dark:bg-[#78836B]/25" />
-      <div className="surreal-orb top-[1400px] left-[-80px] w-[400px] h-[400px] bg-[#C5A15B]/20 dark:bg-[#C5A15B]/15" />
+      <div className="surreal-orb top-[-100px] left-[15%] w-[500px] h-[500px] bg-[#651F3C]/15 dark:bg-[#651F3C]/18" />
+      <div className="surreal-orb top-[450px] right-[-100px] w-[550px] h-[550px] bg-[#C5A15B]/15 dark:bg-[#C5A15B]/12" />
+      <div className="surreal-orb top-[1300px] left-[-80px] w-[450px] h-[450px] bg-[#78836B]/15 dark:bg-[#78836B]/15" />
+      <div className="surreal-orb top-[2300px] right-[-60px] w-[500px] h-[500px] bg-[#651F3C]/12 dark:bg-[#651F3C]/15" />
+      <div className="surreal-orb top-[3300px] left-[10%] w-[550px] h-[550px] bg-[#C5A15B]/12 dark:bg-[#C5A15B]/12" />
 
       {/* ── 1. Surrealist Hero Section ── */}
-      <section className="relative min-h-[calc(100vh-80px)] overflow-hidden bg-[radial-gradient(ellipse_at_50%_0%,rgba(253,242,248,0.8)_0%,rgba(255,249,246,0.95)_50%,rgba(245,243,255,0.7)_100%)] dark:bg-[radial-gradient(ellipse_at_50%_0%,rgba(45,20,50,0.5)_0%,rgba(14,12,18,0.95)_55%,rgba(20,15,30,0.9)_100%)]">
+      <section className="relative min-h-[calc(100vh-80px)] overflow-hidden bg-[radial-gradient(ellipse_at_50%_0%,#FFFDFC_0%,#FAF5EE_45%,#F5ECE3_100%)] dark:bg-[radial-gradient(ellipse_at_50%_0%,#261522_0%,#1A1018_55%,#140C12_100%)]">
         <span className="hero-petal left-[8%] top-[16%] rotate-12" />
         <span className="hero-petal left-[46%] top-[10%] -rotate-12 [animation-delay:1.8s]" />
         <span className="hero-petal right-[7%] top-[24%] rotate-45 [animation-delay:3.4s]" />
@@ -283,8 +285,8 @@ const HomePage = () => {
         <div className="mx-auto grid min-h-[calc(100vh-80px)] max-w-[1440px] items-center gap-10 px-5 py-14 sm:px-8 lg:grid-cols-[0.95fr_1.05fr] lg:px-12 lg:py-16 xl:px-20">
           <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.85 }} className="relative z-10 max-w-2xl">
             {/* Surreal Badge */}
-            <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-[#D9B8B8]/60 bg-white/70 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.28em] text-[#78836B] shadow-md backdrop-blur-xl dark:border-[#30232A]/30 dark:bg-[#30232A]/40 dark:text-[#D9B8B8]">
-              <span className="h-2 w-2 rounded-full bg-[#651F3C] animate-ping" />
+            <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-[#C5A15B]/35 bg-white/80 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.28em] text-[#651F3C] shadow-sm backdrop-blur-xl dark:border-[#493640] dark:bg-[#231722]/80 dark:text-[#D5B36C]">
+              <span className="h-2 w-2 rounded-full bg-[#651F3C] dark:bg-[#D5B36C] animate-ping" />
               ✦ {content.badgeText}
             </div>
 
@@ -292,7 +294,7 @@ const HomePage = () => {
               {renderHeroText(content.heroText)}
             </h1>
 
-            <p className="mt-7 max-w-xl text-base leading-8 text-[#655E5A] dark:text-zinc-300 sm:text-lg">
+            <p className="mt-7 max-w-xl text-base leading-8 text-[#51454B] dark:text-zinc-300 sm:text-lg">
               {renderHeroDescription(content.heroDescription)}
             </p>
 
@@ -305,10 +307,10 @@ const HomePage = () => {
               </Link>
             </div>
 
-            <div className="mt-10 flex flex-wrap gap-x-8 gap-y-3 text-xs font-medium text-[#756C67] dark:text-zinc-400">
+            <div className="mt-10 flex flex-wrap gap-x-8 gap-y-3 text-xs font-medium text-[#78836B] dark:text-[#D5B36C]">
               {content.features?.map((feature, idx) => (
                 <span key={idx} className="flex items-center gap-2">
-                  <FiCheck className="text-emerald-500" /> {feature}
+                  <FiCheck className="text-[#651F3C] dark:text-[#D5B36C]" /> {feature}
                 </span>
               ))}
             </div>
@@ -322,9 +324,9 @@ const HomePage = () => {
             className="relative mx-auto w-full max-w-[700px] lg:ml-auto"
           >
             {/* Glowing Aurora Portal Aura */}
-            <div className="absolute -inset-4 rounded-[180px_180px_40px_40px] bg-gradient-to-tr from-[#651F3C]/15 via-[#C5A15B]/15 to-[#D9B8B8]/15 blur-2xl -z-10" />
+            <div className="absolute -inset-4 rounded-[180px_180px_40px_40px] bg-gradient-to-tr from-[#651F3C]/15 via-[#C5A15B]/15 to-[#78836B]/15 blur-2xl -z-10" />
 
-            <div className="relative ml-auto aspect-[4/5] max-h-[720px] overflow-hidden rounded-[180px_180px_36px_36px] border-[10px] border-white/80 bg-white/20 shadow-[0_35px_90px_rgba(101,31,60,0.22)] backdrop-blur-xl dark:border-[#651F3C]/20 dark:bg-[#30232A]/20 sm:border-[14px]">
+            <div className="relative ml-auto aspect-[4/5] max-h-[720px] overflow-hidden rounded-[180px_180px_36px_36px] border-[10px] border-white/90 bg-white/20 shadow-[0_35px_90px_rgba(101,31,60,0.18)] backdrop-blur-xl dark:border-[#493640] dark:bg-[#231722]/30 sm:border-[14px]">
               {heroSlides && heroSlides.length > 1 ? (
                 <CarouselSlider slides={heroSlides} />
               ) : heroImage ? (
@@ -336,21 +338,21 @@ const HomePage = () => {
                   decoding="async"
                 />
               ) : (
-                <div className="grid h-full place-items-center bg-[#F8F2EF] text-sm text-[#9A8E86] dark:bg-zinc-800 dark:text-zinc-400">Hero image not set</div>
+                <div className="grid h-full place-items-center bg-[#FAF5EE] text-sm text-[#81747A] dark:bg-[#211720] dark:text-zinc-400">Hero image not set</div>
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-white/10 pointer-events-none" />
             </div>
 
             {/* Floating Glassmorphic Pill */}
-            <div className="absolute -bottom-6 left-2 flex items-center gap-3.5 rounded-2xl border border-white/80 bg-white/85 p-4 pr-7 shadow-2xl backdrop-blur-2xl dark:border-[#651F3C]/30 dark:bg-[#181324]/90">
+            <div className="absolute -bottom-6 left-2 flex items-center gap-3.5 rounded-2xl border border-[#C5A15B]/30 bg-white/95 p-4 pr-7 shadow-2xl backdrop-blur-2xl dark:border-[#493640] dark:bg-[#1E1420]/95">
               <div className="grid h-12 w-12 place-items-center rounded-full bg-gradient-to-br from-[#651F3C] to-[#30232A] text-white shadow-md">
                 <FiGift className="text-xl" />
               </div>
               <div>
-                <p className="text-sm font-bold tracking-wide text-gray-900 dark:text-white">
+                <p className="text-sm font-bold tracking-wide text-[#30232A] dark:text-white">
                   {content.floatingBadgeTitle || "Ethereal Artistry"}
                 </p>
-                <p className="text-[11px] text-[#817873] dark:text-zinc-400">
+                <p className="text-[11px] text-[#81747A] dark:text-zinc-400">
                   {content.floatingBadgeSubtitle || "Suspended in pure beauty"}
                 </p>
               </div>
@@ -360,8 +362,8 @@ const HomePage = () => {
       </section>
 
       {/* ── 2. Feature Bar (The Realm of Wonders) ── */}
-      <section className="border-y border-[#D9B8B8]/80 bg-white/60 dark:border-[#30232A]/30 dark:bg-[#211820]/70 backdrop-blur-md">
-        <div className="mx-auto grid max-w-7xl grid-cols-2 divide-x divide-[#D9B8B8] dark:divide-[#30232A]/40 px-4 md:grid-cols-4">
+      <section className="border-y border-[#C5A15B]/25 bg-gradient-to-r from-[#FAF5EE]/95 via-[#F5ECE3]/85 to-[#FAF5EE]/95 dark:border-[#493640] dark:from-[#211720]/95 dark:via-[#281A27]/90 dark:to-[#211720]/95 backdrop-blur-md">
+        <div className="mx-auto grid max-w-7xl grid-cols-2 divide-x divide-[#C5A15B]/20 dark:divide-[#493640]/60 px-4 md:grid-cols-4">
           {[
             [FiTruck, "Express Delivery", "Karur & All Tamil Nadu"],
             [FiGift, "Surreal Packaging", "Gilded Floral Wraps"],
@@ -369,12 +371,12 @@ const HomePage = () => {
             [FiShoppingBag, "Harvested Fresh", "Crafted in Reverie"],
           ].map(([Icon, title, note]) => (
             <div key={title} className="flex items-center gap-3.5 px-4 py-5 sm:px-7">
-              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#D9B8B8]/60 dark:bg-[#30232A]/40 text-[#651F3C] dark:text-[#D9B8B8]">
+              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/90 border border-[#C5A15B]/25 dark:bg-[#30202B]/80 text-[#651F3C] dark:text-[#D5B36C] shadow-sm">
                 <Icon className="text-lg" />
               </div>
               <div>
-                <p className="text-xs font-bold sm:text-sm text-gray-800 dark:text-gray-100">{title}</p>
-                <p className="mt-0.5 text-[10px] text-[#8A817C] dark:text-zinc-400 sm:text-xs">{note}</p>
+                <p className="text-xs font-bold sm:text-sm text-[#30232A] dark:text-gray-100">{title}</p>
+                <p className="mt-0.5 text-[10px] text-[#81747A] dark:text-zinc-400 sm:text-xs">{note}</p>
               </div>
             </div>
           ))}
@@ -396,7 +398,7 @@ const HomePage = () => {
               transition={{ duration: 0.3 }}
             >
               <Link to="/gallery" className="group block">
-                <div className="relative aspect-[4/5] overflow-hidden rounded-[28px] border border-white/70 bg-white/40 shadow-[0_16px_40px_rgba(101,31,60,0.12)] backdrop-blur-xl dark:border-[#651F3C]/20 dark:bg-[#30232A]/20">
+                <div className="relative aspect-[4/5] overflow-hidden rounded-[28px] border border-[#C5A15B]/30 hover:border-[#C5A15B] bg-white shadow-[0_16px_40px_rgba(101,31,60,0.10)] hover:shadow-[0_24px_55px_rgba(101,31,60,0.20)] backdrop-blur-xl dark:border-[#493640] dark:bg-[#231722] transition-all duration-300">
                   {category.image ? (
                     <img
                       src={category.image}
@@ -405,7 +407,7 @@ const HomePage = () => {
                       loading="lazy"
                     />
                   ) : (
-                    <div className="grid h-full place-items-center bg-[#F8F2EF] text-sm text-[#9A8E86] dark:bg-zinc-800 dark:text-zinc-400">No image</div>
+                    <div className="grid h-full place-items-center bg-[#FAF5EE] text-sm text-[#81747A] dark:bg-[#211720] dark:text-zinc-400">No image</div>
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                   <div className="absolute inset-x-0 bottom-0 p-6 text-white">
@@ -414,7 +416,7 @@ const HomePage = () => {
                     </span>
                     <h3 className="text-2xl font-serif font-medium">{category.name}</h3>
                     <p className="mt-1 text-xs text-white/80 line-clamp-1">{category.note}</p>
-                    <span className="mt-4 inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-[#FAF5EF]">
+                    <span className="mt-4 inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-[#FAF5EE] group-hover:text-[#C5A15B] transition-colors">
                       Enter Portal <FiArrowRight />
                     </span>
                   </div>
@@ -425,8 +427,8 @@ const HomePage = () => {
         </div>
       </motion.section>
 
-      {/* ── 4. The Favourites (Petals from the Ether) ── */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-[#FAF5EF]/40 via-[#D9B8B8]/30 to-transparent px-5 py-24 dark:from-[#30232A]/20 dark:via-zinc-950 dark:to-transparent sm:px-8 sm:py-28">
+      {/* ── 4. The Favourites (The Cherished Collections) ── */}
+      <section className="relative overflow-hidden bg-gradient-to-b from-[#FAF5EE] via-[#F6ECE7] to-[#FAF5EE] border-y border-[#C5A15B]/20 px-5 py-24 dark:from-[#160F17] dark:via-[#221620] dark:to-[#160F17] dark:border-[#493640]/40 sm:px-8 sm:py-28">
         <motion.div {...reveal} className="mx-auto max-w-7xl">
           <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
             <SectionHeading
@@ -435,7 +437,7 @@ const HomePage = () => {
               title="The Cherished Collections"
               copy="Living floral art requested time and again, crafted fresh for your celebration."
             />
-            <Link to="/gallery" className="inline-flex items-center gap-2 text-sm font-bold text-[#651F3C] hover:underline">
+            <Link to="/gallery" className="inline-flex items-center gap-2 text-sm font-bold text-[#651F3C] hover:text-[#C5A15B] transition-colors">
               View All Works <FiArrowRight />
             </Link>
           </div>
@@ -450,7 +452,7 @@ const HomePage = () => {
       {/* ── 5. The Surreal Botanical Atelier (Sculpting Living Petals) ── */}
       <section className="mx-auto grid max-w-7xl scroll-mt-24 gap-12 px-5 py-24 sm:px-8 sm:py-28 lg:grid-cols-2 lg:items-center">
         <motion.div {...reveal} className="relative">
-          <div className="aspect-[5/6] overflow-hidden rounded-[140px_28px_28px_28px] border-[8px] border-white/70 bg-white/30 shadow-[0_30px_70px_rgba(101,31,60,0.18)] backdrop-blur-xl dark:border-[#651F3C]/20 dark:bg-[#30232A]/20">
+          <div className="aspect-[5/6] overflow-hidden rounded-[140px_28px_28px_28px] border-[8px] border-[#C5A15B]/30 bg-white shadow-[0_30px_70px_rgba(101,31,60,0.16)] backdrop-blur-xl dark:border-[#493640] dark:bg-[#231722]">
             {eventImage ? (
               <img
                 src={eventImage}
@@ -459,12 +461,12 @@ const HomePage = () => {
                 loading="lazy"
               />
             ) : (
-              <div className="grid h-full place-items-center bg-[#F8F2EF] text-sm text-[#9A8E86] dark:bg-zinc-800 dark:text-zinc-400">Atelier image not set</div>
+              <div className="grid h-full place-items-center bg-[#FAF5EE] text-sm text-[#81747A] dark:bg-[#211720] dark:text-zinc-400">Atelier image not set</div>
             )}
           </div>
-          <div className="absolute -bottom-7 -right-2 hidden w-56 rounded-2xl border border-white/80 bg-white/90 p-5 shadow-2xl backdrop-blur-2xl dark:border-[#651F3C]/30 dark:bg-[#1A1424]/90 sm:block">
+          <div className="absolute -bottom-7 -right-2 hidden w-56 rounded-2xl border border-[#C5A15B]/35 bg-white/95 p-5 shadow-2xl backdrop-blur-2xl dark:border-[#493640] dark:bg-[#1E1420]/95 sm:block">
             <p className="text-3xl text-[#C5A15B] font-serif">"</p>
-            <p className="-mt-2 text-xs leading-5 text-gray-700 dark:text-gray-300">
+            <p className="-mt-2 text-xs leading-5 text-[#51454B] dark:text-gray-300">
               Every petal is woven with intention, belonging to your sacred celebration.
             </p>
           </div>
@@ -475,7 +477,7 @@ const HomePage = () => {
             ✦ The Botanical Atelier
           </p>
           <h2 className="mt-4 text-4xl sm:text-5xl font-medium leading-[1.05] text-[#30232A] dark:text-white">
-            Sculpting Dreams from <span className="bg-gradient-to-r from-[#651F3C] to-[#30232A] bg-clip-text text-transparent italic font-serif">Living Petals</span>.
+            Sculpting Dreams from <span className="bg-gradient-to-r from-[#651F3C] to-[#C5A15B] bg-clip-text text-transparent italic font-serif">Living Petals</span>.
           </h2>
           <p className="mt-6 max-w-lg leading-8 text-[#51454B] dark:text-zinc-300">
             From heirloom-inspired bridal jadai and royal lotus dollars to atmospheric venue styling, we harmonize natural blooms into living poetry.
@@ -487,8 +489,8 @@ const HomePage = () => {
               "Fresh Premium Harvest",
               "Express Setup Across Tamil Nadu"
             ].map((item) => (
-              <p key={item} className="flex items-center gap-3 text-sm font-medium text-gray-700 dark:text-gray-200">
-                <span className="grid h-6 w-6 place-items-center rounded-full bg-[#D9B8B8] text-[#651F3C] dark:bg-[#30232A] dark:text-[#D9B8B8]">
+              <p key={item} className="flex items-center gap-3 text-sm font-medium text-[#51454B] dark:text-gray-200">
+                <span className="grid h-6 w-6 place-items-center rounded-full bg-[#FAF5EE] border border-[#C5A15B]/30 text-[#651F3C] dark:bg-[#30232A] dark:text-[#D5B36C]">
                   <FiCheck className="text-xs" />
                 </span>
                 {item}
@@ -505,10 +507,10 @@ const HomePage = () => {
       <section className="px-5 py-10 sm:px-8">
         <motion.div
           {...reveal}
-          className="relative mx-auto max-w-7xl overflow-hidden rounded-[36px] bg-gradient-to-r from-[#2D1B36] via-[#1F1829] to-[#36182B] px-6 py-16 text-white shadow-[0_30px_80px_rgba(45,27,54,0.4)] sm:px-12 lg:px-20 lg:py-20 border border-[#651F3C]/30"
+          className="relative mx-auto max-w-7xl overflow-hidden rounded-[36px] bg-gradient-to-r from-[#2B121E] via-[#1D0C15] to-[#361626] px-6 py-16 text-white shadow-[0_30px_90px_rgba(43,18,30,0.45)] sm:px-12 lg:px-20 lg:py-20 border-2 border-[#C5A15B]/40"
         >
           <div className="surreal-orb top-[-50px] right-[10%] w-[350px] h-[350px] bg-[#651F3C]/30" />
-          <div className="surreal-orb bottom-[-50px] left-[10%] w-[400px] h-[400px] bg-[#78836B]/30" />
+          <div className="surreal-orb bottom-[-50px] left-[10%] w-[400px] h-[400px] bg-[#C5A15B]/20" />
 
           <div className="relative grid gap-10 lg:grid-cols-[1fr_auto] lg:items-center">
             <div className="max-w-3xl">
@@ -518,13 +520,13 @@ const HomePage = () => {
               <h2 className="mt-4 text-3xl sm:text-5xl font-medium leading-tight">
                 Conjure a floral design that is <span className="italic font-serif text-[#C5A15B]">entirely yours</span>.
               </h2>
-              <p className="mt-5 max-w-2xl leading-7 text-white/80 text-sm sm:text-base">
+              <p className="mt-5 max-w-2xl leading-7 text-white/85 text-sm sm:text-base">
                 Share your mood, colors, flowers, and message. Our master florists will handcraft your vision into a living masterpiece.
               </p>
             </div>
             <Link
               to="/gallery"
-              className="inline-flex h-14 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#651F3C] via-[#C5A15B] to-[#D9B8B8] px-8 text-sm font-bold uppercase tracking-wider text-white shadow-xl transition hover:scale-105"
+              className="inline-flex h-14 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#651F3C] via-[#C5A15B] to-[#651F3C] px-8 text-sm font-bold uppercase tracking-wider text-white shadow-xl transition hover:scale-105"
             >
               Start Creating <FiArrowRight />
             </Link>
@@ -544,7 +546,7 @@ const HomePage = () => {
             <Link
               key={tile.id || tile.src || index}
               to="/gallery"
-              className={`group relative overflow-hidden rounded-[26px] border border-white/60 dark:border-[#651F3C]/20 shadow-md ${tile.className || ""}`}
+              className={`group relative overflow-hidden rounded-[26px] border border-[#E8DDD5] hover:border-[#C5A15B]/70 shadow-md dark:border-[#493640] transition-colors ${tile.className || ""}`}
             >
               {tile.src ? (
                 <img
@@ -554,10 +556,10 @@ const HomePage = () => {
                   loading="lazy"
                 />
               ) : (
-                <div className="grid h-full place-items-center bg-[#F8F2EF] text-sm text-[#9A8E86] dark:bg-zinc-800 dark:text-zinc-400">No image</div>
+                <div className="grid h-full place-items-center bg-[#FAF5EE] text-sm text-[#81747A] dark:bg-[#211720] dark:text-zinc-400">No image</div>
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent" />
-              <p className="absolute bottom-5 left-5 text-xl font-serif font-medium text-white group-hover:text-[#D9B8B8] transition-colors">
+              <p className="absolute bottom-5 left-5 text-xl font-serif font-medium text-white group-hover:text-[#C5A15B] transition-colors">
                 {tile.label}
               </p>
             </Link>
@@ -566,7 +568,7 @@ const HomePage = () => {
       </motion.section>
 
       {/* ── 8. Kind Words (Love Notes in Petals) ── */}
-      <section className="bg-white/40 px-5 py-24 dark:bg-[#120E1A]/40 backdrop-blur-md sm:px-8 sm:py-28 border-t border-[#D9B8B8]/50 dark:border-[#30232A]/30">
+      <section className="bg-gradient-to-b from-[#FAF5EE] via-[#F6ECE7]/70 to-[#FAF5EE] px-5 py-24 dark:from-[#160F17] dark:via-[#221721] dark:to-[#160F17] backdrop-blur-md sm:px-8 sm:py-28 border-t border-[#C5A15B]/25 dark:border-[#493640]/40">
         <motion.div {...reveal} className="mx-auto max-w-7xl">
           <SectionHeading
             eyebrow="Heartfelt Reveries"
@@ -577,25 +579,25 @@ const HomePage = () => {
             {reviews.map((review) => (
               <article
                 key={review.name}
-                className="rounded-[26px] border border-white/80 bg-white/70 p-7 shadow-lg backdrop-blur-xl dark:border-[#651F3C]/20 dark:bg-[#1A1424]/80 sm:p-8"
+                className="rounded-[26px] border border-[#E8DDD5] bg-white p-7 shadow-lg backdrop-blur-xl dark:border-[#493640] dark:bg-[#231722] sm:p-8 hover:border-[#C5A15B]/50 transition-colors"
               >
                 <div className="flex gap-1 text-[#C5A15B]">
                   {Array.from({ length: 5 }).map((_, i) => (
                     <FiStar key={i} fill="currentColor" />
                   ))}
                 </div>
-                <p className="mt-6 text-xl sm:text-2xl font-serif italic leading-8 text-gray-800 dark:text-gray-100">
+                <p className="mt-6 text-xl sm:text-2xl font-serif italic leading-8 text-[#30232A] dark:text-gray-100">
                   "{review.quote}"
                 </p>
-                <div className="mt-7 border-t border-[#D9B8B8] pt-5 dark:border-[#30232A]/40">
-                  <p className="text-sm font-bold text-gray-900 dark:text-white">{review.name}</p>
-                  <p className="mt-0.5 text-xs text-[#8A817C] dark:text-zinc-400">{review.event}</p>
+                <div className="mt-7 border-t border-[#E8DDD5] pt-5 dark:border-[#493640]">
+                  <p className="text-sm font-bold text-[#30232A] dark:text-white">{review.name}</p>
+                  <p className="mt-0.5 text-xs text-[#81747A] dark:text-zinc-400">{review.event}</p>
                 </div>
               </article>
             ))}
           </div>
           <div className="mt-10 text-center">
-            <Link to="/reviews" className="inline-flex items-center gap-2 text-sm font-bold text-[#651F3C] hover:underline">
+            <Link to="/reviews" className="inline-flex items-center gap-2 text-sm font-bold text-[#651F3C] hover:text-[#C5A15B] transition-colors">
               Read Every Love Note <FiArrowRight />
             </Link>
           </div>
@@ -606,9 +608,9 @@ const HomePage = () => {
         <section className="mx-auto max-w-7xl px-5 pb-24 sm:px-8">
           <div className="grid gap-4 md:grid-cols-3">
             {content.promotionalSections.map((section) => (
-              <article key={section.id} className="rounded-[22px] border border-white/80 bg-white/70 p-7 shadow-md backdrop-blur-xl dark:border-[#651F3C]/20 dark:bg-[#1A1424]">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#651F3C]">Atelier Special</p>
-                <h3 className="mt-3 text-2xl font-serif">{section.title}</h3>
+              <article key={section.id} className="rounded-[22px] border border-[#E8DDD5] bg-white p-7 shadow-md backdrop-blur-xl dark:border-[#493640] dark:bg-[#231722]">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#651F3C] dark:text-[#D5B36C]">Atelier Special</p>
+                <h3 className="mt-3 text-2xl font-serif text-[#30232A] dark:text-white">{section.title}</h3>
                 <p className="mt-3 text-sm leading-7 text-[#51454B] dark:text-zinc-400">{section.description}</p>
               </article>
             ))}

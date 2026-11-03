@@ -77,26 +77,26 @@ const SearchModal = ({ isOpen, onClose }) => {
                     <input
                         id="search-input"
                         type="text"
-                        placeholder="Search for bouquets, stage decor, jadai..."
-                        className="flex-1 text-lg outline-none text-[#30232A] dark:text-[#FAF5EF] placeholder-[#81747A] dark:placeholder-[#8E7A83] bg-transparent"
+                        placeholder="Search for bouquets, stage decor, bridal jadai..."
+                        className="flex-1 text-lg outline-none text-[#30232A] dark:text-[#FAF5EE] placeholder-[#81747A] dark:placeholder-[#8E7A83] bg-transparent"
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
                         autoComplete="off"
                     />
-                    <button onClick={onClose} className="p-2 hover:bg-[#F5EAE9] dark:hover:bg-[#30232A] rounded-full transition">
+                    <button onClick={onClose} className="p-2 hover:bg-[#F6ECE7] dark:hover:bg-[#30232A] rounded-full transition">
                         <FiX className="w-6 h-6 text-[#81747A] dark:text-[#8E7A83]" />
                     </button>
                 </div>
 
                 {/* Results */}
-                <div className="max-h-[60vh] overflow-y-auto p-4 custom-scrollbar bg-[#FAF5EF] dark:bg-[#171116]">
+                <div className="max-h-[60vh] overflow-y-auto p-4 custom-scrollbar bg-[#FAF5EE] dark:bg-[#160F17]">
                     {loading ? (
                         <div className="text-center py-10 opacity-50 dark:text-[#8E7A83]">Searching...</div>
                     ) : results.length > 0 ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             {results.map(product => (
-                                <div key={product._id} className="bg-white dark:bg-[#261B22] p-3 rounded-xl shadow-sm hover:shadow-md transition flex gap-4 border border-[#E8DDD5] dark:border-[#493640] hover:border-[#C5A15B] group">
-                                    <img src={product.image} alt={product.name} className="w-20 h-20 object-cover rounded-lg bg-[#F5EAE9]" />
+                                <div key={product._id} className="bg-white dark:bg-[#231722] p-3 rounded-xl shadow-sm hover:shadow-md transition flex gap-4 border border-[#E8DDD5] dark:border-[#493640] hover:border-[#C5A15B] group">
+                                    <img src={product.image} alt={product.name} className="w-20 h-20 object-cover rounded-lg bg-[#F6ECE7]" />
                                     <div className="flex-1 flex flex-col justify-between">
                                         <div>
                                             <h4 className="font-bold text-[#30232A] dark:text-[#FAF5EF] line-clamp-1 group-hover:text-[#651F3C] transition">{product.name}</h4>

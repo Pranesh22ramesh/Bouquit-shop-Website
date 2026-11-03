@@ -61,37 +61,37 @@ const AboutPage = () => {
   );
 
   return (
-    <div className={`min-h-screen py-10 transition-colors ${isDarkMode ? "bg-[#171116] text-[#FAF5EF]" : "bg-[#FAF5EF] text-[#30232A]"}`}>
+    <div className={`min-h-screen py-10 transition-colors ${isDarkMode ? "bg-[#160F17] text-[#FAF5EE]" : "bg-[#FAF5EE] text-[#30232A]"}`}>
       <div className="mx-auto max-w-7xl px-4">
         <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
           <div className="space-y-6">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#C5A15B]">Our Story</p>
-            <h1 className={`text-4xl font-serif font-bold ${isDarkMode ? "text-[#FAF5EF]" : "text-[#30232A]"}`}>{content.title}</h1>
+            <h1 className={`text-4xl font-serif font-bold ${isDarkMode ? "text-[#FAF5EE]" : "text-[#30232A]"}`}>{content.title}</h1>
             <p className={`text-base leading-8 ${isDarkMode ? "text-[#C9B8BF]" : "text-[#51454B]"}`}>{content.description}</p>
 
             <div className="grid gap-4 md:grid-cols-2">
-              <div className={`rounded-[1.75rem] border p-6 ${isDarkMode ? "border-[#493640] bg-[#261B22]" : "border-[#E8DDD5] bg-white shadow-sm"}`}>
+              <div className={`rounded-[1.75rem] border p-6 ${isDarkMode ? "border-[#493640] bg-[#231722]" : "border-[#E8DDD5] bg-white shadow-sm"}`}>
                 <h2 className="text-xl font-serif font-bold text-[#651F3C] dark:text-[#D5B36C]">Mission</h2>
                 <p className={`mt-3 text-sm leading-7 ${isDarkMode ? "text-[#C9B8BF]" : "text-[#51454B]"}`}>{content.mission}</p>
               </div>
-              <div className={`rounded-[1.75rem] border p-6 ${isDarkMode ? "border-[#493640] bg-[#261B22]" : "border-[#E8DDD5] bg-white shadow-sm"}`}>
+              <div className={`rounded-[1.75rem] border p-6 ${isDarkMode ? "border-[#493640] bg-[#231722]" : "border-[#E8DDD5] bg-white shadow-sm"}`}>
                 <h2 className="text-xl font-serif font-bold text-[#651F3C] dark:text-[#D5B36C]">Vision</h2>
                 <p className={`mt-3 text-sm leading-7 ${isDarkMode ? "text-[#C9B8BF]" : "text-[#51454B]"}`}>{content.vision}</p>
               </div>
             </div>
 
-            <div className={`rounded-[1.75rem] border p-6 ${isDarkMode ? "border-[#493640] bg-[#261B22]" : "border-[#E8DDD5] bg-white shadow-sm"}`}>
+            <div className={`rounded-[1.75rem] border p-6 ${isDarkMode ? "border-[#493640] bg-[#231722]" : "border-[#E8DDD5] bg-white shadow-sm"}`}>
               <h2 className="text-xl font-serif font-bold text-[#651F3C] dark:text-[#D5B36C]">Company Story</h2>
               <p className={`mt-3 text-sm leading-8 ${isDarkMode ? "text-[#C9B8BF]" : "text-[#51454B]"}`}>{content.companyStory}</p>
             </div>
           </div>
 
           <div className="space-y-4">
-            <div className={`overflow-hidden rounded-[2rem] border shadow-xl ${isDarkMode ? "border-[#493640] bg-[#261B22]" : "border-[#E8DDD5] bg-white"}`}>
+            <div className={`overflow-hidden rounded-[2rem] border shadow-xl ${isDarkMode ? "border-[#493640] bg-[#231722]" : "border-[#E8DDD5] bg-white"}`}>
               {content.heroImage ? (
                 <img src={content.heroImage} alt="About page" className="h-[420px] w-full object-cover" />
               ) : (
-                <div className="flex h-[420px] items-center justify-center bg-[#F5EAE9] text-[#81747A]">
+                <div className="flex h-[420px] items-center justify-center bg-[#F6ECE7] text-[#81747A]">
                   No hero image yet
                 </div>
               )}
@@ -116,9 +116,9 @@ const AboutPage = () => {
               {content.team.map((member) => (
                 <article
                   key={member.id}
-                  className={`rounded-[1.75rem] border p-6 ${isDarkMode ? "border-[#493640] bg-[#261B22]" : "border-[#E8DDD5] bg-white shadow-sm"}`}
+                  className={`rounded-[1.75rem] border p-6 ${isDarkMode ? "border-[#493640] bg-[#231722]" : "border-[#E8DDD5] bg-white shadow-sm"}`}
                 >
-                  <h3 className={`text-xl font-serif font-bold ${isDarkMode ? "text-[#FAF5EF]" : "text-[#30232A]"}`}>{member.name}</h3>
+                  <h3 className={`text-xl font-serif font-bold ${isDarkMode ? "text-[#FAF5EE]" : "text-[#30232A]"}`}>{member.name}</h3>
                   <p className="mt-2 text-sm font-semibold uppercase tracking-[0.2em] text-[#C5A15B]">{member.role}</p>
                   <p className={`mt-4 text-sm leading-7 ${isDarkMode ? "text-[#C9B8BF]" : "text-[#51454B]"}`}>{member.bio}</p>
                 </article>

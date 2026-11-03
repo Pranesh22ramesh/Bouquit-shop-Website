@@ -139,12 +139,12 @@ const AIChatbot = () => {
     };
 
     const chatWindowBg = isDarkMode
-        ? 'linear-gradient(135deg, rgba(23, 17, 22, 0.98) 0%, rgba(38, 27, 34, 0.98) 100%)'
-        : 'linear-gradient(135deg, rgba(250, 245, 239, 0.98) 0%, rgba(245, 234, 233, 0.98) 100%)';
+        ? 'linear-gradient(135deg, rgba(22, 15, 23, 0.98) 0%, rgba(35, 23, 34, 0.98) 100%)'
+        : 'linear-gradient(135deg, rgba(250, 245, 238, 0.98) 0%, rgba(246, 236, 231, 0.98) 100%)';
 
     const messagesBg = isDarkMode
-        ? 'bg-gradient-to-b from-[#171116] to-[#261B22]'
-        : 'bg-gradient-to-b from-[#FAF5EF] to-[#F5EAE9]';
+        ? 'bg-gradient-to-b from-[#160F17] to-[#231722]'
+        : 'bg-gradient-to-b from-[#FAF5EE] to-[#F6ECE7]';
 
     const botMessageBg = isDarkMode
         ? 'bg-[#261B22] text-gray-100 shadow-md border border-[#493640]'

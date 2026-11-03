@@ -4,9 +4,42 @@ const productService = require('../services/productService');
 const { logActivity } = require('../services/activityService');
 
 const productValidators = [
-  body('name').trim().notEmpty().withMessage('Product name is required'),
-  body('category').trim().notEmpty().withMessage('Category is required'),
-  body('price').isNumeric().withMessage('Price is required'),
+  body('name')
+    .trim()
+    .notEmpty().withMessage('Product name is required')
+    .isLength({ min: 2, max: 120 }).withMessage('Product name must be between 2 and 120 characters'),
+  body('category')
+    .trim()
+    .notEmpty().withMessage('Category is required')
+    .isLength({ min: 2, max: 60 }).withMessage('Category must be between 2 and 60 characters'),
+  body('price')
+    .notEmpty().withMessage('Price is required')
+    .isFloat({ min: 0 }).withMessage('Price must be a positive number'),
+  body('offerPrice')
+    .optional({ values: 'falsy' })
+    .isFloat({ min: 0 }).withMessage('Offer price must be a positive number'),
+  body('description')
+    .optional()
+    .isString().withMessage('Description must be a string')
+    .isLength({ max: 3000 }).withMessage('Description must not exceed 3000 characters'),
+  body('badge')
+    .optional()
+    .isIn(['NORMAL', 'NEW_ARRIVAL', 'OFFER', 'Normal', 'New Arrival', 'Offer'])
+    .withMessage('Invalid product badge'),
+  body('availability')
+    .optional()
+    .isIn(['AVAILABLE', 'UNAVAILABLE', 'Available', 'Unavailable'])
+    .withMessage('Invalid availability status'),
+  body('featured')
+    .optional()
+    .customSanitizer((val) => val === true || val === 'true'),
+];
+
+const productIdValidator = [
+  param('id')
+    .trim()
+    .notEmpty().withMessage('Product ID is required')
+    .isLength({ min: 1, max: 64 }).withMessage('Invalid product ID format'),
 ];
 
 const listProducts = asyncHandler(async (req, res) => {
@@ -72,6 +105,7 @@ module.exports = {
   getProductById,
   listCategories,
   listProducts,
+  productIdValidator,
   productValidators,
   updateProduct,
 };

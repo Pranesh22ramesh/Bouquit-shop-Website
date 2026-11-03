@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "private": true,
   "main": "src/server.js",
-
   "scripts": {
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
@@ -14,8 +13,8 @@
     "seed": "node prisma/seed.js"
   },
   "dependencies": {
+    "@prisma/client": "6.11.1",
     "@supabase/supabase-js": "^2.56.0",
-    "@prisma/client": "^6.11.1",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
@@ -27,10 +26,10 @@
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
     "multer": "^2.0.2",
-    "sharp": "^0.34.3"
+    "sharp": "^0.35.5"
   },
   "devDependencies": {
     "nodemon": "^3.1.10",
-    "prisma": "^6.11.1"
+    "prisma": "6.11.1"
   }
 }

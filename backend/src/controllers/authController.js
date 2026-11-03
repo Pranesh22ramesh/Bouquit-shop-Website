@@ -1,25 +1,70 @@
-const { body } = require('express-validator');
+const { body, param } = require('express-validator');
 const { asyncHandler } = require('../utils/asyncHandler');
 const authService = require('../services/authService');
 const { refreshCookieOptions } = require('../utils/cookies');
 const { env } = require('../config/env');
+const { recordFailedAuth, recordSuccessfulAuth } = require('../middleware/rateLimiter');
 
+// Strict input validation schemas
 const signupValidators = [
-  body('fullName').trim().notEmpty().withMessage('Full name is required'),
-  body('email').isEmail().withMessage('Enter a valid email address'),
-  body('phoneNumber').notEmpty().withMessage('Phone number is required').isLength({ min: 10, max: 20 }).withMessage('Enter a valid phone number'),
-  body('password').isLength({ min: 8 }).withMessage('Password must be at least 8 characters long'),
-  body('confirmPassword').custom((value, { req }) => value === req.body.password).withMessage('Passwords do not match'),
+  body('fullName')
+    .trim()
+    .notEmpty().withMessage('Full name is required')
+    .isLength({ min: 2, max: 70 }).withMessage('Full name must be between 2 and 70 characters')
+    .matches(/^[a-zA-Z\s.'-]+$/).withMessage('Full name contains invalid characters'),
+  body('email')
+    .trim()
+    .notEmpty().withMessage('Email address is required')
+    .isEmail().withMessage('Enter a valid email address')
+    .normalizeEmail()
+    .isLength({ max: 100 }).withMessage('Email address is too long'),
+  body('phoneNumber')
+    .trim()
+    .notEmpty().withMessage('Phone number is required')
+    .matches(/^\+?[0-9]{10,15}$/).withMessage('Enter a valid phone number (10 to 15 digits)'),
+  body('password')
+    .isString().withMessage('Password must be a string')
+    .isLength({ min: 8, max: 100 }).withMessage('Password must be between 8 and 100 characters'),
+  body('confirmPassword')
+    .custom((value, { req }) => value === req.body.password)
+    .withMessage('Passwords do not match'),
 ];
 
 const loginValidators = [
-  body('email').isEmail().withMessage('Enter a valid email address'),
-  body('password').notEmpty().withMessage('Password is required'),
+  body('email')
+    .trim()
+    .notEmpty().withMessage('Email address is required')
+    .isEmail().withMessage('Enter a valid email address')
+    .normalizeEmail()
+    .isLength({ max: 100 }).withMessage('Email address is too long'),
+  body('password')
+    .isString().withMessage('Password must be a string')
+    .notEmpty().withMessage('Password is required')
+    .isLength({ max: 100 }).withMessage('Password exceeds maximum length'),
+];
+
+const forgotPasswordValidators = [
+  body('email')
+    .trim()
+    .notEmpty().withMessage('Email address is required')
+    .isEmail().withMessage('Enter a valid email address')
+    .normalizeEmail()
+    .isLength({ max: 100 }).withMessage('Email address is too long'),
 ];
 
 const resetValidators = [
-  body('password').isLength({ min: 8 }).withMessage('Password must be at least 8 characters long'),
-  body('confirmPassword').optional().custom((value, { req }) => !value || value === req.body.password).withMessage('Passwords do not match'),
+  param('token')
+    .isString().withMessage('Reset token is required')
+    .trim()
+    .notEmpty().withMessage('Reset token is required')
+    .isLength({ min: 16, max: 256 }).withMessage('Invalid reset token format'),
+  body('password')
+    .isString().withMessage('Password must be a string')
+    .isLength({ min: 8, max: 100 }).withMessage('Password must be between 8 and 100 characters'),
+  body('confirmPassword')
+    .optional()
+    .custom((value, { req }) => !value || value === req.body.password)
+    .withMessage('Passwords do not match'),
 ];
 
 const sendSession = (res, session) => {
@@ -36,13 +81,25 @@ const signup = asyncHandler(async (req, res) => {
 });
 
 const login = asyncHandler(async (req, res) => {
-  const session = await authService.login(req.body);
-  sendSession(res, session);
+  try {
+    const session = await authService.login(req.body);
+    recordSuccessfulAuth(req.body.email, req.ip);
+    sendSession(res, session);
+  } catch (error) {
+    recordFailedAuth(req.body.email, req.ip);
+    throw error;
+  }
 });
 
 const adminLogin = asyncHandler(async (req, res) => {
-  const session = await authService.login({ ...req.body, adminOnly: true });
-  sendSession(res, session);
+  try {
+    const session = await authService.login({ ...req.body, adminOnly: true });
+    recordSuccessfulAuth(req.body.email, req.ip);
+    sendSession(res, session);
+  } catch (error) {
+    recordFailedAuth(req.body.email, req.ip);
+    throw error;
+  }
 });
 
 const me = asyncHandler(async (req, res) => {
@@ -64,7 +121,7 @@ const logout = asyncHandler(async (req, res) => {
 const forgotPassword = asyncHandler(async (req, res) => {
   const token = await authService.beginPasswordReset(req.body.email);
   const response = {
-    message: 'If that email exists, a reset link has been generated',
+    message: 'If that email exists, a password reset link has been processed.',
   };
 
   if (token && env.nodeEnv !== 'production') {
@@ -85,6 +142,7 @@ const resetPassword = asyncHandler(async (req, res) => {
 module.exports = {
   adminLogin,
   forgotPassword,
+  forgotPasswordValidators,
   login,
   loginValidators,
   logout,

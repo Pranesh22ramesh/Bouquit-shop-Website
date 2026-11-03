@@ -3,16 +3,39 @@ const { asyncHandler } = require('../utils/asyncHandler');
 const reviewService = require('../services/reviewService');
 
 const createValidators = [
-  body('rating').isInt({ min: 1, max: 5 }).withMessage('Rating must be between 1 and 5'),
-  body('comment').trim().notEmpty().withMessage('Comment is required'),
-  body('author').optional({ values: 'falsy' }).trim().notEmpty().withMessage('Author is required'),
-  body('productId').optional({ values: 'falsy' }).isUUID().withMessage('Invalid product ID'),
+  body('rating')
+    .notEmpty().withMessage('Rating is required')
+    .isInt({ min: 1, max: 5 }).withMessage('Rating must be an integer between 1 and 5'),
+  body('comment')
+    .trim()
+    .notEmpty().withMessage('Comment is required')
+    .isLength({ min: 3, max: 1000 }).withMessage('Comment must be between 3 and 1000 characters'),
+  body('author')
+    .optional({ values: 'falsy' })
+    .trim()
+    .isLength({ min: 2, max: 70 }).withMessage('Author name must be between 2 and 70 characters'),
+  body('productId')
+    .optional({ values: 'falsy' })
+    .trim()
+    .isLength({ min: 1, max: 64 }).withMessage('Invalid product ID format'),
+];
+
+const reviewIdValidator = [
+  param('id')
+    .trim()
+    .notEmpty().withMessage('Review ID is required')
+    .isLength({ min: 1, max: 64 }).withMessage('Invalid review ID format'),
 ];
 
 const updateValidators = [
-  param('id').notEmpty().withMessage('Review ID is required'),
-  body('rating').isInt({ min: 1, max: 5 }).withMessage('Rating must be between 1 and 5'),
-  body('comment').trim().notEmpty().withMessage('Comment is required'),
+  ...reviewIdValidator,
+  body('rating')
+    .notEmpty().withMessage('Rating is required')
+    .isInt({ min: 1, max: 5 }).withMessage('Rating must be an integer between 1 and 5'),
+  body('comment')
+    .trim()
+    .notEmpty().withMessage('Comment is required')
+    .isLength({ min: 3, max: 1000 }).withMessage('Comment must be between 3 and 1000 characters'),
 ];
 
 const listReviews = asyncHandler(async (req, res) => {
@@ -43,6 +66,7 @@ module.exports = {
   createValidators,
   deleteReview,
   listReviews,
+  reviewIdValidator,
   updateReview,
   updateValidators,
 };

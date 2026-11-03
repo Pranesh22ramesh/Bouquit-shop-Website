@@ -3,30 +3,76 @@ const { asyncHandler } = require('../utils/asyncHandler');
 const userService = require('../services/userService');
 
 const profileValidators = [
-  body('fullName').optional().trim().notEmpty().withMessage('Full name is required'),
-  body('name').optional().trim().notEmpty().withMessage('Full name is required'),
-  body('email').isEmail().withMessage('Enter a valid email address'),
-  body('phoneNumber').optional({ values: 'falsy' }).isLength({ min: 10, max: 20 }).withMessage('Enter a valid phone number'),
-  body('mobile').optional({ values: 'falsy' }).isLength({ min: 10, max: 20 }).withMessage('Enter a valid phone number'),
-  body('address').optional({ values: 'falsy' }).isString(),
-  body('password').optional({ values: 'falsy' }).isLength({ min: 8 }).withMessage('Password must be at least 8 characters long'),
+  body('fullName')
+    .optional()
+    .trim()
+    .isLength({ min: 2, max: 70 }).withMessage('Full name must be between 2 and 70 characters'),
+  body('name')
+    .optional()
+    .trim()
+    .isLength({ min: 2, max: 70 }).withMessage('Full name must be between 2 and 70 characters'),
+  body('email')
+    .optional()
+    .trim()
+    .isEmail().withMessage('Enter a valid email address')
+    .normalizeEmail()
+    .isLength({ max: 100 }).withMessage('Email address is too long'),
+  body('phoneNumber')
+    .optional({ values: 'falsy' })
+    .trim()
+    .matches(/^\+?[0-9]{10,15}$/).withMessage('Enter a valid phone number (10 to 15 digits)'),
+  body('mobile')
+    .optional({ values: 'falsy' })
+    .trim()
+    .matches(/^\+?[0-9]{10,15}$/).withMessage('Enter a valid phone number (10 to 15 digits)'),
+  body('address')
+    .optional({ values: 'falsy' })
+    .isString().withMessage('Address must be a string')
+    .isLength({ max: 300 }).withMessage('Address must not exceed 300 characters'),
+  body('password')
+    .optional({ values: 'falsy' })
+    .isString().withMessage('Password must be a string')
+    .isLength({ min: 8, max: 100 }).withMessage('Password must be between 8 and 100 characters'),
 ];
 
 const passwordValidators = [
-  body('password').isLength({ min: 8 }).withMessage('Password must be at least 8 characters long'),
+  body('password')
+    .isString().withMessage('Password must be a string')
+    .notEmpty().withMessage('Password is required')
+    .isLength({ min: 8, max: 100 }).withMessage('Password must be between 8 and 100 characters'),
 ];
 
 const cartValidators = [
-  body('productId').notEmpty().withMessage('Product ID is required'),
-  body('quantity').isInt({ min: 1 }).withMessage('Quantity must be at least 1'),
+  body('productId')
+    .trim()
+    .notEmpty().withMessage('Product ID is required')
+    .isLength({ min: 1, max: 64 }).withMessage('Invalid product ID format'),
+  body('quantity')
+    .notEmpty().withMessage('Quantity is required')
+    .isInt({ min: 1, max: 99 }).withMessage('Quantity must be between 1 and 99'),
 ];
 
 const updateCartValidators = [
-  body('itemId').notEmpty().withMessage('Cart item ID is required'),
-  body('quantity').isInt({ min: 1 }).withMessage('Quantity must be at least 1'),
+  body('itemId')
+    .trim()
+    .notEmpty().withMessage('Cart item ID is required')
+    .isLength({ min: 1, max: 64 }).withMessage('Invalid cart item ID format'),
+  body('quantity')
+    .notEmpty().withMessage('Quantity is required')
+    .isInt({ min: 1, max: 99 }).withMessage('Quantity must be between 1 and 99'),
 ];
 
-const idParamValidator = [param('id').notEmpty().withMessage('ID is required')];
+const statusValidators = [
+  body('isActive').optional().isBoolean().withMessage('isActive must be a boolean value'),
+  body('status').optional().isIn(['ACTIVE', 'INACTIVE', 'SUSPENDED']).withMessage('Invalid status value'),
+];
+
+const idParamValidator = [
+  param('id')
+    .trim()
+    .notEmpty().withMessage('ID parameter is required')
+    .isLength({ min: 1, max: 64 }).withMessage('Invalid ID format'),
+];
 
 const getUsers = asyncHandler(async (req, res) => {
   res.json(
@@ -133,6 +179,7 @@ module.exports = {
   passwordValidators,
   profileValidators,
   removeCart,
+  statusValidators,
   toggleLike,
   toggleWishlist,
   updateCart,

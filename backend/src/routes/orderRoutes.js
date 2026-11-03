@@ -7,6 +7,6 @@ const router = express.Router();
 
 router.post('/', protect, orderController.orderValidators, validateRequest, orderController.createOrder);
 router.get('/myorders', protect, orderController.getMyOrders);
-router.get('/:id', protect, orderController.getOrderById);
+router.get('/:id', protect, orderController.orderIdValidator, validateRequest, orderController.getOrderById);
 
 module.exports = router;

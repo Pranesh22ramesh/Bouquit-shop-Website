@@ -18,3 +18,4 @@ export default function useClickOutside(ref, handler) {
     };
   }, [ref, handler]);
 }
+

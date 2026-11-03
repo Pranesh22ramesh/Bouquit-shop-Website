@@ -114,8 +114,14 @@ async function main() {
   
   // Seed admin user
   const adminEmail = (process.env.ADMIN_EMAIL || 'miudhunyas2012@gmail.com').toLowerCase();
-  const adminPassword = process.env.ADMIN_PASSWORD || 'Sudh@2012';
-  const passwordHash = await bcrypt.hash(adminPassword, 10);
+  const adminPassword = process.env.ADMIN_PASSWORD;
+
+  if (!adminPassword && process.env.NODE_ENV === 'production') {
+    throw new Error('FATAL: ADMIN_PASSWORD environment variable must be set to run seed in production!');
+  }
+
+  const finalPassword = adminPassword || 'DevAdminPass123!';
+  const passwordHash = await bcrypt.hash(finalPassword, 12);
   
   await prisma.user.upsert({
     where: { email: adminEmail },

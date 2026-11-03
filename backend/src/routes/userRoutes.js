@@ -16,10 +16,10 @@ router.post('/likes/:id', protect, userController.idParamValidator, validateRequ
 router.get('/wishlist', protect, userController.getWishlist);
 router.post('/wishlist/:id', protect, userController.idParamValidator, validateRequest, userController.toggleWishlist);
 router.get('/:id/activities', protect, adminOnly, userController.idParamValidator, validateRequest, userController.getUserActivities);
-router.patch('/:id/status', protect, adminOnly, userController.idParamValidator, validateRequest, userController.updateUserStatus);
-router.put('/:id/password', protect, adminOnly, userController.idParamValidator.concat(userController.passwordValidators), validateRequest, userController.updatePassword);
+router.patch('/:id/status', protect, adminOnly, userController.idParamValidator, userController.statusValidators, validateRequest, userController.updateUserStatus);
+router.put('/:id/password', protect, adminOnly, userController.idParamValidator, userController.passwordValidators, validateRequest, userController.updatePassword);
 router.get('/:id', protect, adminOnly, userController.idParamValidator, validateRequest, userController.getUserById);
-router.put('/:id', protect, adminOnly, userController.idParamValidator, validateRequest, userController.adminUpdateUser);
+router.put('/:id', protect, adminOnly, userController.idParamValidator, userController.profileValidators, validateRequest, userController.adminUpdateUser);
 router.delete('/:id', protect, adminOnly, userController.idParamValidator, validateRequest, userController.deleteUser);
 
 module.exports = router;

@@ -1,6 +1,51 @@
 // src/controllers/seoController.js
+const { body, param } = require('express-validator');
 const { asyncHandler } = require('../utils/asyncHandler');
 const seoService = require('../services/seoService');
+
+const pageKeyValidator = [
+  param('pageKey')
+    .trim()
+    .notEmpty().withMessage('Page key is required')
+    .matches(/^[a-z0-9_-]{2,60}$/).withMessage('Invalid page key format (alphanumeric, hyphens and underscores only)'),
+];
+
+const updateConfigValidators = [
+  body('siteTitle')
+    .optional()
+    .trim()
+    .isString().withMessage('Site title must be a string')
+    .isLength({ max: 120 }).withMessage('Site title must not exceed 120 characters'),
+  body('siteDescription')
+    .optional()
+    .trim()
+    .isString().withMessage('Site description must be a string')
+    .isLength({ max: 500 }).withMessage('Site description must not exceed 500 characters'),
+  body('defaultOgImage')
+    .optional()
+    .trim()
+    .isString().withMessage('Default OG image must be a string')
+    .isLength({ max: 500 }).withMessage('Image URL too long'),
+];
+
+const upsertPageValidators = [
+  ...pageKeyValidator,
+  body('title')
+    .optional()
+    .trim()
+    .isString().withMessage('Title must be a string')
+    .isLength({ max: 120 }).withMessage('Title must not exceed 120 characters'),
+  body('description')
+    .optional()
+    .trim()
+    .isString().withMessage('Description must be a string')
+    .isLength({ max: 500 }).withMessage('Description must not exceed 500 characters'),
+  body('canonical')
+    .optional()
+    .trim()
+    .isString().withMessage('Canonical URL must be a string')
+    .isLength({ max: 300 }).withMessage('Canonical URL too long'),
+];
 
 const getConfig = asyncHandler(async (req, res) => {
   const config = await seoService.getConfig();
@@ -47,4 +92,16 @@ const getHealthCheck = asyncHandler(async (req, res) => {
   res.json({ health });
 });
 
-module.exports = { getConfig, updateConfig, getAllPages, getPage, upsertPage, getSitemap, getRobots, getHealthCheck };
+module.exports = {
+  getConfig,
+  getHealthCheck,
+  getPage,
+  getRobots,
+  getSitemap,
+  getAllPages,
+  pageKeyValidator,
+  updateConfig,
+  updateConfigValidators,
+  upsertPage,
+  upsertPageValidators,
+};

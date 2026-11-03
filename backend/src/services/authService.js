@@ -46,6 +46,11 @@ const buildSession = async (user) => {
 };
 
 const seedAdminUser = async () => {
+  if (!env.adminPassword) {
+    console.warn('[AUTH] Skipping admin user seed: ADMIN_PASSWORD is not set.');
+    return;
+  }
+
   await prisma.user.updateMany({
     where: {
       role: Role.ADMIN,

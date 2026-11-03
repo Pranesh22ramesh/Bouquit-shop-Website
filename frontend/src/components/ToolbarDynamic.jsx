@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { motion, MotionConfig } from 'framer-motion';
 import useClickOutside from '../hooks/useClickOutside';
-import { ArrowLeft, Search } from 'lucide-react';
+import { FiArrowLeft, FiSearch } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 
 const transition = {
@@ -65,7 +65,7 @@ export default function ToolbarDynamic({ onSearch }) {
                   aria-label="Search flowers"
                   className="w-8 h-8 rounded-full flex items-center justify-center text-zinc-700 dark:text-zinc-200 hover:text-[#E85D8E] dark:hover:text-[#E85D8E] transition-colors"
                 >
-                  <Search className="h-4 w-4" />
+                  <FiSearch className="h-4 w-4" />
                 </button>
               ) : (
                 <div className="flex items-center space-x-1.5 w-full pr-2">
@@ -78,7 +78,7 @@ export default function ToolbarDynamic({ onSearch }) {
                     aria-label="Close search"
                     className="w-8 h-8 rounded-full flex items-center justify-center text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-black/5 dark:hover:bg-white/10 transition-colors shrink-0"
                   >
-                    <ArrowLeft className="h-4 w-4" />
+                    <FiArrowLeft className="h-4 w-4" />
                   </button>
                   <div className="relative w-full">
                     <input

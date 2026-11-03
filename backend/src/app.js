@@ -15,6 +15,7 @@ const orderRoutes = require('./routes/orderRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
 const contentRoutes = require('./routes/contentRoutes');
 const productRoutes = require('./routes/productRoutes');
+const productController = require('./controllers/productController');
 const adminRoutes = require('./routes/adminRoutes');
 const eventRoutes = require('./routes/eventRoutes');
 const seoRoutes = require('./routes/seoRoutes');
@@ -25,7 +26,7 @@ app.use(helmet());
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin || origin.startsWith('http://localhost:') || origin === 'https://karurflowershop.vercel.app') {
+      if (!origin || origin.startsWith('http://localhost:') || origin === 'https://karurflowershop.vercel.app' || origin.endsWith('.vercel.app')) {
         callback(null, true);
       } else {
         callback(new Error('Not allowed by CORS'));
@@ -59,6 +60,8 @@ app.use('/api/reviews', reviewRoutes);
 app.use('/api/content', contentRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/gallery', productRoutes);
+app.get('/api/categories', productController.listCategories);
+app.get('/api/categories/list', productController.listCategories);
 app.use('/api/admin', adminRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/seo', seoRoutes);

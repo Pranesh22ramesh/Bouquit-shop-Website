@@ -17,6 +17,7 @@ import { SITE_EVENTS, subscribeToSiteEvent } from "../lib/siteEvents";
 import { subscribeToTable } from "../lib/supabaseRealtime";
 import SeoHead from "../seo/SeoHead.jsx";
 import { usePageSeo } from "../seo/useSeo.js";
+import CarouselSlider from "../components/CarouselSlider.jsx";
 
 const defaultHomeCategoryTiles = [
   { id: "bouquets", name: "Bouquets", note: "For every dreamlike love story", image: "/gallery/bouquet/bouquet12.jpg" },
@@ -249,6 +250,20 @@ const HomePage = () => {
   const heroImage = content.banners?.[0] || "";
   const eventImage = content.eventImage || "";
 
+  const heroSlides = useMemo(() => {
+    if (content.banners && content.banners.length > 1) {
+      return content.banners.map((img, idx) => ({ id: idx + 1, img }));
+    }
+    return [
+      { id: 1, img: content.banners?.[0] || "/gallery/bouquet/bouquet13.jpg" },
+      { id: 2, img: "https://images.unsplash.com/photo-1518780664697-55e3ad937233?q=80&w=1200&auto=format&fit=crop" },
+      { id: 3, img: "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?q=80&w=1200&auto=format&fit=crop" },
+      { id: 4, img: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1200&auto=format&fit=crop" },
+      { id: 5, img: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1200&auto=format&fit=crop" },
+      { id: 6, img: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=1200&auto=format&fit=crop" },
+    ];
+  }, [content.banners]);
+
   return (
     <div className="relative overflow-hidden bg-[#FFF9F6] text-[#2D2D2D] transition-colors dark:bg-[#0E0C12] dark:text-[#F5F5F5]">
       <SeoHead seoOverride={pageSeo} breadcrumbs={[{ name: 'Home', url: '/' }]} />
@@ -310,7 +325,9 @@ const HomePage = () => {
             <div className="absolute -inset-4 rounded-[180px_180px_40px_40px] bg-gradient-to-tr from-pink-500/20 via-purple-500/20 to-amber-400/20 blur-2xl -z-10" />
 
             <div className="relative ml-auto aspect-[4/5] max-h-[720px] overflow-hidden rounded-[180px_180px_36px_36px] border-[10px] border-white/80 bg-white/20 shadow-[0_35px_90px_rgba(219,39,119,0.22)] backdrop-blur-xl dark:border-purple-400/20 dark:bg-purple-950/20 sm:border-[14px]">
-              {heroImage ? (
+              {heroSlides && heroSlides.length > 1 ? (
+                <CarouselSlider slides={heroSlides} />
+              ) : heroImage ? (
                 <img
                   src={heroImage}
                   alt="Midhunyas surreal floral arrangement"
@@ -321,7 +338,7 @@ const HomePage = () => {
               ) : (
                 <div className="grid h-full place-items-center bg-[#F8F2EF] text-sm text-[#9A8E86] dark:bg-zinc-800 dark:text-zinc-400">Hero image not set</div>
               )}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-white/10" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-white/10 pointer-events-none" />
             </div>
 
             {/* Floating Glassmorphic Pill */}

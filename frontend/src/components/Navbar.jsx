@@ -4,6 +4,7 @@ import { FiHeart, FiLogOut, FiMenu, FiMoon, FiSearch, FiShoppingBag, FiSun, FiUs
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 import SearchModal from "./SearchModal";
+import ToolbarDynamic from "./ToolbarDynamic";
 
 const navItems = [
   { label: "Shop", to: "/gallery" },
@@ -82,9 +83,11 @@ const Navbar = () => {
             ))}
           </nav>
 
-          <div className="flex items-center gap-0.5 sm:gap-1">
-            <button onClick={() => setShowSearch(true)} className="hidden h-10 w-10 place-items-center rounded-full transition hover:bg-[#FCEFF3] hover:text-[#E85D8E] sm:grid" aria-label="Search"><FiSearch /></button>
-            <Link to="/favorites" className="hidden h-10 w-10 place-items-center rounded-full transition hover:bg-[#FCEFF3] hover:text-[#E85D8E] sm:grid" aria-label="Wishlist"><FiHeart /></Link>
+          <div className="flex items-center gap-1 sm:gap-2">
+            <div className="hidden sm:block">
+              <ToolbarDynamic />
+            </div>
+            <Link to="/favorites" className="grid h-10 w-10 place-items-center rounded-full transition hover:bg-[#FCEFF3] hover:text-[#E85D8E]" aria-label="Wishlist"><FiHeart /></Link>
             <Link to="/cart" className="relative grid h-10 w-10 place-items-center rounded-full transition hover:bg-[#FCEFF3] hover:text-[#E85D8E]" aria-label={`Shopping bag with ${cartCount} items`}>
               <FiShoppingBag />
               {cartCount > 0 && <span className="absolute right-0 top-0 grid h-4 min-w-4 place-items-center rounded-full bg-[#E85D8E] px-1 text-[9px] font-semibold text-white">{cartCount}</span>}

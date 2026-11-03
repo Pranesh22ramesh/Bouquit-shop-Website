@@ -8,6 +8,7 @@ const rateLimit = require('express-rate-limit');
 const { env } = require('./config/env');
 const { notFound } = require('./middleware/notFound');
 const { errorHandler } = require('./middleware/errorMiddleware');
+const { sanitizeInput } = require('./middleware/sanitizeInput');
 
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
@@ -22,11 +23,22 @@ const seoRoutes = require('./routes/seoRoutes');
 
 const app = express();
 
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: false, // Allows cross-origin asset loading from CDNs/Supabase
+    crossOriginEmbedderPolicy: false,
+  })
+);
+
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin || origin.startsWith('http://localhost:') || origin === 'https://karurflowershop.vercel.app' || origin.endsWith('.vercel.app')) {
+      if (
+        !origin ||
+        origin.startsWith('http://localhost:') ||
+        origin === 'https://karurflowershop.vercel.app' ||
+        origin.endsWith('.vercel.app')
+      ) {
         callback(null, true);
       } else {
         callback(new Error('Not allowed by CORS'));
@@ -35,6 +47,8 @@ app.use(
     credentials: true,
   })
 );
+
+// Global general rate limit
 app.use(
   rateLimit({
     windowMs: 15 * 60 * 1000,
@@ -43,9 +57,12 @@ app.use(
     legacyHeaders: false,
   })
 );
+
 app.use(express.json({ limit: '2mb' }));
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true, limit: '2mb' }));
 app.use(cookieParser());
+app.use(sanitizeInput); // Global XSS & prototype pollution sanitizer
+
 app.use(morgan(env.nodeEnv === 'production' ? 'combined' : 'dev'));
 app.use('/uploads', express.static(path.join(__dirname, '..', env.uploadDir)));
 

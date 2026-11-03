@@ -8,7 +8,7 @@
     html {
         scroll-behavior: smooth;
     }
-    
+
     body {
         @apply bg-floralBg text-gray-800 antialiased overflow-x-hidden custom-scrollbar;
         font-family: "Poppins", system-ui, sans-serif;
@@ -30,12 +30,22 @@
     }
 
     .glass-premium {
-        @apply bg-white/60 backdrop-blur-xl border border-white/50 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] hover:shadow-[0_8px_32px_0_rgba(31,38,135,0.15)] transition-all duration-300;
+        background-color: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+        transition: all 0.3s ease;
+    }
+
+    .glass-premium:hover {
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
     }
 
     .btn-primary {
         @apply bg-gradient-to-r from-pink-500 to-rose-600 text-white px-6 py-2.5 rounded-full font-medium transition-all shadow-lg shadow-pink-500/30 hover:shadow-pink-500/50 active:scale-95 hover:scale-105;
     }
+
     .btn-outline {
         @apply border-2 border-pink-400 text-pink-700 px-6 py-2.5 rounded-full font-medium hover:bg-pink-50 transition-all active:scale-95 hover:scale-105 hover:border-pink-500;
     }
@@ -62,7 +72,29 @@
     }
 
     .btn-luxury {
-        @apply inline-flex min-h-14 items-center justify-center gap-2 rounded-full bg-[linear-gradient(135deg,#D94672,#F78FB3)] px-7 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(217,70,114,0.3)] transition duration-500 hover:scale-[1.04] hover:shadow-[0_16px_40px_rgba(217,70,114,0.4)] active:scale-[0.98];
+        display: inline-flex;
+        min-height: 3.5rem;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        border-radius: 9999px;
+        background: linear-gradient(135deg, #D94672, #F78FB3);
+        padding-left: 1.75rem;
+        padding-right: 1.75rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #ffffff;
+        box-shadow: 0 12px 30px rgba(217, 70, 114, 0.3);
+        transition: all 0.5s ease;
+    }
+
+    .btn-luxury:hover {
+        transform: scale(1.04);
+        box-shadow: 0 16px 40px rgba(217, 70, 114, 0.4);
+    }
+
+    .btn-luxury:active {
+        transform: scale(0.98);
     }
 
     .btn-luxury-outline {
@@ -192,12 +224,80 @@
 }
 
 @keyframes petal-float {
-    0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
-    50% { transform: translate3d(18px, 34px, 0) rotate(120deg); }
+
+    0%,
+    100% {
+        transform: translate3d(0, 0, 0) rotate(0deg);
+    }
+
+    50% {
+        transform: translate3d(18px, 34px, 0) rotate(120deg);
+    }
+}
+
+/* ── Surrealism Floral Dreamscape Utilities ── */
+@keyframes surreal-levitate {
+    0%, 100% {
+        transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-16px) rotate(1.5deg);
+    }
+}
+
+@keyframes surreal-drift {
+    0%, 100% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+    33% {
+        transform: translate(12px, -20px) rotate(6deg);
+    }
+    66% {
+        transform: translate(-10px, -10px) rotate(-4deg);
+    }
+}
+
+.animate-surreal-float {
+    animation: surreal-levitate 7s ease-in-out infinite;
+}
+
+.animate-surreal-drift {
+    animation: surreal-drift 11s ease-in-out infinite;
+}
+
+.surreal-glass-panel {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.75) 0%, rgba(255, 240, 246, 0.5) 50%, rgba(243, 232, 255, 0.6) 100%);
+    backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 25px 60px -15px rgba(219, 39, 119, 0.15), 0 0 40px rgba(168, 85, 247, 0.08);
+}
+
+.dark .surreal-glass-panel {
+    background: linear-gradient(135deg, rgba(30, 22, 38, 0.85) 0%, rgba(22, 18, 32, 0.8) 50%, rgba(42, 20, 36, 0.85) 100%);
+    backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
+    border: 1px solid rgba(216, 180, 254, 0.25);
+    box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.65), 0 0 50px rgba(192, 132, 252, 0.15);
+}
+
+.surreal-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(65px);
+    pointer-events: none;
+    opacity: 0.65;
+}
+
+.dark .surreal-orb {
+    opacity: 0.45;
 }
 
 @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
+
+    *,
+    *::before,
+    *::after {
         scroll-behavior: auto !important;
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;

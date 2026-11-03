@@ -4,14 +4,86 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================
+   ROYAL BOTANICAL LUXURY DESIGN SYSTEM — CSS CUSTOM PROPERTIES
+   ============================================================ */
+:root {
+  /* Core Palette */
+  --color-burgundy: #651F3C;
+  --color-burgundy-hover: #4D172D;
+  --color-gold: #C5A15B;
+  --color-gold-hover: #AD8946;
+  --color-ivory: #FAF5EF;
+  --color-plum: #30232A;
+  --color-dusty-rose: #D9B8B8;
+  --color-sage: #78836B;
+
+  /* Backgrounds */
+  --bg-main: #FAF5EF;
+  --bg-secondary: #FFFFFF;
+  --bg-alt: #F5EAE9;
+  --bg-dark-section: #30232A;
+
+  /* Text */
+  --text-heading: #30232A;
+  --text-body: #51454B;
+  --text-secondary: #81747A;
+  --text-highlight: #651F3C;
+  --text-price: #651F3C;
+  --text-discount: #78836B;
+  --text-on-dark: #FAF5EF;
+
+  /* Borders */
+  --border-luxury: #E8DDD5;
+  --border-gold: #C5A15B;
+
+  /* Scrollbar */
+  --scrollbar-thumb: #D9C9C3;
+  --scrollbar-thumb-hover: #C5A15B;
+}
+
+.dark {
+  --color-burgundy: #A64B6B;
+  --color-burgundy-hover: #8A3D58;
+  --color-gold: #D5B36C;
+  --color-gold-hover: #C5A15B;
+  --color-ivory: #261B22;
+  --color-plum: #FAF5EF;
+
+  --bg-main: #171116;
+  --bg-secondary: #261B22;
+  --bg-alt: #211820;
+  --bg-dark-section: #0D0A0E;
+
+  --text-heading: #FAF5EF;
+  --text-body: #C9B8BF;
+  --text-secondary: #8E7A83;
+  --text-highlight: #D5B36C;
+  --text-price: #D5B36C;
+  --text-on-dark: #FAF5EF;
+
+  --border-luxury: #493640;
+  --border-gold: #5C4350;
+
+  --scrollbar-thumb: #493640;
+  --scrollbar-thumb-hover: #D5B36C;
+}
+
 @layer base {
     html {
         scroll-behavior: smooth;
     }
 
     body {
-        @apply bg-floralBg text-gray-800 antialiased overflow-x-hidden custom-scrollbar;
+        @apply bg-ivory text-plum antialiased overflow-x-hidden custom-scrollbar;
         font-family: "Poppins", system-ui, sans-serif;
+        background-color: var(--bg-main);
+        color: var(--text-body);
+    }
+
+    .dark body {
+        background-color: var(--bg-main);
+        color: var(--text-body);
     }
 
     h1,
@@ -21,6 +93,7 @@
     h5,
     h6 {
         font-family: "Cormorant Garamond", Georgia, serif;
+        color: var(--text-heading);
     }
 }
 
@@ -30,24 +103,24 @@
     }
 
     .glass-premium {
-        background-color: rgba(255, 255, 255, 0.6);
+        background-color: rgba(250, 245, 239, 0.65);
         backdrop-filter: blur(24px);
         -webkit-backdrop-filter: blur(24px);
-        border: 1px solid rgba(255, 255, 255, 0.5);
-        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+        border: 1px solid rgba(197, 161, 91, 0.2);
+        box-shadow: 0 8px 32px 0 rgba(101, 31, 60, 0.07);
         transition: all 0.3s ease;
     }
 
     .glass-premium:hover {
-        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        box-shadow: 0 8px 32px 0 rgba(101, 31, 60, 0.15);
     }
 
     .btn-primary {
-        @apply bg-gradient-to-r from-pink-500 to-rose-600 text-white px-6 py-2.5 rounded-full font-medium transition-all shadow-lg shadow-pink-500/30 hover:shadow-pink-500/50 active:scale-95 hover:scale-105;
+        @apply bg-burgundy text-white px-6 py-2.5 rounded-full font-medium transition-all shadow-burgundy hover:shadow-burgundy-lg hover:bg-burgundy-hover active:scale-95 hover:scale-105;
     }
 
     .btn-outline {
-        @apply border-2 border-pink-400 text-pink-700 px-6 py-2.5 rounded-full font-medium hover:bg-pink-50 transition-all active:scale-95 hover:scale-105 hover:border-pink-500;
+        @apply border-2 border-burgundy text-burgundy px-6 py-2.5 rounded-full font-medium hover:bg-soft-rose transition-all active:scale-95 hover:scale-105;
     }
 
     .card-hover {
@@ -78,19 +151,20 @@
         justify-content: center;
         gap: 0.5rem;
         border-radius: 9999px;
-        background: linear-gradient(135deg, #D94672, #F78FB3);
+        background: linear-gradient(135deg, #651F3C, #4D172D);
         padding-left: 1.75rem;
         padding-right: 1.75rem;
         font-size: 0.875rem;
         font-weight: 600;
         color: #ffffff;
-        box-shadow: 0 12px 30px rgba(217, 70, 114, 0.3);
+        box-shadow: 0 12px 30px rgba(101, 31, 60, 0.3);
         transition: all 0.5s ease;
     }
 
     .btn-luxury:hover {
         transform: scale(1.04);
-        box-shadow: 0 16px 40px rgba(217, 70, 114, 0.4);
+        box-shadow: 0 16px 40px rgba(101, 31, 60, 0.45);
+        background: linear-gradient(135deg, #4D172D, #651F3C);
     }
 
     .btn-luxury:active {
@@ -98,7 +172,7 @@
     }
 
     .btn-luxury-outline {
-        @apply inline-flex min-h-14 items-center justify-center rounded-full border border-[#D9D2CC] bg-white/45 px-7 text-sm font-semibold text-[#2D2D2D] backdrop-blur transition duration-300 hover:border-[#E85D8E] hover:bg-white dark:border-zinc-700 dark:bg-white/5 dark:text-white dark:hover:border-[#F472B6];
+        @apply inline-flex min-h-14 items-center justify-center rounded-full border border-[#C5A15B]/50 bg-white/45 px-7 text-sm font-semibold text-plum backdrop-blur transition duration-300 hover:border-burgundy hover:bg-white dark:border-[#493640] dark:bg-white/5 dark:text-[#FAF5EF] dark:hover:border-[#D5B36C];
     }
 }
 
@@ -121,12 +195,12 @@
     }
 
     .custom-scrollbar::-webkit-scrollbar-thumb {
-        @apply bg-gray-300 rounded-full hover:bg-gray-400;
+        background: var(--scrollbar-thumb);
+        border-radius: 9999px;
     }
 
-    /* Dark mode specific */
-    .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-        @apply bg-gray-700 hover:bg-gray-600;
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: var(--scrollbar-thumb-hover);
     }
 }
 
@@ -183,11 +257,11 @@
 
     0%,
     100% {
-        box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.4);
+        box-shadow: 0 0 0 0 rgba(101, 31, 60, 0.4);
     }
 
     50% {
-        box-shadow: 0 0 20px 10px rgba(244, 63, 94, 0);
+        box-shadow: 0 0 20px 10px rgba(101, 31, 60, 0);
     }
 }
 
@@ -217,7 +291,7 @@
     width: 18px;
     height: 26px;
     border-radius: 70% 30% 70% 30%;
-    background: linear-gradient(145deg, rgba(232, 93, 142, 0.5), rgba(247, 143, 179, 0.16));
+    background: linear-gradient(145deg, rgba(197, 161, 91, 0.4), rgba(217, 184, 184, 0.2));
     filter: blur(0.2px);
     animation: petal-float 8s ease-in-out infinite;
     pointer-events: none;
@@ -235,7 +309,7 @@
     }
 }
 
-/* ── Surrealism Floral Dreamscape Utilities ── */
+/* ✦ Royal Botanical Luxury Utilities ✦ */
 @keyframes surreal-levitate {
     0%, 100% {
         transform: translateY(0px) rotate(0deg);
@@ -266,19 +340,19 @@
 }
 
 .surreal-glass-panel {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.75) 0%, rgba(255, 240, 246, 0.5) 50%, rgba(243, 232, 255, 0.6) 100%);
+    background: linear-gradient(135deg, rgba(250, 245, 239, 0.85) 0%, rgba(245, 234, 233, 0.65) 50%, rgba(217, 184, 184, 0.4) 100%);
     backdrop-filter: blur(28px);
     -webkit-backdrop-filter: blur(28px);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    box-shadow: 0 25px 60px -15px rgba(219, 39, 119, 0.15), 0 0 40px rgba(168, 85, 247, 0.08);
+    border: 1px solid rgba(197, 161, 91, 0.3);
+    box-shadow: 0 25px 60px -15px rgba(101, 31, 60, 0.12), 0 0 40px rgba(197, 161, 91, 0.06);
 }
 
 .dark .surreal-glass-panel {
-    background: linear-gradient(135deg, rgba(30, 22, 38, 0.85) 0%, rgba(22, 18, 32, 0.8) 50%, rgba(42, 20, 36, 0.85) 100%);
+    background: linear-gradient(135deg, rgba(38, 27, 34, 0.88) 0%, rgba(23, 17, 22, 0.82) 50%, rgba(48, 35, 42, 0.88) 100%);
     backdrop-filter: blur(28px);
     -webkit-backdrop-filter: blur(28px);
-    border: 1px solid rgba(216, 180, 254, 0.25);
-    box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.65), 0 0 50px rgba(192, 132, 252, 0.15);
+    border: 1px solid rgba(197, 161, 91, 0.2);
+    box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.65), 0 0 50px rgba(197, 161, 91, 0.08);
 }
 
 .surreal-orb {
@@ -286,11 +360,11 @@
     border-radius: 50%;
     filter: blur(65px);
     pointer-events: none;
-    opacity: 0.65;
+    opacity: 0.5;
 }
 
 .dark .surreal-orb {
-    opacity: 0.45;
+    opacity: 0.3;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -11,12 +11,12 @@ import { DEFAULT_GOOGLE_MAP_EMBED_URL, toGoogleMapsEmbedUrl } from "../utils/goo
 const defaultContent = {
   title: "Contact Us",
   description: "Reach out for custom floral orders, event packages, and support.",
-  shopName: "Midhunya Event Flowers",
+  shopName: "MIDHUNYAS Petals & Bridal Flowers",
   workingHours: "9:00 AM - 8:00 PM",
   phonePrimary: "+91 9942071721",
   phoneSecondary: "",
   whatsapp: "+91 9942071721",
-  email: "hello@midhunyaflowers.com",
+  email: "hello@midhunyas.com",
   instaUrl: "",
   facebookUrl: "",
   youtubeUrl: "",
@@ -71,45 +71,45 @@ const ContactPage = () => {
   const mapEmbedUrl = toGoogleMapsEmbedUrl(content.googleMapUrl || content.address);
 
   return (
-    <div className={`min-h-screen px-4 py-10 ${isDarkMode ? "bg-gray-900 text-white" : "bg-[#fff9f7] text-slate-900"}`}>
+    <div className={`min-h-screen px-4 py-10 transition-colors ${isDarkMode ? "bg-[#171116] text-[#FAF5EF]" : "bg-[#FAF5EF] text-[#30232A]"}`}>
       <div className="mx-auto max-w-6xl">
         <div className="mb-8">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-rose-500">Contact Page</p>
-          <h1 className="mt-3 text-4xl font-bold">{content.title}</h1>
-          <p className={`mt-3 max-w-2xl text-base ${isDarkMode ? "text-gray-300" : "text-slate-600"}`}>{content.description}</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#C5A15B]">Get In Touch</p>
+          <h1 className="mt-3 text-4xl font-serif font-bold">{content.title}</h1>
+          <p className={`mt-3 max-w-2xl text-base ${isDarkMode ? "text-[#C9B8BF]" : "text-[#51454B]"}`}>{content.description}</p>
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
-          <section className={`rounded-[2rem] border p-8 shadow-xl ${isDarkMode ? "border-gray-800 bg-gray-900/50 backdrop-blur-xl" : "border-rose-100 bg-white"}`}>
-            <h2 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-rose-500 to-orange-400">{content.shopName}</h2>
-            <div className={`mt-3 flex items-center gap-2 text-sm font-medium ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>
-              <FiClock className="text-rose-500 w-4 h-4" />
+          <section className={`rounded-[2rem] border p-8 shadow-xl ${isDarkMode ? "border-[#493640] bg-[#261B22]/80 backdrop-blur-xl" : "border-[#E8DDD5] bg-white shadow-sm"}`}>
+            <h2 className="text-3xl font-extrabold font-serif text-[#651F3C] dark:text-[#D5B36C]">{content.shopName}</h2>
+            <div className={`mt-3 flex items-center gap-2 text-sm font-medium ${isDarkMode ? "text-[#8E7A83]" : "text-[#81747A]"}`}>
+              <FiClock className="text-[#C5A15B] w-4 h-4" />
               <span>Working Hours: {content.workingHours}</span>
             </div>
 
             <div className="mt-8 space-y-8">
               <div className="flex gap-4">
-                <div className="flex-shrink-0 w-12 h-12 rounded-2xl bg-rose-50 dark:bg-rose-500/10 flex items-center justify-center">
-                  <FiMapPin className="w-5 h-5 text-rose-500" />
+                <div className="flex-shrink-0 w-12 h-12 rounded-2xl bg-[#F5EAE9] dark:bg-[#30232A] flex items-center justify-center">
+                  <FiMapPin className="w-5 h-5 text-[#651F3C] dark:text-[#D5B36C]" />
                 </div>
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-1">Address</p>
-                  <p className={`text-base font-medium leading-relaxed ${isDarkMode ? "text-gray-200" : "text-slate-700"}`}>{content.address}</p>
+                  <p className="text-xs font-bold uppercase tracking-widest text-[#81747A] dark:text-[#8E7A83] mb-1">Address</p>
+                  <p className={`text-base font-medium leading-relaxed ${isDarkMode ? "text-[#FAF5EF]" : "text-[#30232A]"}`}>{content.address}</p>
                 </div>
               </div>
 
               <div className="flex gap-4">
-                <div className="flex-shrink-0 w-12 h-12 rounded-2xl bg-rose-50 dark:bg-rose-500/10 flex items-center justify-center">
-                  <FiPhone className="w-5 h-5 text-rose-500" />
+                <div className="flex-shrink-0 w-12 h-12 rounded-2xl bg-[#F5EAE9] dark:bg-[#30232A] flex items-center justify-center">
+                  <FiPhone className="w-5 h-5 text-[#651F3C] dark:text-[#D5B36C]" />
                 </div>
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-1">Phone</p>
+                  <p className="text-xs font-bold uppercase tracking-widest text-[#81747A] dark:text-[#8E7A83] mb-1">Phone</p>
                   <div className="space-y-1">
-                    <a href={`tel:${content.phonePrimary}`} className="block text-base font-medium text-rose-500 hover:text-rose-600 transition-colors">
+                    <a href={`tel:${content.phonePrimary}`} className="block text-base font-medium text-[#651F3C] dark:text-[#D5B36C] hover:underline transition-colors">
                       {content.phonePrimary}
                     </a>
                     {content.phoneSecondary && (
-                      <a href={`tel:${content.phoneSecondary}`} className="block text-base font-medium text-rose-500 hover:text-rose-600 transition-colors">
+                      <a href={`tel:${content.phoneSecondary}`} className="block text-base font-medium text-[#651F3C] dark:text-[#D5B36C] hover:underline transition-colors">
                         {content.phoneSecondary}
                       </a>
                     )}
@@ -118,33 +118,33 @@ const ContactPage = () => {
               </div>
 
               <div className="flex gap-4">
-                <div className="flex-shrink-0 w-12 h-12 rounded-2xl bg-rose-50 dark:bg-rose-500/10 flex items-center justify-center">
-                  <FiMail className="w-5 h-5 text-rose-500" />
+                <div className="flex-shrink-0 w-12 h-12 rounded-2xl bg-[#F5EAE9] dark:bg-[#30232A] flex items-center justify-center">
+                  <FiMail className="w-5 h-5 text-[#651F3C] dark:text-[#D5B36C]" />
                 </div>
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-1">Email</p>
-                  <a href={`mailto:${content.email}`} className="block text-base font-medium text-rose-500 hover:text-rose-600 transition-colors">
+                  <p className="text-xs font-bold uppercase tracking-widest text-[#81747A] dark:text-[#8E7A83] mb-1">Email</p>
+                  <a href={`mailto:${content.email}`} className="block text-base font-medium text-[#651F3C] dark:text-[#D5B36C] hover:underline transition-colors">
                     {content.email}
                   </a>
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-gray-100 dark:border-gray-800">
-                <p className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-4">Connect With Us</p>
+              <div className="pt-4 border-t border-[#E8DDD5] dark:border-[#493640]">
+                <p className="text-xs font-bold uppercase tracking-widest text-[#81747A] dark:text-[#8E7A83] mb-4">Connect With Us</p>
                 <div className="flex flex-wrap gap-3">
                   {content.instaUrl && (
-                    <a href={content.instaUrl} target="_blank" rel="noreferrer" className="flex items-center gap-2 rounded-xl bg-gray-50 dark:bg-gray-800 px-5 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-500/20 dark:hover:text-rose-400 transition-all">
-                      <FiInstagram className="w-4 h-4" /> Instagram
+                    <a href={content.instaUrl} target="_blank" rel="noreferrer" className="flex items-center gap-2 rounded-xl bg-[#FAF5EF] dark:bg-[#30232A] border border-[#E8DDD5] dark:border-[#493640] px-5 py-2.5 text-sm font-semibold text-[#30232A] dark:text-[#FAF5EF] hover:border-[#C5A15B] hover:text-[#651F3C] transition-all">
+                      <FiInstagram className="w-4 h-4 text-[#651F3C] dark:text-[#D5B36C]" /> Instagram
                     </a>
                   )}
                   {content.facebookUrl && (
-                    <a href={content.facebookUrl} target="_blank" rel="noreferrer" className="flex items-center gap-2 rounded-xl bg-gray-50 dark:bg-gray-800 px-5 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-500/20 dark:hover:text-rose-400 transition-all">
-                      <FiFacebook className="w-4 h-4" /> Facebook
+                    <a href={content.facebookUrl} target="_blank" rel="noreferrer" className="flex items-center gap-2 rounded-xl bg-[#FAF5EF] dark:bg-[#30232A] border border-[#E8DDD5] dark:border-[#493640] px-5 py-2.5 text-sm font-semibold text-[#30232A] dark:text-[#FAF5EF] hover:border-[#C5A15B] hover:text-[#651F3C] transition-all">
+                      <FiFacebook className="w-4 h-4 text-[#651F3C] dark:text-[#D5B36C]" /> Facebook
                     </a>
                   )}
                   {content.youtubeUrl && (
-                    <a href={content.youtubeUrl} target="_blank" rel="noreferrer" className="flex items-center gap-2 rounded-xl bg-gray-50 dark:bg-gray-800 px-5 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-500/20 dark:hover:text-rose-400 transition-all">
-                      <FiYoutube className="w-4 h-4" /> YouTube
+                    <a href={content.youtubeUrl} target="_blank" rel="noreferrer" className="flex items-center gap-2 rounded-xl bg-[#FAF5EF] dark:bg-[#30232A] border border-[#E8DDD5] dark:border-[#493640] px-5 py-2.5 text-sm font-semibold text-[#30232A] dark:text-[#FAF5EF] hover:border-[#C5A15B] hover:text-[#651F3C] transition-all">
+                      <FiYoutube className="w-4 h-4 text-[#651F3C] dark:text-[#D5B36C]" /> YouTube
                     </a>
                   )}
                 </div>
@@ -152,7 +152,7 @@ const ContactPage = () => {
             </div>
           </section>
 
-          <section className={`overflow-hidden rounded-[2rem] border shadow-lg ${isDarkMode ? "border-gray-700 bg-gray-800" : "border-rose-100 bg-white"}`}>
+          <section className={`overflow-hidden rounded-[2rem] border shadow-lg ${isDarkMode ? "border-[#493640] bg-[#261B22]" : "border-[#E8DDD5] bg-white"}`}>
             <iframe title="Store location" src={mapEmbedUrl} className="h-[480px] w-full border-0" loading="lazy" />
           </section>
         </div>

@@ -23,6 +23,7 @@ const FavoritesPage = lazy(() => import("./pages/FavoritesPage.jsx"));
 const ForgotPasswordPage = lazy(() => import("./pages/ForgotPasswordPage.jsx"));
 const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage.jsx"));
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import ErrorBoundary from "./components/ErrorBoundary.jsx";
 
 const Layout = () => {
   const [isDarkMode, setIsDarkMode] = React.useState(() => {
@@ -53,9 +54,11 @@ const Layout = () => {
       }`}>
       <Navbar />
       <main className="flex-1 relative">
-        <Suspense fallback={<div className="flex h-full w-full items-center justify-center min-h-[50vh]"><div className="h-10 w-10 animate-spin rounded-full border-4 border-rose-500 border-t-transparent"></div></div>}>
-          <Outlet />
-        </Suspense>
+        <ErrorBoundary>
+          <Suspense fallback={<div className="flex h-full w-full items-center justify-center min-h-[50vh]"><div className="h-10 w-10 animate-spin rounded-full border-4 border-rose-500 border-t-transparent"></div></div>}>
+            <Outlet />
+          </Suspense>
+        </ErrorBoundary>
       </main>
       <Footer />
       <AIChatbot />

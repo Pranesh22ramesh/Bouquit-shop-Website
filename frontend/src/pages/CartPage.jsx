@@ -123,7 +123,7 @@ const CartPage = () => {
 
   if (!items || items.length === 0) {
     return (
-      <div className={`min-h-[60vh] flex flex-col items-center justify-center text-center p-4 transition-colors duration-300 ${isDarkMode ? "bg-[#171116] text-[#FAF5EF]" : "bg-[#FAF5EF] text-[#30232A]"}`}>
+      <div className={`min-h-[60vh] flex flex-col items-center justify-center text-center p-4 transition-colors duration-300 ${isDarkMode ? "bg-[#160F17] text-[#FAF5EE]" : "bg-[#FAF5EE] text-[#30232A]"}`}>
         <h1 className="text-2xl font-bold font-serif mb-3">Your Cart is Empty</h1>
         <p className={`mb-6 ${isDarkMode ? "text-[#8E7A83]" : "text-[#81747A]"}`}>Looks like you haven&apos;t added any floral designs yet.</p>
         <Link to="/gallery" className="px-6 py-2.5 bg-[#651F3C] text-white rounded-full font-medium hover:bg-[#4D172D] transition shadow-md">
@@ -134,9 +134,9 @@ const CartPage = () => {
   }
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${isDarkMode ? "bg-[#171116] text-[#FAF5EF]" : "bg-[#FAF5EF] text-[#30232A]"}`}>
+    <div className={`min-h-screen transition-colors duration-300 ${isDarkMode ? "bg-[#160F17] text-[#FAF5EE]" : "bg-[#FAF5EE] text-[#30232A]"}`}>
       <div className="max-w-6xl mx-auto px-4 py-10">
-        <h1 className={`text-3xl font-bold font-serif mb-8 ${isDarkMode ? "text-[#FAF5EF]" : "text-[#651F3C]"}`}>Your Cart</h1>
+        <h1 className={`text-3xl font-bold font-serif mb-8 ${isDarkMode ? "text-[#FAF5EE]" : "text-[#651F3C]"}`}>Your Cart</h1>
 
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Cart Items List */}

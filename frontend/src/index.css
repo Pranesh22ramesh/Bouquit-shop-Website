@@ -8,32 +8,32 @@
    ROYAL BOTANICAL LUXURY DESIGN SYSTEM — CSS CUSTOM PROPERTIES
    ============================================================ */
 :root {
-  /* Core Palette */
+  /* Core Brand & Accents */
   --color-burgundy: #651F3C;
   --color-burgundy-hover: #4D172D;
   --color-gold: #C5A15B;
   --color-gold-hover: #AD8946;
-  --color-ivory: #FAF5EF;
+  --color-ivory: #FAF5EE;
   --color-plum: #30232A;
   --color-dusty-rose: #D9B8B8;
   --color-sage: #78836B;
 
-  /* Backgrounds */
-  --bg-main: #FAF5EF;
+  /* Background Hierarchy */
+  --bg-main: #FAF5EE;
   --bg-secondary: #FFFFFF;
-  --bg-alt: #F5EAE9;
-  --bg-dark-section: #30232A;
+  --bg-alt: #F6ECE7;
+  --bg-dark-section: #261520;
 
-  /* Text */
+  /* Typography */
   --text-heading: #30232A;
   --text-body: #51454B;
   --text-secondary: #81747A;
   --text-highlight: #651F3C;
   --text-price: #651F3C;
   --text-discount: #78836B;
-  --text-on-dark: #FAF5EF;
+  --text-on-dark: #FAF5EE;
 
-  /* Borders */
+  /* Borders & Dividers */
   --border-luxury: #E8DDD5;
   --border-gold: #C5A15B;
 
@@ -48,22 +48,22 @@
   --color-gold: #D5B36C;
   --color-gold-hover: #C5A15B;
   --color-ivory: #261B22;
-  --color-plum: #FAF5EF;
+  --color-plum: #FAF5EE;
 
-  --bg-main: #171116;
-  --bg-secondary: #261B22;
-  --bg-alt: #211820;
-  --bg-dark-section: #0D0A0E;
+  --bg-main: #160F17;
+  --bg-secondary: #231722;
+  --bg-alt: #1F141E;
+  --bg-dark-section: #120A13;
 
-  --text-heading: #FAF5EF;
+  --text-heading: #FAF5EE;
   --text-body: #C9B8BF;
   --text-secondary: #8E7A83;
   --text-highlight: #D5B36C;
   --text-price: #D5B36C;
-  --text-on-dark: #FAF5EF;
+  --text-on-dark: #FAF5EE;
 
   --border-luxury: #493640;
-  --border-gold: #5C4350;
+  --border-gold: #634857;
 
   --scrollbar-thumb: #493640;
   --scrollbar-thumb-hover: #D5B36C;
@@ -103,10 +103,10 @@
     }
 
     .glass-premium {
-        background-color: rgba(250, 245, 239, 0.65);
+        background-color: rgba(250, 245, 238, 0.75);
         backdrop-filter: blur(24px);
         -webkit-backdrop-filter: blur(24px);
-        border: 1px solid rgba(197, 161, 91, 0.2);
+        border: 1px solid rgba(197, 161, 91, 0.25);
         box-shadow: 0 8px 32px 0 rgba(101, 31, 60, 0.07);
         transition: all 0.3s ease;
     }
@@ -172,7 +172,7 @@
     }
 
     .btn-luxury-outline {
-        @apply inline-flex min-h-14 items-center justify-center rounded-full border border-[#C5A15B]/50 bg-white/45 px-7 text-sm font-semibold text-plum backdrop-blur transition duration-300 hover:border-burgundy hover:bg-white dark:border-[#493640] dark:bg-white/5 dark:text-[#FAF5EF] dark:hover:border-[#D5B36C];
+        @apply inline-flex min-h-14 items-center justify-center rounded-full border border-[#C5A15B]/50 bg-white/45 px-7 text-sm font-semibold text-plum backdrop-blur transition duration-300 hover:border-burgundy hover:bg-white dark:border-[#493640] dark:bg-white/5 dark:text-[#FAF5EE] dark:hover:border-[#D5B36C];
     }
 }
 
@@ -204,13 +204,12 @@
     }
 }
 
-/* Additional Animations */
+/* Animations */
 @keyframes slideInLeft {
     from {
         opacity: 0;
         transform: translateX(-30px);
     }
-
     to {
         opacity: 1;
         transform: translateX(0);
@@ -222,7 +221,6 @@
         opacity: 0;
         transform: translateX(30px);
     }
-
     to {
         opacity: 1;
         transform: translateX(0);
@@ -234,7 +232,6 @@
         opacity: 0;
         transform: scale(0.9);
     }
-
     to {
         opacity: 1;
         transform: scale(1);
@@ -242,24 +239,18 @@
 }
 
 @keyframes bounce-subtle {
-
-    0%,
-    100% {
+    0%, 100% {
         transform: translateY(0);
     }
-
     50% {
         transform: translateY(-5px);
     }
 }
 
 @keyframes pulse-glow {
-
-    0%,
-    100% {
+    0%, 100% {
         box-shadow: 0 0 0 0 rgba(101, 31, 60, 0.4);
     }
-
     50% {
         box-shadow: 0 0 20px 10px rgba(101, 31, 60, 0);
     }
@@ -291,19 +282,16 @@
     width: 18px;
     height: 26px;
     border-radius: 70% 30% 70% 30%;
-    background: linear-gradient(145deg, rgba(197, 161, 91, 0.4), rgba(217, 184, 184, 0.2));
+    background: linear-gradient(145deg, rgba(197, 161, 91, 0.45), rgba(217, 184, 184, 0.25));
     filter: blur(0.2px);
     animation: petal-float 8s ease-in-out infinite;
     pointer-events: none;
 }
 
 @keyframes petal-float {
-
-    0%,
-    100% {
+    0%, 100% {
         transform: translate3d(0, 0, 0) rotate(0deg);
     }
-
     50% {
         transform: translate3d(18px, 34px, 0) rotate(120deg);
     }
@@ -340,7 +328,7 @@
 }
 
 .surreal-glass-panel {
-    background: linear-gradient(135deg, rgba(250, 245, 239, 0.85) 0%, rgba(245, 234, 233, 0.65) 50%, rgba(217, 184, 184, 0.4) 100%);
+    background: linear-gradient(135deg, rgba(250, 245, 238, 0.88) 0%, rgba(246, 236, 231, 0.72) 50%, rgba(217, 184, 184, 0.4) 100%);
     backdrop-filter: blur(28px);
     -webkit-backdrop-filter: blur(28px);
     border: 1px solid rgba(197, 161, 91, 0.3);
@@ -348,27 +336,26 @@
 }
 
 .dark .surreal-glass-panel {
-    background: linear-gradient(135deg, rgba(38, 27, 34, 0.88) 0%, rgba(23, 17, 22, 0.82) 50%, rgba(48, 35, 42, 0.88) 100%);
+    background: linear-gradient(135deg, rgba(35, 23, 34, 0.90) 0%, rgba(22, 15, 23, 0.85) 50%, rgba(48, 35, 42, 0.90) 100%);
     backdrop-filter: blur(28px);
     -webkit-backdrop-filter: blur(28px);
-    border: 1px solid rgba(197, 161, 91, 0.2);
+    border: 1px solid rgba(197, 161, 91, 0.25);
     box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.65), 0 0 50px rgba(197, 161, 91, 0.08);
 }
 
 .surreal-orb {
     position: absolute;
     border-radius: 50%;
-    filter: blur(65px);
+    filter: blur(70px);
     pointer-events: none;
-    opacity: 0.5;
+    opacity: 0.45;
 }
 
 .dark .surreal-orb {
-    opacity: 0.3;
+    opacity: 0.25;
 }
 
 @media (prefers-reduced-motion: reduce) {
-
     *,
     *::before,
     *::after {

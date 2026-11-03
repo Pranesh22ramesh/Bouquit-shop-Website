@@ -71,7 +71,7 @@ const ContactPage = () => {
   const mapEmbedUrl = toGoogleMapsEmbedUrl(content.googleMapUrl || content.address);
 
   return (
-    <div className={`min-h-screen px-4 py-10 transition-colors ${isDarkMode ? "bg-[#171116] text-[#FAF5EF]" : "bg-[#FAF5EF] text-[#30232A]"}`}>
+    <div className={`min-h-screen px-4 py-10 transition-colors ${isDarkMode ? "bg-[#160F17] text-[#FAF5EE]" : "bg-[#FAF5EE] text-[#30232A]"}`}>
       <div className="mx-auto max-w-6xl">
         <div className="mb-8">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#C5A15B]">Get In Touch</p>
@@ -80,7 +80,7 @@ const ContactPage = () => {
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
-          <section className={`rounded-[2rem] border p-8 shadow-xl ${isDarkMode ? "border-[#493640] bg-[#261B22]/80 backdrop-blur-xl" : "border-[#E8DDD5] bg-white shadow-sm"}`}>
+          <section className={`rounded-[2rem] border p-8 shadow-xl ${isDarkMode ? "border-[#493640] bg-[#231722]/80 backdrop-blur-xl" : "border-[#E8DDD5] bg-white shadow-sm"}`}>
             <h2 className="text-3xl font-extrabold font-serif text-[#651F3C] dark:text-[#D5B36C]">{content.shopName}</h2>
             <div className={`mt-3 flex items-center gap-2 text-sm font-medium ${isDarkMode ? "text-[#8E7A83]" : "text-[#81747A]"}`}>
               <FiClock className="text-[#C5A15B] w-4 h-4" />
@@ -89,17 +89,17 @@ const ContactPage = () => {
 
             <div className="mt-8 space-y-8">
               <div className="flex gap-4">
-                <div className="flex-shrink-0 w-12 h-12 rounded-2xl bg-[#F5EAE9] dark:bg-[#30232A] flex items-center justify-center">
+                <div className="flex-shrink-0 w-12 h-12 rounded-2xl bg-[#F6ECE7] dark:bg-[#30232A] flex items-center justify-center">
                   <FiMapPin className="w-5 h-5 text-[#651F3C] dark:text-[#D5B36C]" />
                 </div>
                 <div>
                   <p className="text-xs font-bold uppercase tracking-widest text-[#81747A] dark:text-[#8E7A83] mb-1">Address</p>
-                  <p className={`text-base font-medium leading-relaxed ${isDarkMode ? "text-[#FAF5EF]" : "text-[#30232A]"}`}>{content.address}</p>
+                  <p className={`text-base font-medium leading-relaxed ${isDarkMode ? "text-[#FAF5EE]" : "text-[#30232A]"}`}>{content.address}</p>
                 </div>
               </div>
 
               <div className="flex gap-4">
-                <div className="flex-shrink-0 w-12 h-12 rounded-2xl bg-[#F5EAE9] dark:bg-[#30232A] flex items-center justify-center">
+                <div className="flex-shrink-0 w-12 h-12 rounded-2xl bg-[#F6ECE7] dark:bg-[#30232A] flex items-center justify-center">
                   <FiPhone className="w-5 h-5 text-[#651F3C] dark:text-[#D5B36C]" />
                 </div>
                 <div>

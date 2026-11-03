@@ -59,10 +59,10 @@ const Navbar = () => {
   };
 
   const shell = isScrolled
-    ? "border-[#C5A15B]/40 bg-[#FAF5EF]/95 shadow-[0_8px_30px_rgba(101,31,60,0.08)] backdrop-blur-xl dark:border-[#493640] dark:bg-[#211820]/95"
+    ? "border-[#C5A15B]/40 bg-[#FAF5EE]/95 shadow-[0_8px_30px_rgba(101,31,60,0.08)] backdrop-blur-xl dark:border-[#493640] dark:bg-[#211820]/95"
     : isHome
-      ? "border-transparent bg-[#FAF5EF]/60 backdrop-blur-md dark:bg-[#171116]/60"
-      : "border-[#E8DDD5] bg-[#FAF5EF] dark:border-[#493640] dark:bg-[#211820]";
+      ? "border-transparent bg-[#FAF5EE]/70 backdrop-blur-md dark:bg-[#171116]/70"
+      : "border-[#E8DDD5] bg-[#FAF5EE] dark:border-[#493640] dark:bg-[#211820]";
 
   return (
     <>
@@ -85,9 +85,7 @@ const Navbar = () => {
           </nav>
 
           <div className="flex items-center gap-1 sm:gap-2">
-            <div className="hidden sm:block">
-              <ToolbarDynamic />
-            </div>
+            <ToolbarDynamic />
             <Link to="/favorites" className="grid h-10 w-10 place-items-center rounded-full text-[#30232A] transition hover:bg-[#F5EAE9] hover:text-[#651F3C] dark:text-[#FAF5EF] dark:hover:bg-[#261B22] dark:hover:text-[#D5B36C]" aria-label="Wishlist"><FiHeart /></Link>
             <Link to="/cart" className="relative grid h-10 w-10 place-items-center rounded-full text-[#30232A] transition hover:bg-[#F5EAE9] hover:text-[#651F3C] dark:text-[#FAF5EF] dark:hover:bg-[#261B22] dark:hover:text-[#D5B36C]" aria-label={`Shopping bag with ${cartCount} items`}>
               <FiShoppingBag />
@@ -97,7 +95,7 @@ const Navbar = () => {
 
             {isAuthenticated ? (
               <div className="relative hidden md:block">
-                <button onClick={() => setShowUserMenu((value) => !value)} className="ml-1 flex h-10 items-center gap-2 rounded-full border border-[#E8DDD5] px-3 text-xs text-[#30232A] dark:border-[#493640] dark:text-[#FAF5EF]"><FiUser /> {user?.name?.split(" ")[0]}</button>
+                <button onClick={() => setShowUserMenu((value) => !value)} className="ml-1 flex h-10 items-center gap-2 rounded-full border border-[#E8DDD5] hover:border-[#C5A15B]/50 px-3 text-xs text-[#30232A] dark:border-[#493640] dark:text-[#FAF5EF] transition-colors"><FiUser /> {user?.name?.split(" ")[0]}</button>
                 {showUserMenu && (
                   <div className="absolute right-0 mt-2 w-52 overflow-hidden rounded-2xl border border-[#E8DDD5] bg-white p-2 text-sm shadow-xl dark:border-[#493640] dark:bg-[#261B22]">
                     <Link to="/my-orders" className="block rounded-xl px-3 py-2.5 text-[#30232A] hover:bg-[#FAF5EF] dark:text-[#FAF5EF] dark:hover:bg-[#30232A]">My orders</Link>
@@ -106,14 +104,14 @@ const Navbar = () => {
                   </div>
                 )}
               </div>
-            ) : <Link to="/login" className="ml-2 hidden rounded-full bg-[#651F3C] px-5 py-2.5 text-xs font-semibold text-white transition hover:bg-[#C5A15B] md:block dark:bg-[#651F3C] dark:text-white dark:hover:bg-[#D5B36C]">Sign in</Link>}
+            ) : <Link to="/login" className="ml-2 hidden rounded-full bg-[#651F3C] px-5 py-2.5 text-xs font-semibold text-white transition hover:bg-[#4D172D] shadow-sm md:block dark:bg-[#651F3C] dark:text-white dark:hover:bg-[#C5A15B]">Sign in</Link>}
           </div>
         </div>
       </header>
 
       {showMobileMenu && (
-        <div className="fixed inset-0 z-[80] bg-black/30 backdrop-blur-sm lg:hidden" onClick={() => setShowMobileMenu(false)}>
-          <aside className="h-full w-[min(88vw,380px)] bg-[#FAF5EF] p-6 shadow-2xl dark:bg-[#211820]" onClick={(event) => event.stopPropagation()}>
+        <div className="fixed inset-0 z-[80] bg-black/40 backdrop-blur-sm lg:hidden" onClick={() => setShowMobileMenu(false)}>
+          <aside className="h-full w-[min(88vw,380px)] bg-[#FAF5EE] p-6 shadow-2xl dark:bg-[#211820]" onClick={(event) => event.stopPropagation()}>
             <div className="flex items-center justify-between border-b border-[#E8DDD5] pb-5 dark:border-[#493640]">
               <span className="font-serif text-2xl tracking-wider text-[#651F3C] dark:text-[#D5B36C]">MIDHUNYAS</span>
               <button onClick={() => setShowMobileMenu(false)} className="grid h-10 w-10 place-items-center rounded-full bg-white text-xl shadow-sm dark:bg-[#30232A]" aria-label="Close navigation"><FiX /></button>

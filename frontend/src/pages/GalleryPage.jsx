@@ -143,7 +143,7 @@ const GalleryPage = () => {
   };
 
   return (
-    <div className={`min-h-screen transition-colors ${isDarkMode ? "bg-[#171116]" : "bg-[#FAF5EF]"}`}>
+    <div className={`min-h-screen transition-colors ${isDarkMode ? "bg-[#160F17]" : "bg-[#FAF5EE]"}`}>
       <SeoHead seoOverride={pageSeo} breadcrumbs={[{ name: 'Home', url: '/' }, { name: 'Gallery', url: '/gallery' }]} />
       <section className="relative h-[80vh] w-full overflow-hidden md:h-[85vh]">
         <div className="absolute inset-0 bg-cover bg-center bg-fixed" style={{ backgroundImage: "url('https://5258c99641bea1ec763a.b-cdn.net/wp-content/uploads/2024/06/wedding-flowers-budget-title-image.jpg')" }} />
@@ -156,30 +156,30 @@ const GalleryPage = () => {
 
       <section id="gallery" className="relative z-10 -mt-16 pb-10 md:-mt-24">
         <div className="mx-auto max-w-7xl px-4">
-          <div className={`rounded-3xl p-4 shadow-xl backdrop-blur-sm md:p-6 ${isDarkMode ? "bg-[#261B22]/95 border border-[#493640]" : "bg-white/95 border border-[#E8DDD5]"}`}>
+          <div className={`rounded-3xl p-4 shadow-xl backdrop-blur-sm md:p-6 ${isDarkMode ? "bg-[#231722]/95 border border-[#493640]" : "bg-white/95 border border-[#E8DDD5]"}`}>
             <div className="flex flex-wrap items-center justify-between gap-4 border-b pb-4 dark:border-[#493640]">
               <div className="flex flex-1 flex-wrap items-center gap-2">
                 <div className="relative w-full max-w-sm md:w-auto">
-                  <input value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} placeholder="Search products..." className={`w-full rounded-xl border py-2 pl-10 pr-4 outline-none ${isDarkMode ? "border-[#493640] bg-[#171116] text-[#FAF5EF]" : "border-[#E8DDD5] bg-[#FAF5EF] text-[#30232A]"}`} />
+                  <input value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} placeholder="Search products..." className={`w-full rounded-xl border py-2 pl-10 pr-4 outline-none ${isDarkMode ? "border-[#493640] bg-[#160F17] text-[#FAF5EE]" : "border-[#E8DDD5] bg-[#FAF5EE] text-[#30232A]"}`} />
                   <svg className="absolute left-3 top-2.5 h-5 w-5 text-[#81747A]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                 </div>
                 <div className="flex flex-1 gap-2 overflow-x-auto py-2">
                   {categories.map((item) => (
-                    <button key={item.key} onClick={() => setActiveCategory(item.key)} className={`whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition ${activeCategory === item.key ? "bg-[#651F3C] text-white shadow-md" : isDarkMode ? "bg-[#171116] text-[#FAF5EF] border border-[#493640]" : "border border-[#C5A15B]/30 bg-[#F5EAE9] text-[#651F3C] hover:bg-[#FAF5EF]"}`}>
+                    <button key={item.key} onClick={() => setActiveCategory(item.key)} className={`whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition ${activeCategory === item.key ? "bg-[#651F3C] text-white shadow-md" : isDarkMode ? "bg-[#160F17] text-[#FAF5EE] border border-[#493640]" : "border border-[#C5A15B]/30 bg-[#F6ECE7] text-[#651F3C] hover:bg-[#FAF5EE]"}`}>
                       {item.label}
                     </button>
                   ))}
                 </div>
               </div>
               <div className="flex w-full gap-3 md:w-auto">
-                <select value={filterOption} onChange={(event) => setFilterOption(event.target.value)} className={`flex-1 rounded-xl border px-4 py-2 text-sm font-medium outline-none ${isDarkMode ? "border-[#493640] bg-[#171116] text-[#FAF5EF]" : "border-[#E8DDD5] bg-[#FAF5EF] text-[#30232A]"}`}>
+                <select value={filterOption} onChange={(event) => setFilterOption(event.target.value)} className={`flex-1 rounded-xl border px-4 py-2 text-sm font-medium outline-none ${isDarkMode ? "border-[#493640] bg-[#160F17] text-[#FAF5EE]" : "border-[#E8DDD5] bg-[#FAF5EE] text-[#30232A]"}`}>
                   <option value="all">All Products</option>
                   <option value="latest">Latest</option>
                   <option value="high-selling">High Selling</option>
                   <option value="offered">Offered</option>
                   <option value="combo">Combo</option>
                 </select>
-                <select value={sortOption} onChange={(event) => setSortOption(event.target.value)} className={`flex-1 rounded-xl border px-4 py-2 text-sm font-medium outline-none ${isDarkMode ? "border-[#493640] bg-[#171116] text-[#FAF5EF]" : "border-[#E8DDD5] bg-[#FAF5EF] text-[#30232A]"}`}>
+                <select value={sortOption} onChange={(event) => setSortOption(event.target.value)} className={`flex-1 rounded-xl border px-4 py-2 text-sm font-medium outline-none ${isDarkMode ? "border-[#493640] bg-[#160F17] text-[#FAF5EE]" : "border-[#E8DDD5] bg-[#FAF5EE] text-[#30232A]"}`}>
                   <option value="latest">Latest First</option>
                   <option value="oldest">Oldest First</option>
                   <option value="price-low">Price: Low to High</option>
@@ -191,12 +191,12 @@ const GalleryPage = () => {
 
             {isFetching && products.length === 0 ? (
               <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-                {Array.from({ length: 8 }).map((_, index) => <div key={index} className={`h-80 animate-pulse rounded-xl ${isDarkMode ? "bg-[#30232A]" : "bg-[#F5EAE9]"}`} />)}
+                {Array.from({ length: 8 }).map((_, index) => <div key={index} className={`h-80 animate-pulse rounded-xl ${isDarkMode ? "bg-[#30232A]" : "bg-[#F6ECE7]"}`} />)}
               </div>
             ) : products.length ? (
               <div className={`mt-6 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 transition-opacity duration-200 ${isFetching ? "opacity-50 pointer-events-none" : "opacity-100"}`}>
                 {products.map((item, index) => (
-                  <article key={item._id} onClick={() => navigate(`/product/${item._id}`)} style={{ animationDelay: `${index * 0.05}s` }} className={`group relative cursor-pointer overflow-hidden rounded-xl border shadow-md transition hover:-translate-y-1 hover:shadow-xl ${isDarkMode ? "border-[#493640] bg-[#171116]" : "border-[#E8DDD5] bg-white"} ${item.status === "Unavailable" ? "opacity-60 grayscale-[.5]" : ""}`}>
+                  <article key={item._id} onClick={() => navigate(`/product/${item._id}`)} style={{ animationDelay: `${index * 0.05}s` }} className={`group relative cursor-pointer overflow-hidden rounded-xl border shadow-md transition hover:-translate-y-1 hover:shadow-xl ${isDarkMode ? "border-[#493640] bg-[#160F17]" : "border-[#E8DDD5] bg-white"} ${item.status === "Unavailable" ? "opacity-60 grayscale-[.5]" : ""}`}>
                     <div className="relative aspect-[4/5] overflow-hidden">
                       {item.image ? (
                         <img
@@ -207,7 +207,7 @@ const GalleryPage = () => {
                           className="h-full w-full object-cover transition duration-700 group-hover:scale-110 image-enhanced"
                         />
                       ) : (
-                        <div className="grid h-full place-items-center bg-[#F5EAE9] text-[#81747A]">No image</div>
+                        <div className="grid h-full place-items-center bg-[#F6ECE7] text-[#81747A]">No image</div>
                       )}
                       {item.status === "Unavailable" && <div className="absolute inset-0 grid place-items-center bg-black/40"><span className="rounded bg-red-600 px-3 py-1 text-sm font-bold text-white">Unavailable</span></div>}
                     </div>

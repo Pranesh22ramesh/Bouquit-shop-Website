@@ -45,10 +45,10 @@ export default function ToolbarDynamic({ onSearch }) {
     <MotionConfig transition={transition}>
       <div className="relative inline-block z-40" ref={containerRef}>
         <div
-          className={`transition-colors duration-200 rounded-full ${
+          className={`transition-all duration-300 rounded-full ${
             isOpen
-              ? 'border border-[#C5A15B]/50 bg-[#FAF5EF]/95 dark:border-[#493640] dark:bg-[#211820]/95 shadow-lg backdrop-blur-xl'
-              : 'border border-transparent bg-transparent hover:bg-[#F5EAE9] dark:hover:bg-[#261B22]/80'
+              ? 'border border-[#C5A15B] bg-[#FAF5EE]/98 dark:border-[#C5A15B]/80 dark:bg-[#211820]/98 shadow-[0_10px_30px_rgba(101,31,60,0.15)] backdrop-blur-2xl'
+              : 'border border-[#C5A15B]/30 bg-white/70 hover:bg-white/95 dark:bg-white/5 dark:border-[#493640] dark:hover:bg-white/10 hover:border-[#C5A15B]/70 shadow-sm backdrop-blur-md'
           }`}
         >
           <motion.div
@@ -63,7 +63,7 @@ export default function ToolbarDynamic({ onSearch }) {
                   type="button"
                   onClick={() => setIsOpen(true)}
                   aria-label="Search flowers"
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-[#651F3C] dark:text-[#D5B36C] hover:text-[#4D172D] dark:hover:text-[#C5A15B] transition-colors"
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-[#651F3C] dark:text-[#D5B36C] hover:scale-110 active:scale-95 transition-all"
                 >
                   <FiSearch className="h-4 w-4" />
                 </button>
@@ -82,14 +82,24 @@ export default function ToolbarDynamic({ onSearch }) {
                   </button>
                   <div className="relative w-full">
                     <input
-                      className="h-8 w-full bg-transparent px-2 text-xs text-[#30232A] placeholder-[#81747A] dark:text-[#FAF5EF] dark:placeholder-[#8E7A83] outline-none"
+                      className="h-8 w-full bg-transparent px-2 text-xs font-medium text-[#30232A] placeholder-[#81747A] dark:text-[#FAF5EF] dark:placeholder-[#8E7A83] outline-none"
                       autoFocus
                       value={query}
                       onChange={(e) => setQuery(e.target.value)}
                       onKeyDown={handleKeyDown}
-                      placeholder="Search bouquets, jadai..."
+                      placeholder="Search bouquets, bridal jadai..."
                     />
                   </div>
+                  {query.trim() && (
+                    <button
+                      type="button"
+                      onClick={handleSubmit}
+                      className="w-7 h-7 rounded-full bg-[#651F3C] text-white flex items-center justify-center hover:bg-[#4D172D] transition-colors shrink-0"
+                      aria-label="Submit search"
+                    >
+                      <FiSearch className="h-3 w-3" />
+                    </button>
+                  )}
                 </div>
               )}
             </div>

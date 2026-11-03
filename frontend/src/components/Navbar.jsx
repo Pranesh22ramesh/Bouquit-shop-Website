@@ -7,7 +7,6 @@ import SearchModal from "./SearchModal";
 
 const navItems = [
   { label: "Shop", to: "/gallery" },
-  { label: "Events", to: "/#events" },
   { label: "Our story", to: "/about" },
   { label: "Love notes", to: "/reviews" },
   { label: "Contact", to: "/contact" },

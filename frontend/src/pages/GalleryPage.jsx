@@ -198,7 +198,17 @@ const GalleryPage = () => {
                 {products.map((item, index) => (
                   <article key={item._id} onClick={() => navigate(`/product/${item._id}`)} style={{ animationDelay: `${index * 0.05}s` }} className={`group relative cursor-pointer overflow-hidden rounded-xl shadow-md transition hover:-translate-y-1 hover:shadow-xl ${isDarkMode ? "border border-gray-700 bg-gray-800" : "bg-white"} ${item.status === "Unavailable" ? "opacity-60 grayscale-[.5]" : ""}`}>
                     <div className="relative aspect-[4/5] overflow-hidden">
-                      {item.image ? <img src={item.image} alt={item.name} loading="lazy" className="h-full w-full object-cover transition duration-700 group-hover:scale-110" /> : <div className="grid h-full place-items-center bg-gray-100 text-gray-400">No image</div>}
+                      {item.image ? (
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          loading="lazy"
+                          decoding="async"
+                          className="h-full w-full object-cover transition duration-700 group-hover:scale-110 image-enhanced"
+                        />
+                      ) : (
+                        <div className="grid h-full place-items-center bg-gray-100 text-gray-400">No image</div>
+                      )}
                       {item.status === "Unavailable" && <div className="absolute inset-0 grid place-items-center bg-black/40"><span className="rounded bg-red-600 px-3 py-1 text-sm font-bold text-white">Unavailable</span></div>}
                     </div>
                     <div className="absolute right-2 top-2 z-10 flex flex-col gap-2">

@@ -44,6 +44,23 @@
         @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-2;
     }
 
+    /* Automatic Visual Clarity & Contrast Enhancement for Gallery & Product Images */
+    .image-enhanced,
+    .gallery-card-img,
+    article img {
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
+        backface-visibility: hidden;
+        transform: translateZ(0);
+        filter: contrast(1.03) saturate(1.05);
+        transition: filter 0.3s ease, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    article:hover img,
+    .image-enhanced:hover {
+        filter: contrast(1.05) saturate(1.08);
+    }
+
     .btn-luxury {
         @apply inline-flex min-h-14 items-center justify-center gap-2 rounded-full bg-[linear-gradient(135deg,#D94672,#F78FB3)] px-7 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(217,70,114,0.3)] transition duration-500 hover:scale-[1.04] hover:shadow-[0_16px_40px_rgba(217,70,114,0.4)] active:scale-[0.98];
     }

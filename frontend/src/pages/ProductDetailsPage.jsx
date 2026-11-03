@@ -223,7 +223,9 @@ const ProductDetailsPage = () => {
               <img 
                 src={product.image} 
                 alt={product.name} 
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                loading="eager"
+                decoding="async"
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 image-enhanced" 
               />
             ) : (
               <div className="w-full h-full grid place-items-center bg-gray-100 text-gray-400">No Image Available</div>

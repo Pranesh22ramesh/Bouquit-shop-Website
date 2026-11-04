@@ -43,6 +43,7 @@ const productIdValidator = [
 ];
 
 const listProducts = asyncHandler(async (req, res) => {
+  res.setHeader('Cache-Control', 'public, max-age=30, stale-while-revalidate=120');
   const products = await productService.listProducts(req.query);
   if (req.baseUrl.endsWith('/gallery')) {
     return res.json({
@@ -56,6 +57,7 @@ const listProducts = asyncHandler(async (req, res) => {
 });
 
 const listCategories = asyncHandler(async (req, res) => {
+  res.setHeader('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
   res.json(await productService.listCategories());
 });
 

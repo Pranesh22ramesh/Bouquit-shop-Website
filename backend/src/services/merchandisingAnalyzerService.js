@@ -77,13 +77,28 @@ const buildMerchandisingAnalysis = (products, orders, reviews, now = new Date())
   }));
 };
 
+let cachedAnalysis = null;
+let cachedAnalysisTime = 0;
+const ANALYSIS_CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes cache for sales/review analytics
+
+const invalidateAnalysisCache = () => {
+  cachedAnalysis = null;
+  cachedAnalysisTime = 0;
+};
+
 const analyzeProducts = async (products) => {
   if (!products.length) return new Map();
+  const now = Date.now();
+  if (cachedAnalysis && (now - cachedAnalysisTime < ANALYSIS_CACHE_TTL_MS)) {
+    return cachedAnalysis;
+  }
+
   const productIds = products.map((product) => product.id);
   const [orders, reviews] = await Promise.all([
     prisma.order.findMany({
       where: { status: { not: OrderStatus.CANCELLED } },
       select: { orderItems: true },
+      take: 200, // Limit historical orders scan to avoid unbounded database memory
     }),
     prisma.review.findMany({
       where: { productId: { in: productIds }, isHidden: false },
@@ -91,7 +106,9 @@ const analyzeProducts = async (products) => {
     }),
   ]);
 
-  return buildMerchandisingAnalysis(products, orders, reviews);
+  cachedAnalysis = buildMerchandisingAnalysis(products, orders, reviews);
+  cachedAnalysisTime = now;
+  return cachedAnalysis;
 };
 
-module.exports = { LATEST_WINDOW_DAYS, analyzeProducts, buildMerchandisingAnalysis };
+module.exports = { LATEST_WINDOW_DAYS, analyzeProducts, buildMerchandisingAnalysis, invalidateAnalysisCache };

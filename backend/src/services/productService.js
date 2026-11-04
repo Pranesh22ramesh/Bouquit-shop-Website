@@ -3,7 +3,22 @@ const { prisma } = require('../config/prisma');
 const { ApiError } = require('../utils/apiError');
 const { serializeProduct } = require('../utils/serializers');
 const { deleteImage, uploadImage } = require('./storageService');
-const { analyzeProducts } = require('./merchandisingAnalyzerService');
+const { analyzeProducts, invalidateAnalysisCache } = require('./merchandisingAnalyzerService');
+
+let cachedDefaultProducts = null;
+let cachedDefaultProductsTime = 0;
+let cachedCategories = null;
+let cachedCategoriesTime = 0;
+const PRODUCTS_CACHE_TTL_MS = 60 * 1000; // 60 seconds
+const CATEGORIES_CACHE_TTL_MS = 3 * 60 * 1000; // 3 minutes
+
+const invalidateProductCache = () => {
+  cachedDefaultProducts = null;
+  cachedDefaultProductsTime = 0;
+  cachedCategories = null;
+  cachedCategoriesTime = 0;
+  invalidateAnalysisCache();
+};
 
 const badgeMap = {
   Normal: ProductBadge.NORMAL,
@@ -101,6 +116,22 @@ const normalizePayload = (payload, hasNewImage = false, isCreate = false) => {
 };
 
 const listProducts = async (query = {}) => {
+  const isDefaultQuery =
+    !query.keyword &&
+    !query.search &&
+    (!query.category || query.category === 'all') &&
+    (!query.filter || query.filter === 'all') &&
+    (!query.sort || query.sort === 'latest') &&
+    !query.featured &&
+    !query.status;
+
+  const now = Date.now();
+  const limit = Math.min(Math.max(Number(query.limit) || 1000, 1), 1000);
+
+  if (isDefaultQuery && cachedDefaultProducts && now - cachedDefaultProductsTime < PRODUCTS_CACHE_TTL_MS) {
+    return cachedDefaultProducts.slice(0, limit);
+  }
+
   const where = {};
 
   if (query.keyword || query.search) {
@@ -122,7 +153,6 @@ const listProducts = async (query = {}) => {
     where.availability = Availability.AVAILABLE;
   }
 
-  const limit = Math.min(Math.max(Number(query.limit) || 1000, 1), 1000);
   const products = await runProductQuery(() =>
     prisma.product.findMany({
       where,
@@ -149,10 +179,20 @@ const listProducts = async (query = {}) => {
   else if (sort === 'high-selling') analyzedProducts.sort((a, b) => b.analytics.unitsSold - a.analytics.unitsSold);
   else analyzedProducts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
+  if (isDefaultQuery) {
+    cachedDefaultProducts = analyzedProducts;
+    cachedDefaultProductsTime = now;
+  }
+
   return analyzedProducts.slice(0, limit);
 };
 
 const listCategories = async () => {
+  const now = Date.now();
+  if (cachedCategories && now - cachedCategoriesTime < CATEGORIES_CACHE_TTL_MS) {
+    return cachedCategories;
+  }
+
   const categories = await runProductQuery(() =>
     prisma.product.findMany({
       distinct: ['category'],
@@ -161,7 +201,7 @@ const listCategories = async () => {
     })
   );
 
-  return categories
+  const result = categories
     .map((entry) => entry.category?.trim())
     .filter(Boolean)
     .sort((a, b) => {
@@ -171,6 +211,10 @@ const listCategories = async () => {
       return a.localeCompare(b);
     })
     .map((category) => ({ value: category, label: getCategoryDisplayLabel(category) }));
+
+  cachedCategories = result;
+  cachedCategoriesTime = now;
+  return result;
 };
 
 const getProductById = async (id) => {
@@ -196,6 +240,7 @@ const createProduct = async (payload, file) => {
     },
   });
 
+  invalidateProductCache();
   return serializeProduct(product);
 };
 
@@ -221,7 +266,7 @@ const updateProduct = async (id, payload, file) => {
   });
 
   if (file && existing.image) await deleteImage(existing.image);
-
+  invalidateProductCache();
   return serializeProduct(updated);
 };
 
@@ -230,12 +275,14 @@ const deleteProduct = async (id) => {
   if (!existing) throw new ApiError(404, 'Product not found');
   await prisma.product.delete({ where: { id } });
   if (existing.image) await deleteImage(existing.image);
+  invalidateProductCache();
 };
 
 module.exports = {
   createProduct,
   deleteProduct,
   getProductById,
+  invalidateProductCache,
   listCategories,
   listProducts,
   updateProduct,

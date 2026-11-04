@@ -24,11 +24,17 @@ const ForgotPasswordPage = lazy(() => import("./pages/ForgotPasswordPage.jsx"));
 const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage.jsx"));
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import ErrorBoundary from "./components/ErrorBoundary.jsx";
+import { galleryService } from "./api/galleryService.js";
 
 const Layout = () => {
   const [isDarkMode, setIsDarkMode] = React.useState(() => {
     return document.documentElement.classList.contains("dark");
   });
+
+  React.useEffect(() => {
+    // Pre-warm backend and cache products in background on initial load
+    galleryService.list({ limit: 40 }).catch(() => {});
+  }, []);
 
   React.useEffect(() => {
     // Check theme on mount
@@ -80,6 +86,7 @@ const App = () => {
         <Route path="about" element={<AboutPage />} />
         <Route path="contact" element={<ContactPage />} />
         <Route path="gallery" element={<GalleryPage />} />
+        <Route path="shop" element={<GalleryPage />} />
         <Route path="product/:id" element={<ProductDetailsPage />} />
         <Route path="favorites" element={<FavoritesPage />} />
         <Route path="login" element={<LoginPage />} />

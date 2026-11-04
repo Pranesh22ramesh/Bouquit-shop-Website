@@ -8,6 +8,53 @@ const defaultHomeCategoryTiles = [
   { id: 'gift-arrangements', name: 'Gift Arrangements', note: 'A joy to give', image: '/gallery/bouquet/bouquet13.jpg' },
 ];
 
+const defaultHomeOccasionTiles = [
+  { id: 'occasion-1', name: 'Birthday', note: 'Joyful blooms to make their day brighter', image: '/gallery/bouquet/bouquet1.jpg', link: '/gallery?occasion=birthday' },
+  { id: 'occasion-2', name: 'Anniversary', note: 'Romantic arrangements celebrating eternal love', image: '/gallery/bouquet/bouquet13.jpg', link: '/gallery?occasion=anniversary' },
+  { id: 'occasion-3', name: 'Congratulations', note: 'Vibrant blossoms for milestones and success', image: '/gallery/bouquet/bouquet4.jpg', link: '/gallery?occasion=congratulations' },
+  { id: 'occasion-4', name: 'Love & Romance', note: 'Deep crimson roses and blushing reveries', image: '/gallery/bouquet/bouquet7.jpg', link: '/gallery?occasion=romance' },
+  { id: 'occasion-5', name: 'Bridal & Wedding', note: 'Sacred wedding florals, malai, and hair jadai', image: '/gallery/bridal/flower11.jpg', link: '/gallery?occasion=bridal' },
+  { id: 'occasion-6', name: 'Temple & Traditional', note: 'Heirloom garlands and stage flower decor', image: '/gallery/garlands/garland1.jpg', link: '/gallery?occasion=traditional' },
+];
+
+const defaultHomeWhyChooseUs = [
+  { id: 'why-1', title: 'Farm Fresh Flowers', note: 'Sourced from trusted growers every single morning', icon: 'FiFeather' },
+  { id: 'why-2', title: 'Fast & Reliable Delivery', note: 'On-time delivery across Karur and all Tamil Nadu', icon: 'FiTruck' },
+  { id: 'why-3', title: 'Beautiful Arrangements', note: 'Handcrafted by expert florists with love and passion', icon: 'FiHeart' },
+  { id: 'why-4', title: 'Perfect For Every Occasion', note: 'Bespoke designs tailored to your cherished moments', icon: 'FiGift' },
+];
+
+const defaultDeliveryBanner = {
+  title: 'Same Day Flower Delivery',
+  subtitle: 'Beautiful flowers at your doorstep, right on time. We deliver all over Karur and Tamil Nadu.',
+  buttonLabel: 'Order Now →',
+  buttonLink: 'https://wa.me/919942071721?text=Hello%20MIDHUNYAS%20Petals!%20I%20would%20like%20to%20order%20same%20day%20flower%20delivery.',
+  image: '/gallery/bouquet/bouquet15.jpg',
+};
+
+const defaultMidBanner = {
+  eyebrow: 'FLOWERS THAT SPEAK YOUR HEART',
+  title: 'Flowers That Speak Your Heart',
+  subtitle: "From birthdays to 'just because' to sacred weddings, find your perfect bouquet.",
+  buttonLabel: 'Explore Collections →',
+  buttonLink: '/gallery',
+  badgeText: 'More Love Less Ordinary ♡',
+  image: '/gallery/bouquet/bouquet12.jpg',
+};
+
+const defaultOfferPopup = {
+  enabled: true,
+  badge: 'SPECIAL EXCLUSIVE OFFER ✦',
+  title: 'Flat 15% OFF On Your Order',
+  subtitle: 'Welcome to MIDHUNYAS Petals & Bridal Flowers',
+  description: 'Handcrafted bridal flowers, luxury bouquets, and elegant stage decor. Fresh blossoms harvested daily and delivered across Karur & Tamil Nadu.',
+  couponCode: 'MIDHUNYAS15',
+  buttonLabel: 'Claim 15% Off & Shop Now →',
+  buttonLink: '/gallery',
+  whatsappMessage: 'Hello MIDHUNYAS! I would like to claim 15% OFF with coupon code MIDHUNYAS15 for my order.',
+  image: '/gallery/bouquet/bouquet13.jpg',
+};
+
 const defaultHomeInspirationTiles = [
   { id: 'rose-stories', src: '/gallery/bouquet/bouquet1.jpg', label: 'Rose stories', className: 'sm:row-span-2' },
   { id: 'bridal-details', src: '/gallery/bridal/flower12.jpg', label: 'Bridal details', className: '' },
@@ -32,9 +79,14 @@ const defaultContent = {
     secondaryButtonLabel: 'Customer Stories',
     secondaryButtonLink: '/reviews',
     homeImagesEditableVersion: 1,
-    banners: ['/gallery/bouquet/bouquet13.jpg'],
+    banners: ['/gallery/bouquet/bouquet13.jpg', '/gallery/bouquet/bouquet1.jpg', '/gallery/bouquet/bouquet12.jpg'],
     featuredProductIds: [],
     categoryTiles: defaultHomeCategoryTiles,
+    occasionTiles: defaultHomeOccasionTiles,
+    whyChooseUs: defaultHomeWhyChooseUs,
+    deliveryBanner: defaultDeliveryBanner,
+    midBanner: defaultMidBanner,
+    offerPopup: defaultOfferPopup,
     eventImage: '/gallery/bouquet/bouquet6.jpg',
     inspirationTiles: defaultHomeInspirationTiles,
     fallbackProductImages: defaultHomeFallbackProductImages,
@@ -99,6 +151,15 @@ const normalizeCategoryTiles = (value) =>
     image: String(item?.image || ''),
   }));
 
+const normalizeOccasionTiles = (value) =>
+  normalizeArray(value).map((item, index) => ({
+    id: String(item?.id || `occasion-${index + 1}`),
+    name: String(item?.name || ''),
+    note: String(item?.note || ''),
+    image: String(item?.image || ''),
+    link: String(item?.link || '/gallery'),
+  }));
+
 const normalizeInspirationTiles = (value) =>
   normalizeArray(value).map((item, index) => ({
     id: String(item?.id || `inspiration-${index + 1}`),
@@ -113,12 +174,17 @@ const hydrateContent = (key, data = {}) => {
   const defaults = defaultContent[key] || {};
   const merged = { ...defaults, ...(data || {}) };
 
-  if (key === 'home-highlight' && !data?.homeImagesEditableVersion) {
-    if (!Array.isArray(data?.banners) || data.banners.length === 0) merged.banners = defaults.banners;
-    if (!Array.isArray(data?.categoryTiles) || data.categoryTiles.length === 0) merged.categoryTiles = defaults.categoryTiles;
-    if (!data?.eventImage) merged.eventImage = defaults.eventImage;
-    if (!Array.isArray(data?.inspirationTiles) || data.inspirationTiles.length === 0) merged.inspirationTiles = defaults.inspirationTiles;
-    if (!Array.isArray(data?.fallbackProductImages) || data.fallbackProductImages.length === 0) {
+  if (key === 'home-highlight') {
+    if (!Array.isArray(merged.banners) || merged.banners.length === 0) merged.banners = defaults.banners;
+    if (!Array.isArray(merged.categoryTiles) || merged.categoryTiles.length === 0) merged.categoryTiles = defaults.categoryTiles;
+    if (!Array.isArray(merged.occasionTiles) || merged.occasionTiles.length === 0) merged.occasionTiles = defaultHomeOccasionTiles;
+    if (!Array.isArray(merged.whyChooseUs) || merged.whyChooseUs.length === 0) merged.whyChooseUs = defaultHomeWhyChooseUs;
+    if (!merged.deliveryBanner) merged.deliveryBanner = defaultDeliveryBanner;
+    if (!merged.midBanner) merged.midBanner = defaultMidBanner;
+    if (!merged.offerPopup) merged.offerPopup = defaultOfferPopup;
+    if (!merged.eventImage) merged.eventImage = defaults.eventImage;
+    if (!Array.isArray(merged.inspirationTiles) || merged.inspirationTiles.length === 0) merged.inspirationTiles = defaults.inspirationTiles;
+    if (!Array.isArray(merged.fallbackProductImages) || merged.fallbackProductImages.length === 0) {
       merged.fallbackProductImages = defaults.fallbackProductImages;
     }
   }
@@ -188,12 +254,19 @@ const updateContent = async (key, data, files = []) => {
     next.featuredProductIds = normalizeArray(data.featuredProductIds || current.featuredProductIds || []);
     next.promotionalSections = normalizeArray(data.promotionalSections || current.promotionalSections || []);
     next.categoryTiles = normalizeCategoryTiles(data.categoryTiles || current.categoryTiles || defaultHomeCategoryTiles);
+    next.occasionTiles = normalizeOccasionTiles(data.occasionTiles || current.occasionTiles || defaultHomeOccasionTiles);
+    next.whyChooseUs = normalizeArray(data.whyChooseUs || current.whyChooseUs || defaultHomeWhyChooseUs);
+    next.deliveryBanner = { ...defaultDeliveryBanner, ...(current.deliveryBanner || {}), ...(data.deliveryBanner || {}) };
+    next.midBanner = { ...defaultMidBanner, ...(current.midBanner || {}), ...(data.midBanner || {}) };
+    next.offerPopup = { ...defaultOfferPopup, ...(current.offerPopup || {}), ...(data.offerPopup || {}) };
+
     next.eventImage = data.eventImage !== undefined ? String(data.eventImage || '') : String(current.eventImage || '/gallery/bouquet/bouquet6.jpg');
     next.inspirationTiles = normalizeInspirationTiles(data.inspirationTiles || current.inspirationTiles || defaultHomeInspirationTiles);
 
     const previousFallbackImages = normalizeStringArray(current.fallbackProductImages || defaultHomeFallbackProductImages);
     const fallbackImageItems = normalizeStringArray(data.fallbackProductImages || current.fallbackProductImages || defaultHomeFallbackProductImages).map((image) => ({ image }));
 
+    // File upload for eventImage
     const eventImageFile = files.find((entry) => entry.fieldname === 'homeEventImageFile');
     if (eventImageFile) {
       const uploaded = await uploadImage({
@@ -203,6 +276,50 @@ const updateContent = async (key, data, files = []) => {
       });
       next.eventImage = uploaded.url;
     }
+
+    // File upload for offerPopup poster image
+    const offerPosterFile = files.find((entry) => entry.fieldname === 'offerPosterImageFile');
+    if (offerPosterFile) {
+      const uploaded = await uploadImage({
+        file: offerPosterFile,
+        folder: 'content/home/offers',
+        filenameBase: 'offer-poster',
+      });
+      next.offerPopup.image = uploaded.url;
+    }
+
+    // File upload for midBanner
+    const midBannerFile = files.find((entry) => entry.fieldname === 'midBannerImageFile');
+    if (midBannerFile) {
+      const uploaded = await uploadImage({
+        file: midBannerFile,
+        folder: 'content/home/banners',
+        filenameBase: 'mid-banner',
+      });
+      next.midBanner.image = uploaded.url;
+    }
+
+    // File upload for deliveryBanner
+    const deliveryBannerFile = files.find((entry) => entry.fieldname === 'deliveryBannerImageFile');
+    if (deliveryBannerFile) {
+      const uploaded = await uploadImage({
+        file: deliveryBannerFile,
+        folder: 'content/home/banners',
+        filenameBase: 'delivery-banner',
+      });
+      next.deliveryBanner.image = uploaded.url;
+    }
+
+    // Upload indexed occasion tiles
+    await uploadHomeIndexedImages({
+      files,
+      pattern: /^homeOccasionImage_(\d+)$/,
+      items: next.occasionTiles,
+      imageKey: 'image',
+      folder: 'content/home/occasions',
+      filenamePrefix: 'occasion-card',
+      previousItems: normalizeOccasionTiles(current.occasionTiles || defaultHomeOccasionTiles),
+    });
 
     await uploadHomeIndexedImages({
       files,

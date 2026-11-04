@@ -6,9 +6,7 @@ import {
   FiCheck,
   FiChevronLeft,
   FiChevronRight,
-  FiClock,
   FiFeather,
-  FiGift,
   FiHeart,
   FiShoppingBag,
   FiStar,
@@ -41,29 +39,29 @@ const trustCapsules = [
     id: "capsule-1",
     title: "SAME DAY DELIVERY",
     subtitle: "Order before 2:30PM",
-    icon: <FiTruck className="text-xl text-[#651F3C] dark:text-[#D5B36C]" />,
+    icon: <FiTruck className="text-base sm:text-lg text-[#651F3C] dark:text-[#D5B36C]" />,
   },
   {
     id: "capsule-2",
     title: "FRESH FROM OUR FARMS",
     subtitle: "Handpicked with care",
-    icon: <FiFeather className="text-xl text-[#78836B] dark:text-[#A3B19B]" />,
+    icon: <FiFeather className="text-base sm:text-lg text-[#78836B] dark:text-[#A3B19B]" />,
   },
   {
     id: "capsule-3",
     title: "EXPERT FLORISTS",
     subtitle: "Crafted by professionals",
-    icon: <FiHeart className="text-xl text-[#E07558] dark:text-[#E07558]" />,
+    icon: <FiHeart className="text-base sm:text-lg text-[#E07558] dark:text-[#E07558]" />,
   },
   {
     id: "capsule-4",
     title: "HAPPINESS GUARANTEED",
     subtitle: "Your satisfaction, always",
-    icon: <FiCheck className="text-xl text-[#287A50] dark:text-[#52B788]" />,
+    icon: <FiCheck className="text-base sm:text-lg text-[#287A50] dark:text-[#52B788]" />,
   },
 ];
 
-// ── Default Collections (Hasfarm 4 rounded cards) ──
+// ── Default Collections (Hasfarm 4 cards) ──
 const defaultCollections = [
   {
     id: "col-1",
@@ -154,35 +152,14 @@ const fallbackProducts = [
   { _id: "white-lily", name: "Artisan Gift Hamper", category: "Gift Hampers", price: 2199, offerPrice: 1999, image: "/gallery/bouquet/bouquet10.jpg", rating: 5, reviewsCount: 62 },
 ];
 
-const customerReviews = [
-  {
-    quote: "Absolutely beautiful flowers! The quality and service were outstanding. Delivered fresh and radiant.",
-    name: "Ayesha K.",
-    event: "Bridal Bouquet",
-    avatar: "/gallery/hairstyle/hairstyle_1.jpg",
-  },
-  {
-    quote: "Midhunyas made our anniversary so special! The bouquet was stunning and smelled heavenly.",
-    name: "Usman & Priya",
-    event: "Anniversary Flowers",
-    avatar: "/gallery/bouquet/bouquet1.jpg",
-  },
-  {
-    quote: "Fast delivery and the freshest roses I have ever received in Karur. Highly recommend!",
-    name: "Saravanan R.",
-    event: "Celebration Gift",
-    avatar: "/gallery/bouquet/bouquet10.jpg",
-  },
-];
-
 const reveal = {
-  initial: { opacity: 0, y: 24 },
+  initial: { opacity: 0, y: 16 },
   whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, amount: 0.15 },
-  transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
+  viewport: { once: true, amount: 0.1 },
+  transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] },
 };
 
-// ── Hasfarm Product Card ──
+// ── Hasfarm Compact Product Card ──
 const HasfarmProductCard = ({ product }) => {
   const navigate = useNavigate();
   const { addItem } = useCart();
@@ -213,52 +190,52 @@ const HasfarmProductCard = ({ product }) => {
 
   return (
     <motion.article
-      whileHover={{ y: -6 }}
-      transition={{ duration: 0.25 }}
+      whileHover={{ y: -4 }}
+      transition={{ duration: 0.2 }}
       onClick={() => navigate(`/product/${product._id || product.id}`)}
-      className="group relative flex flex-col justify-between overflow-hidden rounded-[28px] border border-[#F0DFD5] bg-[#FBF0EA] p-4 shadow-sm hover:shadow-xl hover:border-[#C5A15B] transition-all dark:border-[#493640] dark:bg-[#231722] cursor-pointer"
+      className="group relative flex flex-col justify-between overflow-hidden rounded-[20px] sm:rounded-[22px] border border-[#F0DFD5] bg-[#FBF0EA] p-3 shadow-xs hover:shadow-lg hover:border-[#C5A15B] transition-all dark:border-[#493640] dark:bg-[#231722] cursor-pointer"
     >
       <div>
         {/* Photo Container */}
-        <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl bg-white dark:bg-[#1E1420]">
+        <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-white dark:bg-[#1E1420]">
           <img
             src={image}
             alt={product.name}
             loading="lazy"
             decoding="async"
-            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-108 image-enhanced"
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105 image-enhanced"
           />
           <Link
             to="/favorites"
             onClick={(e) => e.stopPropagation()}
             aria-label="Wishlist"
-            className="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full bg-white/90 text-[#30232A] shadow-sm hover:bg-[#651F3C] hover:text-white transition-colors dark:bg-[#1E1420]/90 dark:text-white"
+            className="absolute right-2.5 top-2.5 grid h-7 w-7 place-items-center rounded-full bg-white/90 text-[#30232A] shadow-xs hover:bg-[#651F3C] hover:text-white transition-colors dark:bg-[#1E1420]/90 dark:text-white"
           >
             <FiHeart className="text-xs" />
           </Link>
         </div>
 
         {/* Product Details */}
-        <div className="mt-4">
-          <h3 className="font-serif text-lg font-bold text-[#30232A] dark:text-[#FAF5EF] truncate">
+        <div className="mt-2.5">
+          <h3 className="font-serif text-sm sm:text-base font-bold text-[#30232A] dark:text-[#FAF1EC] truncate">
             {product.name}
           </h3>
 
-          <div className="mt-1 flex items-center gap-1 text-[11px] text-[#C5A15B]">
+          <div className="mt-0.5 flex items-center gap-1 text-[10px] text-[#C5A15B]">
             {Array.from({ length: 5 }).map((_, i) => (
-              <FiStar key={i} fill="currentColor" className="text-xs" />
+              <FiStar key={i} fill="currentColor" className="text-[10px]" />
             ))}
-            <span className="ml-1 text-[10px] text-[#81747A] dark:text-zinc-400">
+            <span className="ml-1 text-[9px] text-[#81747A] dark:text-zinc-400">
               ({product.reviewsCount || 86})
             </span>
           </div>
 
-          <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-base font-bold text-[#651F3C] dark:text-[#D5B36C]">
+          <div className="mt-1 flex items-baseline gap-1.5">
+            <span className="text-sm sm:text-base font-bold text-[#651F3C] dark:text-[#D5B36C]">
               ₹{price.toLocaleString("en-IN")}
             </span>
             {originalPrice && (
-              <span className="text-xs text-[#81747A] line-through">
+              <span className="text-[11px] text-[#81747A] line-through">
                 ₹{originalPrice.toLocaleString("en-IN")}
               </span>
             )}
@@ -266,12 +243,12 @@ const HasfarmProductCard = ({ product }) => {
         </div>
       </div>
 
-      {/* Circular / Pill Action */}
+      {/* Direct Add to Cart Action */}
       <button
         type="button"
         disabled={isAdding}
         onClick={handleAddToCart}
-        className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-[#651F3C] py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-sm hover:bg-[#4D172D] active:scale-[0.98] transition-all dark:bg-[#651F3C] dark:hover:bg-[#C5A15B] dark:hover:text-[#30232A]"
+        className="mt-2.5 flex w-full items-center justify-center gap-1.5 rounded-full bg-[#651F3C] py-2 text-[11px] font-bold uppercase tracking-wider text-white shadow-xs hover:bg-[#4D172D] active:scale-[0.98] transition-all dark:bg-[#651F3C] dark:hover:bg-[#C5A15B] dark:hover:text-[#30232A]"
       >
         <FiShoppingBag className="text-xs" />
         {isAdding ? "Adding..." : "Add to Cart"}
@@ -314,13 +291,11 @@ const HomePage = () => {
     return () => unsubscribers.forEach((unsubscribe) => unsubscribe?.());
   }, []);
 
-  // Hero banners array
   const heroImages = useMemo(() => {
     if (content.banners && content.banners.length > 0) return content.banners;
     return defaultContent.banners;
   }, [content.banners]);
 
-  // Auto advance hero slideshow
   useEffect(() => {
     if (heroImages.length <= 1) return;
     const interval = setInterval(() => {
@@ -329,17 +304,14 @@ const HomePage = () => {
     return () => clearInterval(interval);
   }, [heroImages.length]);
 
-  // Collections list (Hasfarm 4 cards)
   const collections = useMemo(() => {
     return content.collections?.length ? content.collections : defaultCollections;
   }, [content.collections]);
 
-  // Occasions list (Hasfarm 6 round badges)
   const occasions = useMemo(() => {
     return content.occasionTiles?.length ? content.occasionTiles : defaultHomeOccasionTiles;
   }, [content.occasionTiles]);
 
-  // Best sellers: featured products if configured, else first 4 products
   const bestSellers = useMemo(() => {
     if (content.featuredProductIds?.length && allProducts.length) {
       const byId = new Map(allProducts.map((p) => [p._id, p]));
@@ -363,47 +335,47 @@ const HomePage = () => {
       {/* ── 0. POPUP OFFER POSTER ON LOAD / REFRESH ── */}
       <OfferPopupModal offerData={content.offerPopup} />
 
-      {/* ── 1. HERO SECTION (Hasfarm Grand Rounded Card Layout) ── */}
-      <section className="px-3 sm:px-6 lg:px-10 pt-4 pb-10">
+      {/* ── 1. HERO SECTION (Snug, Elegant Hasfarm Layout) ── */}
+      <section className="px-3 sm:px-6 lg:px-8 pt-2 sm:pt-3 pb-3 sm:pb-4">
         <div className="mx-auto max-w-[1440px]">
-          <div className="relative overflow-hidden rounded-[36px] sm:rounded-[48px] md:rounded-[56px] border border-[#ECD9CE] bg-gradient-to-br from-[#FBF1EA] via-[#F8E7DE] to-[#F4DFD3] p-8 sm:p-12 md:p-16 lg:p-20 shadow-sm dark:border-[#493640] dark:from-[#261B22] dark:via-[#1F151C] dark:to-[#171116]">
+          <div className="relative overflow-hidden rounded-[26px] sm:rounded-[36px] md:rounded-[42px] border border-[#ECD9CE] bg-gradient-to-br from-[#FBF1EA] via-[#F8E7DE] to-[#F4DFD3] p-5 sm:p-8 md:p-10 lg:p-12 shadow-xs dark:border-[#493640] dark:from-[#261B22] dark:via-[#1F151C] dark:to-[#171116]">
             
-            {/* Botanical Sage Background Wave Curve (behind bouquet) */}
-            <div className="pointer-events-none absolute -bottom-10 -right-10 h-[80%] w-[58%] rounded-tl-[180px] bg-[#78836B]/15 dark:bg-[#78836B]/10 blur-[1px]" />
-            <div className="pointer-events-none absolute top-8 right-12 text-[#C5A15B]/35 text-2xl select-none">✦</div>
-            <div className="pointer-events-none absolute bottom-12 left-10 text-[#D9B8B8]/40 text-3xl select-none">🌸</div>
+            {/* Botanical Sage Background Wave Curve */}
+            <div className="pointer-events-none absolute -bottom-8 -right-8 h-[80%] w-[56%] rounded-tl-[160px] bg-[#78836B]/15 dark:bg-[#78836B]/10 blur-[1px]" />
+            <div className="pointer-events-none absolute top-6 right-10 text-[#C5A15B]/35 text-xl select-none">✦</div>
+            <div className="pointer-events-none absolute bottom-8 left-8 text-[#D9B8B8]/40 text-2xl select-none">🌸</div>
 
-            <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+            <div className="grid gap-6 lg:gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
               {/* Left Column: 3-Tier Bold Headline, Copy, Pill Button */}
               <motion.div
-                initial={{ opacity: 0, x: -24 }}
+                initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.8 }}
+                transition={{ duration: 0.7 }}
                 className="relative z-10 max-w-xl"
               >
-                <div className="space-y-1 sm:space-y-2">
-                  <h1 className="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight text-[#30232A] dark:text-[#FAF1EC] leading-[0.92] uppercase">
+                <div className="space-y-0.5 sm:space-y-1">
+                  <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight text-[#30232A] dark:text-[#FAF1EC] leading-[0.94] uppercase">
                     {content.heroHeadline1 || "BIGGER."}
                   </h1>
-                  <h1 className="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight text-[#D96B4E] dark:text-[#E07558] leading-[0.92] uppercase flex items-center gap-3">
+                  <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight text-[#D96B4E] dark:text-[#E07558] leading-[0.94] uppercase flex items-center gap-2 sm:gap-3">
                     <span>{content.heroHeadline2 || "BRIGHTER."}</span>
-                    <span className="text-3xl sm:text-5xl md:text-6xl animate-pulse">🌸</span>
+                    <span className="text-2xl sm:text-4xl md:text-5xl animate-pulse">🌸</span>
                   </h1>
-                  <h1 className="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight text-[#30232A] dark:text-[#FAF1EC] leading-[0.92] uppercase">
+                  <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight text-[#30232A] dark:text-[#FAF1EC] leading-[0.94] uppercase">
                     {content.heroHeadline3 || "BETTER."}
                   </h1>
                 </div>
 
-                <p className="mt-6 text-sm sm:text-base md:text-lg leading-relaxed text-[#51454B] dark:text-[#C4B1B8] max-w-md">
+                <p className="mt-3 sm:mt-4 text-xs sm:text-sm md:text-base leading-relaxed text-[#51454B] dark:text-[#C4B1B8] max-w-md">
                   {content.heroDescription ||
                     "Thoughtfully designed flowers and gifts that celebrate life, nature and every meaningful moment."}
                 </p>
 
                 {/* Pill Button: SHOP FLOWERS 🌸 */}
-                <div className="mt-8 sm:mt-10">
+                <div className="mt-5 sm:mt-6">
                   <Link
                     to={content.primaryButtonLink || "/gallery"}
-                    className="inline-flex items-center gap-2.5 rounded-full bg-[#5E6D55] hover:bg-[#4C5B44] px-8 sm:px-10 py-4 text-xs sm:text-sm font-bold uppercase tracking-wider text-white shadow-lg active:scale-95 transition-all dark:bg-[#651F3C] dark:hover:bg-[#4D172D]"
+                    className="inline-flex items-center gap-2 rounded-full bg-[#5E6D55] hover:bg-[#4C5B44] px-6 sm:px-8 py-3 text-xs sm:text-sm font-bold uppercase tracking-wider text-white shadow-md active:scale-95 transition-all dark:bg-[#651F3C] dark:hover:bg-[#4D172D]"
                   >
                     <span>{content.primaryButtonLabel || "SHOP FLOWERS"}</span>
                     <span>🌸</span>
@@ -413,31 +385,31 @@ const HomePage = () => {
 
               {/* Right Column: Hero Bouquet Showcase with Tag & Pagination Dots */}
               <motion.div
-                initial={{ opacity: 0, scale: 0.94 }}
+                initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.85, delay: 0.15 }}
-                className="relative z-10 mx-auto w-full max-w-[460px] lg:max-w-none"
+                transition={{ duration: 0.7, delay: 0.1 }}
+                className="relative z-10 mx-auto w-full max-w-[380px] sm:max-w-[420px] lg:max-w-none"
               >
-                <div className="relative aspect-[4/5] max-h-[580px] w-full overflow-hidden rounded-[32px] sm:rounded-[40px] border-4 border-white/80 bg-white shadow-[0_25px_60px_rgba(48,35,42,0.12)] dark:border-[#493640] dark:bg-[#231722]">
+                <div className="relative aspect-[4/4.6] max-h-[480px] w-full overflow-hidden rounded-[24px] sm:rounded-[32px] border-4 border-white/80 bg-white shadow-[0_15px_40px_rgba(48,35,42,0.10)] dark:border-[#493640] dark:bg-[#231722]">
                   <AnimatePresence mode="wait">
                     <motion.img
                       key={activeSlideIndex}
                       src={heroImages[activeSlideIndex]}
                       alt="MIDHUNYAS signature flower bouquet"
-                      initial={{ opacity: 0, scale: 1.05 }}
+                      initial={{ opacity: 0, scale: 1.04 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0 }}
-                      transition={{ duration: 0.7 }}
+                      transition={{ duration: 0.6 }}
                       className="h-full w-full object-cover image-enhanced"
                     />
                   </AnimatePresence>
 
                   {/* Greeting Card Tag (Hasfarm Style) */}
-                  <div className="absolute top-1/2 right-6 -translate-y-1/2 rotate-6 rounded-xl bg-white px-5 py-3 shadow-xl border border-[#F0DFD5] dark:bg-[#261B22] dark:border-[#493640]">
-                    <span className="font-serif italic text-sm sm:text-base font-bold text-[#651F3C] dark:text-[#D5B36C]">
+                  <div className="absolute top-1/2 right-4 -translate-y-1/2 rotate-6 rounded-lg bg-white px-3.5 py-2 shadow-lg border border-[#F0DFD5] dark:bg-[#261B22] dark:border-[#493640]">
+                    <span className="font-serif italic text-xs sm:text-sm font-bold text-[#651F3C] dark:text-[#D5B36C]">
                       MIDHUNYAS
                     </span>
-                    <span className="block text-[9px] uppercase tracking-widest text-[#81747A] dark:text-zinc-400">
+                    <span className="block text-[8px] uppercase tracking-widest text-[#81747A] dark:text-zinc-400">
                       Petals & Blooms
                     </span>
                   </div>
@@ -451,10 +423,10 @@ const HomePage = () => {
                           e.preventDefault();
                           setActiveSlideIndex((prev) => (prev - 1 + heroImages.length) % heroImages.length);
                         }}
-                        className="pointer-events-auto grid h-8 w-8 place-items-center rounded-full bg-white/70 text-[#30232A] backdrop-blur hover:bg-white shadow transition-all"
+                        className="pointer-events-auto grid h-7 w-7 place-items-center rounded-full bg-white/75 text-[#30232A] backdrop-blur hover:bg-white shadow transition-all"
                         aria-label="Previous bouquet"
                       >
-                        <FiChevronLeft className="text-sm" />
+                        <FiChevronLeft className="text-xs" />
                       </button>
                       <button
                         type="button"
@@ -462,28 +434,28 @@ const HomePage = () => {
                           e.preventDefault();
                           setActiveSlideIndex((prev) => (prev + 1) % heroImages.length);
                         }}
-                        className="pointer-events-auto grid h-8 w-8 place-items-center rounded-full bg-white/70 text-[#30232A] backdrop-blur hover:bg-white shadow transition-all"
+                        className="pointer-events-auto grid h-7 w-7 place-items-center rounded-full bg-white/75 text-[#30232A] backdrop-blur hover:bg-white shadow transition-all"
                         aria-label="Next bouquet"
                       >
-                        <FiChevronRight className="text-sm" />
+                        <FiChevronRight className="text-xs" />
                       </button>
                     </div>
                   )}
                 </div>
 
-                {/* 3 Pagination Dots (Hasfarm Style: ● ○ ○) */}
+                {/* Pagination Dots (● ○ ○) */}
                 {heroImages.length > 1 && (
-                  <div className="mt-4 flex items-center justify-center gap-2">
+                  <div className="mt-2.5 flex items-center justify-center gap-1.5">
                     {heroImages.map((_, idx) => (
                       <button
                         key={idx}
                         type="button"
                         onClick={() => setActiveSlideIndex(idx)}
                         aria-label={`Go to slide ${idx + 1}`}
-                        className={`h-2.5 rounded-full transition-all ${
+                        className={`h-2 rounded-full transition-all ${
                           activeSlideIndex === idx
-                            ? "w-7 bg-[#D96B4E] dark:bg-[#E07558]"
-                            : "w-2.5 bg-[#D9C9C3] hover:bg-[#C5A15B] dark:bg-[#493640]"
+                            ? "w-6 bg-[#D96B4E] dark:bg-[#E07558]"
+                            : "w-2 bg-[#D9C9C3] hover:bg-[#C5A15B] dark:bg-[#493640]"
                         }`}
                       />
                     ))}
@@ -495,23 +467,23 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* ── 2. FOUR TRUST CAPSULES ── */}
-      <section className="px-3 sm:px-6 lg:px-10 py-6">
+      {/* ── 2. FOUR TRUST CAPSULES (Snug Row) ── */}
+      <section className="px-3 sm:px-6 lg:px-8 py-2 sm:py-3">
         <div className="mx-auto max-w-[1440px]">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
             {trustCapsules.map((capsule) => (
               <div
                 key={capsule.id}
-                className="flex items-center gap-3.5 rounded-2xl sm:rounded-full bg-[#FBF0EA] border border-[#EFE2D9] px-5 py-4 shadow-sm hover:shadow-md transition-all dark:bg-[#231722] dark:border-[#493640]"
+                className="flex items-center gap-2.5 rounded-xl sm:rounded-full bg-[#FBF0EA] border border-[#EFE2D9] px-3.5 py-2.5 sm:px-4 sm:py-3 shadow-xs hover:shadow-sm transition-all dark:bg-[#231722] dark:border-[#493640]"
               >
-                <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white dark:bg-[#30232A] shadow-sm">
+                <div className="grid h-8 w-8 sm:h-9 sm:w-9 shrink-0 place-items-center rounded-full bg-white dark:bg-[#30232A] shadow-xs">
                   {capsule.icon}
                 </div>
-                <div>
-                  <h4 className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#30232A] dark:text-[#FAF1EC]">
+                <div className="min-w-0">
+                  <h4 className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-[#30232A] dark:text-[#FAF1EC] truncate">
                     {capsule.title}
                   </h4>
-                  <p className="text-[11px] text-[#81747A] dark:text-[#C4B1B8]">
+                  <p className="text-[9px] sm:text-[10px] text-[#81747A] dark:text-[#C4B1B8] truncate">
                     {capsule.subtitle}
                   </p>
                 </div>
@@ -522,53 +494,53 @@ const HomePage = () => {
       </section>
 
       {/* ── 3. SHOP OUR COLLECTIONS (Hasfarm 4 Peach Cards) ── */}
-      <motion.section {...reveal} className="px-3 sm:px-6 lg:px-10 py-16 sm:py-20">
+      <motion.section {...reveal} className="px-3 sm:px-6 lg:px-8 py-5 sm:py-7">
         <div className="mx-auto max-w-[1440px]">
           {/* Section Header */}
-          <div className="flex items-center justify-between mb-8 sm:mb-10">
-            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-[#30232A] dark:text-[#FAF1EC] flex items-center gap-2.5">
+          <div className="flex items-center justify-between mb-3.5 sm:mb-4">
+            <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-[#30232A] dark:text-[#FAF1EC] flex items-center gap-2">
               <span>Shop Our Collections</span>
-              <span className="text-2xl text-[#E07558]">🌸</span>
+              <span className="text-xl text-[#E07558]">🌸</span>
             </h2>
             <Link
               to="/gallery"
-              className="rounded-full border border-[#D9C9C3] px-6 py-2 text-xs font-bold uppercase tracking-wider text-[#30232A] hover:bg-[#651F3C] hover:text-white hover:border-[#651F3C] transition-all dark:border-[#493640] dark:text-[#FAF1EC] dark:hover:bg-[#651F3C]"
+              className="rounded-full border border-[#D9C9C3] px-4 py-1.5 text-[11px] font-bold uppercase tracking-wider text-[#30232A] hover:bg-[#651F3C] hover:text-white hover:border-[#651F3C] transition-all dark:border-[#493640] dark:text-[#FAF1EC] dark:hover:bg-[#651F3C]"
             >
               VIEW ALL
             </Link>
           </div>
 
           {/* 4 Rounded Collection Cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {collections.map((item) => (
               <Link
                 key={item.id}
                 to={item.link || "/gallery"}
-                className="group relative flex flex-col justify-between overflow-hidden rounded-[28px] border border-[#F0DFD5] bg-[#FBF0EA] p-4 shadow-sm hover:shadow-xl hover:border-[#C5A15B] transition-all dark:border-[#493640] dark:bg-[#231722]"
+                className="group relative flex flex-col justify-between overflow-hidden rounded-[20px] sm:rounded-[22px] border border-[#F0DFD5] bg-[#FBF0EA] p-3 shadow-xs hover:shadow-lg hover:border-[#C5A15B] transition-all dark:border-[#493640] dark:bg-[#231722]"
               >
                 <div>
-                  <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-white dark:bg-[#1E1420]">
+                  <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-white dark:bg-[#1E1420]">
                     <img
                       src={item.image}
                       alt={item.title}
-                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-108 image-enhanced"
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105 image-enhanced"
                       loading="lazy"
                     />
                   </div>
-                  <div className="mt-4">
-                    <h3 className="font-serif text-base sm:text-lg font-bold uppercase tracking-wider text-[#30232A] dark:text-[#FAF1EC]">
+                </div>
+
+                {/* Bottom Row: Title + Starting Price + Arrow */}
+                <div className="mt-2.5 flex items-center justify-between gap-2">
+                  <div className="min-w-0">
+                    <h3 className="font-serif text-sm sm:text-base font-bold uppercase tracking-wider text-[#30232A] dark:text-[#FAF1EC] truncate">
                       {item.title}
                     </h3>
-                    <p className="text-xs text-[#81747A] dark:text-[#C4B1B8] mt-0.5">
+                    <p className="text-[11px] text-[#81747A] dark:text-[#C4B1B8] font-medium">
                       {item.startingPrice}
                     </p>
                   </div>
-                </div>
-
-                {/* Bottom Circular Coral Arrow Button */}
-                <div className="mt-4 flex justify-end">
-                  <div className="grid h-8 w-8 place-items-center rounded-full bg-[#FCE2D7] text-[#D96B4E] group-hover:bg-[#D96B4E] group-hover:text-white transition-all dark:bg-[#382832] dark:text-[#E07558]">
-                    <FiArrowRight className="text-sm transition-transform group-hover:translate-x-0.5" />
+                  <div className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-[#FCE2D7] text-[#D96B4E] group-hover:bg-[#D96B4E] group-hover:text-white transition-all shadow-xs dark:bg-[#382832] dark:text-[#E07558]">
+                    <FiArrowRight className="text-xs transition-transform group-hover:translate-x-0.5" />
                   </div>
                 </div>
               </Link>
@@ -578,24 +550,24 @@ const HomePage = () => {
       </motion.section>
 
       {/* ── 4. STORY SPLIT BANNER (Hasfarm Organic Split Banner) ── */}
-      <motion.section {...reveal} className="px-3 sm:px-6 lg:px-10 py-8 sm:py-12">
+      <motion.section {...reveal} className="px-3 sm:px-6 lg:px-8 py-3 sm:py-5">
         <div className="mx-auto max-w-[1440px]">
-          <div className="relative overflow-hidden rounded-[36px] sm:rounded-[44px] border border-[#ECD9CE] shadow-sm grid lg:grid-cols-2 dark:border-[#493640]">
+          <div className="relative overflow-hidden rounded-[24px] sm:rounded-[32px] border border-[#ECD9CE] shadow-xs grid lg:grid-cols-2 dark:border-[#493640]">
             
             {/* Left Peach Content */}
-            <div className="relative bg-[#FCE8DE] p-8 sm:p-12 md:p-16 flex flex-col justify-center dark:bg-[#261B22]">
-              <span className="text-[#C5A15B] text-xl select-none mb-3">✦</span>
-              <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-black uppercase tracking-tight text-[#30232A] dark:text-[#FAF1EC] leading-[1.08]">
+            <div className="relative bg-[#FCE8DE] p-6 sm:p-8 md:p-10 flex flex-col justify-center dark:bg-[#261B22]">
+              <span className="text-[#C5A15B] text-lg select-none mb-1.5">✦</span>
+              <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-black uppercase tracking-tight text-[#30232A] dark:text-[#FAF1EC] leading-[1.1]">
                 {content.midBanner?.title || "FLOWERS THAT TELL BEAUTIFUL STORIES"}
               </h2>
-              <p className="mt-5 text-sm sm:text-base leading-relaxed text-[#51454B] dark:text-[#C4B1B8] max-w-md">
+              <p className="mt-2.5 text-xs sm:text-sm leading-relaxed text-[#51454B] dark:text-[#C4B1B8] max-w-md">
                 {content.midBanner?.subtitle ||
                   "We source the finest blooms and design with heart to bring beauty, joy and meaning to every moment."}
               </p>
-              <div className="mt-8">
+              <div className="mt-4 sm:mt-5">
                 <Link
                   to={content.midBanner?.buttonLink || "/about"}
-                  className="inline-flex items-center gap-2 rounded-full border border-[#D9C9C3] bg-white/70 px-7 py-3 text-xs font-bold uppercase tracking-wider text-[#30232A] hover:bg-[#651F3C] hover:text-white hover:border-[#651F3C] transition-all dark:border-[#493640] dark:bg-white/10 dark:text-[#FAF1EC] shadow-sm"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-[#D9C9C3] bg-white/70 px-5 py-2 text-xs font-bold uppercase tracking-wider text-[#30232A] hover:bg-[#651F3C] hover:text-white hover:border-[#651F3C] transition-all dark:border-[#493640] dark:bg-white/10 dark:text-[#FAF1EC] shadow-xs"
                 >
                   <span>{content.midBanner?.buttonLabel || "OUR STORY"}</span>
                   <span>🌸</span>
@@ -604,28 +576,29 @@ const HomePage = () => {
             </div>
 
             {/* Right Photo: Florist Arranging Flowers */}
-            <div className="relative aspect-[16/11] lg:aspect-auto min-h-[320px] overflow-hidden bg-[#FAF5EF]">
+            <div className="relative aspect-[16/10] lg:aspect-auto min-h-[220px] sm:min-h-[260px] overflow-hidden bg-[#FAF5EF]">
               <img
                 src={content.midBanner?.image || "/gallery/bouquet/bouquet12.jpg"}
                 alt="Florist arranging flowers at Midhunyas"
                 className="h-full w-full object-cover image-enhanced"
                 loading="lazy"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent pointer-events-none" />
             </div>
           </div>
         </div>
       </motion.section>
 
       {/* ── 5. SHOP BY OCCASION (Hasfarm 6 Circular Badges) ── */}
-      <motion.section id="occasions" {...reveal} className="px-3 sm:px-6 lg:px-10 py-16 sm:py-20">
+      <motion.section id="occasions" {...reveal} className="px-3 sm:px-6 lg:px-8 py-5 sm:py-7">
         <div className="mx-auto max-w-[1440px]">
-          <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-[#30232A] dark:text-[#FAF1EC] flex items-center gap-2.5 mb-10">
+          <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-[#30232A] dark:text-[#FAF1EC] flex items-center gap-2 mb-4 sm:mb-5">
             <span>Shop By Occasion</span>
-            <span className="text-2xl text-[#E07558]">🌸</span>
+            <span className="text-xl text-[#E07558]">🌸</span>
           </h2>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6 sm:gap-8">
+          {/* Centered, Snug Occasion Badges */}
+          <div className="max-w-4xl mx-auto grid grid-cols-3 sm:grid-cols-6 gap-3 sm:gap-4">
             {occasions.map((occasion) => (
               <Link
                 key={occasion.id}
@@ -633,10 +606,10 @@ const HomePage = () => {
                 className="group flex flex-col items-center text-center"
               >
                 {/* Circular Badge */}
-                <div className="grid h-20 w-20 sm:h-24 sm:w-24 place-items-center rounded-full bg-[#FCECE3] border border-[#F4DDD2] text-3xl sm:text-4xl shadow-sm group-hover:scale-110 group-hover:shadow-md group-hover:border-[#E07558] transition-all dark:bg-[#261B22] dark:border-[#493640]">
+                <div className="grid h-16 w-16 sm:h-20 sm:w-20 place-items-center rounded-full bg-[#FCECE3] border border-[#F4DDD2] text-2xl sm:text-3xl shadow-xs group-hover:scale-105 group-hover:shadow-sm group-hover:border-[#E07558] transition-all dark:bg-[#261B22] dark:border-[#493640]">
                   <span>{occasion.icon || "🌸"}</span>
                 </div>
-                <span className="mt-3 text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#30232A] group-hover:text-[#651F3C] transition-colors dark:text-[#FAF1EC] dark:group-hover:text-[#D5B36C]">
+                <span className="mt-1.5 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-[#30232A] group-hover:text-[#651F3C] transition-colors dark:text-[#FAF1EC] dark:group-hover:text-[#D5B36C]">
                   {occasion.name}
                 </span>
               </Link>
@@ -646,30 +619,30 @@ const HomePage = () => {
       </motion.section>
 
       {/* ── 6. DISCOUNT NEWSLETTER BANNER (Hasfarm Botanical Sage Banner) ── */}
-      <motion.section {...reveal} className="px-3 sm:px-6 lg:px-10 py-6">
+      <motion.section {...reveal} className="px-3 sm:px-6 lg:px-8 py-3 sm:py-4">
         <div className="mx-auto max-w-[1440px]">
-          <div className="relative overflow-hidden rounded-[28px] sm:rounded-[36px] bg-[#78836B] px-8 py-10 sm:p-12 text-white shadow-md flex flex-col md:flex-row md:items-center md:justify-between gap-6 dark:bg-[#5E6D55]">
+          <div className="relative overflow-hidden rounded-[20px] sm:rounded-[26px] bg-[#78836B] px-5 py-4 sm:px-8 sm:py-6 text-white shadow-xs flex flex-col md:flex-row md:items-center md:justify-between gap-3 sm:gap-4 dark:bg-[#5E6D55]">
             <div className="max-w-xl">
-              <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight uppercase">
+              <h2 className="font-serif text-xl sm:text-2xl md:text-3xl font-bold tracking-tight uppercase">
                 10% OFF YOUR FIRST ORDER
               </h2>
-              <p className="mt-1.5 text-xs sm:text-sm text-[#FAF5EF]/90">
+              <p className="mt-0.5 text-xs text-[#FAF5EF]/90">
                 Join our community and enjoy your first order.
               </p>
             </div>
 
-            <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row items-stretch gap-2.5 max-w-md w-full">
+            <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row items-stretch gap-2 max-w-md w-full">
               <input
                 type="email"
                 required
                 value={newsletterEmail}
                 onChange={(e) => setNewsletterEmail(e.target.value)}
                 placeholder="Enter your email address"
-                className="flex-1 rounded-full bg-white px-5 py-3 text-xs text-[#30232A] outline-none placeholder:text-gray-400 shadow-inner"
+                className="flex-1 rounded-full bg-white px-4 py-2 text-xs text-[#30232A] outline-none placeholder:text-gray-400 shadow-inner"
               />
               <button
                 type="submit"
-                className="rounded-full bg-[#E07558] hover:bg-[#cf6447] px-7 py-3 text-xs font-bold uppercase tracking-wider text-white shadow-md active:scale-95 transition-all shrink-0"
+                className="rounded-full bg-[#E07558] hover:bg-[#cf6447] px-5 py-2 text-xs font-bold uppercase tracking-wider text-white shadow-xs active:scale-95 transition-all shrink-0"
               >
                 SUBSCRIBE
               </button>
@@ -679,24 +652,24 @@ const HomePage = () => {
       </motion.section>
 
       {/* ── 7. BEST SELLERS SECTION (Hasfarm Best Sellers Grid) ── */}
-      <motion.section {...reveal} className="px-3 sm:px-6 lg:px-10 py-16 sm:py-20">
+      <motion.section {...reveal} className="px-3 sm:px-6 lg:px-8 py-5 sm:py-7">
         <div className="mx-auto max-w-[1440px]">
           {/* Header */}
-          <div className="flex items-center justify-between mb-8 sm:mb-10">
-            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-[#30232A] dark:text-[#FAF1EC] flex items-center gap-2.5">
+          <div className="flex items-center justify-between mb-3.5 sm:mb-4">
+            <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-[#30232A] dark:text-[#FAF1EC] flex items-center gap-2">
               <span>Best Sellers</span>
-              <span className="text-2xl text-[#E07558]">🌸</span>
+              <span className="text-xl text-[#E07558]">🌸</span>
             </h2>
             <Link
               to="/gallery"
-              className="rounded-full border border-[#D9C9C3] px-6 py-2 text-xs font-bold uppercase tracking-wider text-[#30232A] hover:bg-[#651F3C] hover:text-white hover:border-[#651F3C] transition-all dark:border-[#493640] dark:text-[#FAF1EC] dark:hover:bg-[#651F3C]"
+              className="rounded-full border border-[#D9C9C3] px-4 py-1.5 text-[11px] font-bold uppercase tracking-wider text-[#30232A] hover:bg-[#651F3C] hover:text-white hover:border-[#651F3C] transition-all dark:border-[#493640] dark:text-[#FAF1EC] dark:hover:bg-[#651F3C]"
             >
               VIEW ALL
             </Link>
           </div>
 
           {/* 4 Best Seller Cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {bestSellers.map((product) => (
               <HasfarmProductCard key={product._id || product.id} product={product} />
             ))}
@@ -705,17 +678,17 @@ const HomePage = () => {
       </motion.section>
 
       {/* ── 8. EXPRESS DELIVERY CALLOUT ── */}
-      <motion.section {...reveal} className="px-3 sm:px-6 lg:px-10 pb-20">
+      <motion.section {...reveal} className="px-3 sm:px-6 lg:px-8 py-3 sm:py-4 pb-8 sm:pb-10">
         <div className="mx-auto max-w-[1440px]">
-          <div className="rounded-[32px] border border-[#E8DDD5] bg-white p-8 sm:p-12 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6 dark:border-[#493640] dark:bg-[#231722]">
+          <div className="rounded-[22px] border border-[#E8DDD5] bg-white p-5 sm:p-7 shadow-xs flex flex-col md:flex-row items-center justify-between gap-4 dark:border-[#493640] dark:bg-[#231722]">
             <div>
-              <span className="text-xs font-bold uppercase tracking-widest text-[#C5A15B]">
+              <span className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#C5A15B]">
                 ✦ Express Service Across Tamil Nadu
               </span>
-              <h3 className="mt-2 font-serif text-2xl sm:text-3xl font-bold text-[#30232A] dark:text-[#FAF1EC]">
+              <h3 className="mt-1 font-serif text-xl sm:text-2xl font-bold text-[#30232A] dark:text-[#FAF1EC]">
                 Need Flowers Delivered in Karur Today?
               </h3>
-              <p className="mt-2 text-xs sm:text-sm text-[#51454B] dark:text-[#C4B1B8] max-w-xl">
+              <p className="mt-1 text-xs text-[#51454B] dark:text-[#C4B1B8] max-w-xl leading-relaxed">
                 We craft bouquets and bridal florals on-demand. Chat with our florists directly on WhatsApp for custom arrangements.
               </p>
             </div>
@@ -723,9 +696,9 @@ const HomePage = () => {
               href={content.deliveryBanner?.buttonLink || "https://wa.me/919942071721?text=Hello%20MIDHUNYAS!%20I%20need%20flower%20delivery."}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-2.5 rounded-full bg-[#25D366] hover:bg-[#20ba59] px-8 py-3.5 text-xs font-bold uppercase tracking-wider text-white shadow-lg shadow-green-600/20 active:scale-95 transition-all shrink-0"
+              className="inline-flex items-center gap-2 rounded-full bg-[#25D366] hover:bg-[#20ba59] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-md shadow-green-600/20 active:scale-95 transition-all shrink-0"
             >
-              <FaWhatsapp className="text-base" /> WhatsApp Order Now
+              <FaWhatsapp className="text-sm" /> WhatsApp Order Now
             </a>
           </div>
         </div>

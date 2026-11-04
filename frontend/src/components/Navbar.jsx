@@ -7,10 +7,11 @@ import SearchModal from "./SearchModal";
 import ToolbarDynamic from "./ToolbarDynamic";
 
 const navItems = [
+  { label: "Flowers", to: "/gallery" },
   { label: "Shop", to: "/gallery" },
-  { label: "Our story", to: "/about" },
-  { label: "Love notes", to: "/reviews" },
-  { label: "Contact", to: "/contact" },
+  { label: "Occasions", to: "/#occasions" },
+  { label: "Bridal", to: "/gallery" },
+  { label: "About Us", to: "/about" },
 ];
 
 const Navbar = () => {
@@ -22,6 +23,7 @@ const Navbar = () => {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [showAnnouncement, setShowAnnouncement] = useState(() => sessionStorage.getItem("announcementDismissed") !== "true");
   const [isDarkMode, setIsDarkMode] = useState(() => localStorage.getItem("theme") === "dark");
   const cartCount = items?.reduce((sum, item) => sum + (item.quantity || 1), 0) || 0;
   const isHome = location.pathname === "/";
@@ -67,6 +69,24 @@ const Navbar = () => {
   return (
     <>
       <SearchModal isOpen={showSearch} onClose={() => setShowSearch(false)} />
+      {showAnnouncement && (
+        <div className="relative z-50 flex items-center justify-between bg-[#FCE8DE] px-4 py-2 text-xs font-medium text-[#651F3C] border-b border-[#F5D5C6] dark:bg-[#301F28] dark:text-[#E8BDC8] dark:border-[#4A2D3C]">
+          <div className="mx-auto flex items-center gap-2 tracking-wide font-sans text-[11px] sm:text-xs">
+            <span className="text-sm">🌸</span>
+            <span>Same day delivery available until 2:30PM | Karur & all Tamil Nadu</span>
+          </div>
+          <button
+            onClick={() => {
+              setShowAnnouncement(false);
+              sessionStorage.setItem("announcementDismissed", "true");
+            }}
+            aria-label="Close announcement"
+            className="text-[#651F3C] hover:text-[#30232A] dark:text-[#E8BDC8] dark:hover:text-white p-1 rounded transition-colors"
+          >
+            <FiX className="text-sm" />
+          </button>
+        </div>
+      )}
       <header className={`sticky top-0 z-50 border-b transition-all duration-300 ${shell} ${isScrolled ? "h-[72px]" : "h-[96px]"}`}>
         <div className="mx-auto flex h-full max-w-[1440px] items-center justify-between px-5 sm:px-8 xl:px-14">
           <button type="button" onClick={() => setShowMobileMenu(true)} className="grid h-10 w-10 place-items-center text-xl text-[#30232A] lg:hidden dark:text-[#FAF5EF]" aria-label="Open navigation"><FiMenu /></button>

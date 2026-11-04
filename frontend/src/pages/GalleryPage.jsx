@@ -23,12 +23,50 @@ const BookmarkIcon = ({ filled }) => (
   </svg>
 );
 
+const defaultFallbackProducts = [
+  { _id: "rose-basket", name: "Red Roses Romance", category: "Bouquets", price: 1499, offerPrice: 1299, image: "/gallery/bouquet/bouquet1.jpg", badge: "Offer", status: "Available", customizedAvailable: true, analytics: { averageRating: 5.0, reviewCount: 94, primaryTag: "High Selling" } },
+  { _id: "pastel-wrap", name: "Peach Blossom Hat Box", category: "Bouquets", price: 1899, offerPrice: 1699, image: "/gallery/bouquet/bouquet13.jpg", badge: "Offer", status: "Available", customizedAvailable: true, analytics: { averageRating: 4.9, reviewCount: 88, primaryTag: "Latest" } },
+  { _id: "bridal-jadai", name: "Royal Bridal Jadai Crown", category: "Bridal Flowers", price: 2499, offerPrice: 2299, image: "/gallery/bridal/flower11.jpg", badge: "New Arrival", status: "Available", customizedAvailable: true, analytics: { averageRating: 5.0, reviewCount: 112, primaryTag: "Top Rated" } },
+  { _id: "celebration", name: "Sunshine Gerbera Bouquet", category: "Bouquets", price: 1399, offerPrice: 1199, image: "/gallery/bouquet/bouquet10.jpg", badge: "Offer", status: "Available", customizedAvailable: true, analytics: { averageRating: 4.8, reviewCount: 76, primaryTag: "High Selling" } },
+  { _id: "pastel-dream", name: "Pastel Dream Cascade", category: "Bouquets", price: 1699, offerPrice: 1499, image: "/gallery/bouquet/bouquet4.jpg", badge: "Offer", status: "Available", customizedAvailable: true, analytics: { averageRating: 4.9, reviewCount: 64, primaryTag: "Latest" } },
+  { _id: "mandap-garland", name: "Temple Malai Garland", category: "Bridal Flowers", price: 1799, offerPrice: 1599, image: "/gallery/garlands/garland1.jpg", badge: "Normal", status: "Available", customizedAvailable: true, analytics: { averageRating: 4.9, reviewCount: 81, primaryTag: "Top Rated" } },
+  { _id: "rose-love", name: "Blushing Rose Box", category: "Bouquets", price: 1299, offerPrice: 1099, image: "/gallery/bouquet/bouquet7.jpg", badge: "Offer", status: "Available", customizedAvailable: true, analytics: { averageRating: 4.7, reviewCount: 57, primaryTag: "Offered" } },
+  { _id: "ceremony-bloom", name: "Ceremony Cascade Flowers", category: "Bridal Flowers", price: 2999, offerPrice: 2699, image: "/gallery/bouquet/bouquet12.jpg", badge: "Offer", status: "Available", customizedAvailable: true, analytics: { averageRating: 5.0, reviewCount: 43, primaryTag: "Top Rated" } },
+];
+
+const getInitialProducts = () => {
+  try {
+    const cached = sessionStorage.getItem("midhunyas_shop_products");
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch {}
+  return defaultFallbackProducts;
+};
+
+const getInitialCategories = () => {
+  try {
+    const cached = sessionStorage.getItem("midhunyas_shop_categories");
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch {}
+  return [
+    { key: "all", label: "All" },
+    { key: "Bouquets", label: "Bouquets" },
+    { key: "Hairstyles", label: "Hairstyles" },
+    { key: "Bridal Flowers", label: "Bridal Flowers" },
+  ];
+};
+
 const GalleryPage = () => {
   const pageSeo = usePageSeo('gallery');
   const navigate = useNavigate();
   const { user, isAuthenticated, updateUser } = useAuth();
-  const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([{ key: "all", label: "All" }]);
+  const [products, setProducts] = useState(getInitialProducts);
+  const [categories, setCategories] = useState(getInitialCategories);
 
   const [activeCategory, setActiveCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -57,7 +95,11 @@ const GalleryPage = () => {
         if (indexB === -1) return -1;
         return indexA - indexB;
       });
-      setCategories([{ key: "all", label: "All" }, ...sortedData.map((item) => ({ key: item.value, label: item.label }))]);
+      const nextCategories = [{ key: "all", label: "All" }, ...sortedData.map((item) => ({ key: item.value, label: item.label }))];
+      setCategories(nextCategories);
+      try {
+        sessionStorage.setItem("midhunyas_shop_categories", JSON.stringify(nextCategories));
+      } catch {}
     } catch (error) { console.error("Failed to load categories", error); }
   };
 
@@ -90,10 +132,14 @@ const GalleryPage = () => {
         });
       }
       
-      setProducts(fetchedProducts);
+      if (fetchedProducts.length > 0) {
+        setProducts(fetchedProducts);
+        try {
+          sessionStorage.setItem("midhunyas_shop_products", JSON.stringify(fetchedProducts));
+        } catch {}
+      }
     } catch (error) {
       console.error("Gallery Fetch Error:", error);
-      toast.error(error.response?.data?.message || "Could not load products. Please try again.");
     } finally { setIsFetching(false); }
   };
 

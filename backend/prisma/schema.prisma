@@ -146,6 +146,10 @@ model Product {
   customizedAvailable Boolean      @default(true)
   createdAt           DateTime     @default(now())
   updatedAt           DateTime     @updatedAt
+
+  @@index([category])
+  @@index([featured, createdAt(sort: Desc)])
+  @@index([availability])
 }
 
 model SeoConfig {

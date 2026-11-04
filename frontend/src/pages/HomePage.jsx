@@ -33,31 +33,35 @@ const defaultHomeOccasionTiles = [
   { id: "occasion-6", name: "New Baby", icon: "👑", link: "/gallery?occasion=newbaby" },
 ];
 
-// ── 4 Trust Capsules ──
+// ── 4 Trust Capsules (Highlighted Luxury Badges) ──
 const trustCapsules = [
   {
     id: "capsule-1",
     title: "SAME DAY DELIVERY",
     subtitle: "Order before 2:30PM",
-    icon: <FiTruck className="text-base sm:text-lg text-[#651F3C] dark:text-[#D5B36C]" />,
+    iconBg: "bg-[#651F3C]/12 border-[#651F3C]/30 text-[#651F3C] dark:bg-[#651F3C]/35 dark:text-[#D5B36C]",
+    icon: <FiTruck className="text-lg" />,
   },
   {
     id: "capsule-2",
     title: "FRESH FROM OUR FARMS",
     subtitle: "Handpicked with care",
-    icon: <FiFeather className="text-base sm:text-lg text-[#78836B] dark:text-[#A3B19B]" />,
+    iconBg: "bg-[#78836B]/15 border-[#78836B]/35 text-[#78836B] dark:bg-[#78836B]/35 dark:text-[#A3B19B]",
+    icon: <FiFeather className="text-lg" />,
   },
   {
     id: "capsule-3",
     title: "EXPERT FLORISTS",
     subtitle: "Crafted by professionals",
-    icon: <FiHeart className="text-base sm:text-lg text-[#E07558] dark:text-[#E07558]" />,
+    iconBg: "bg-[#E07558]/15 border-[#E07558]/35 text-[#E07558] dark:bg-[#E07558]/35 dark:text-[#E07558]",
+    icon: <FiHeart className="text-lg" />,
   },
   {
     id: "capsule-4",
     title: "HAPPINESS GUARANTEED",
     subtitle: "Your satisfaction, always",
-    icon: <FiCheck className="text-base sm:text-lg text-[#287A50] dark:text-[#52B788]" />,
+    iconBg: "bg-[#287A50]/15 border-[#287A50]/35 text-[#287A50] dark:bg-[#287A50]/35 dark:text-[#52B788]",
+    icon: <FiCheck className="text-lg" />,
   },
 ];
 
@@ -467,23 +471,23 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* ── 2. FOUR TRUST CAPSULES (Snug Row) ── */}
-      <section className="px-3 sm:px-6 lg:px-8 py-2 sm:py-3">
+      {/* ── 2. FOUR TRUST CAPSULES (Highlighted Luxury Badges) ── */}
+      <section className="px-3 sm:px-6 lg:px-8 py-3 sm:py-4">
         <div className="mx-auto max-w-[1440px]">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {trustCapsules.map((capsule) => (
               <div
                 key={capsule.id}
-                className="flex items-center gap-2.5 rounded-xl sm:rounded-full bg-[#FBF0EA] border border-[#EFE2D9] px-3.5 py-2.5 sm:px-4 sm:py-3 shadow-xs hover:shadow-sm transition-all dark:bg-[#231722] dark:border-[#493640]"
+                className="group flex items-center gap-3.5 rounded-full bg-white border-2 border-[#C5A15B]/50 hover:border-[#651F3C] px-5 py-3 sm:px-6 sm:py-3.5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all dark:bg-[#231722] dark:border-[#C5A15B]/40 dark:hover:border-[#D5B36C]"
               >
-                <div className="grid h-8 w-8 sm:h-9 sm:w-9 shrink-0 place-items-center rounded-full bg-white dark:bg-[#30232A] shadow-xs">
+                <div className={`grid h-10 w-10 sm:h-11 sm:w-11 shrink-0 place-items-center rounded-full border shadow-xs transition-transform group-hover:scale-110 ${capsule.iconBg}`}>
                   {capsule.icon}
                 </div>
                 <div className="min-w-0">
-                  <h4 className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-[#30232A] dark:text-[#FAF1EC] truncate">
+                  <h4 className="text-xs sm:text-[12px] font-black uppercase tracking-wider text-[#30232A] dark:text-[#FAF1EC] truncate">
                     {capsule.title}
                   </h4>
-                  <p className="text-[9px] sm:text-[10px] text-[#81747A] dark:text-[#C4B1B8] truncate">
+                  <p className="text-[11px] font-semibold text-[#651F3C] dark:text-[#D5B36C] truncate mt-0.5">
                     {capsule.subtitle}
                   </p>
                 </div>
@@ -549,25 +553,25 @@ const HomePage = () => {
         </div>
       </motion.section>
 
-      {/* ── 4. STORY SPLIT BANNER (Compact Small Size) ── */}
-      <motion.section {...reveal} className="px-3 sm:px-6 lg:px-8 py-2.5 sm:py-4">
+      {/* ── 4. STORY SPLIT BANNER (Full Picture Visible Without Cropping) ── */}
+      <motion.section {...reveal} className="px-3 sm:px-6 lg:px-8 py-3 sm:py-4">
         <div className="mx-auto max-w-4xl lg:max-w-5xl">
-          <div className="relative overflow-hidden rounded-[20px] sm:rounded-[24px] border border-[#ECD9CE] shadow-xs grid grid-cols-1 sm:grid-cols-2 min-h-[190px] sm:h-[220px] md:h-[240px] dark:border-[#493640]">
+          <div className="relative overflow-hidden rounded-[20px] sm:rounded-[26px] border border-[#ECD9CE] shadow-xs grid grid-cols-1 sm:grid-cols-2 min-h-[260px] sm:h-[300px] md:h-[330px] dark:border-[#493640]">
             
             {/* Left Peach Content */}
-            <div className="relative bg-[#FCE8DE] p-4 sm:p-5 md:p-6 flex flex-col justify-center dark:bg-[#261B22]">
+            <div className="relative bg-[#FCE8DE] p-5 sm:p-6 md:p-8 flex flex-col justify-center dark:bg-[#261B22]">
               <span className="text-[#C5A15B] text-sm select-none mb-1">✦</span>
               <h2 className="font-serif text-lg sm:text-xl md:text-2xl font-bold uppercase tracking-tight text-[#30232A] dark:text-[#FAF1EC] leading-snug">
                 {content.midBanner?.title || "FLOWERS THAT TELL BEAUTIFUL STORIES"}
               </h2>
-              <p className="mt-1 text-xs text-[#51454B] dark:text-[#C4B1B8] max-w-sm line-clamp-2">
+              <p className="mt-1.5 text-xs text-[#51454B] dark:text-[#C4B1B8] max-w-sm line-clamp-2">
                 {content.midBanner?.subtitle ||
                   "We source the finest blooms and design with heart to bring beauty, joy and meaning to every moment."}
               </p>
-              <div className="mt-3">
+              <div className="mt-3.5">
                 <Link
                   to={content.midBanner?.buttonLink || "/about"}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-[#D9C9C3] bg-white/80 px-4 py-1.5 text-[11px] font-bold uppercase tracking-wider text-[#30232A] hover:bg-[#651F3C] hover:text-white hover:border-[#651F3C] transition-all dark:border-[#493640] dark:bg-white/10 dark:text-[#FAF1EC] shadow-xs"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-[#D9C9C3] bg-white/90 px-4 py-1.5 text-[11px] font-bold uppercase tracking-wider text-[#30232A] hover:bg-[#651F3C] hover:text-white hover:border-[#651F3C] transition-all dark:border-[#493640] dark:bg-white/10 dark:text-[#FAF1EC] shadow-xs"
                 >
                   <span>{content.midBanner?.buttonLabel || "OUR STORY"}</span>
                   <span>🌸</span>
@@ -575,15 +579,22 @@ const HomePage = () => {
               </div>
             </div>
 
-            {/* Right Photo: Florist Arranging Flowers (constrained to banner height) */}
-            <div className="relative h-44 sm:h-full w-full overflow-hidden bg-[#FAF5EF]">
+            {/* Right Photo: Full Picture Visible Without Cropping */}
+            <div className="relative h-60 sm:h-full w-full overflow-hidden bg-gradient-to-br from-[#FAF5EF] via-[#FCE8DE]/50 to-[#F5D8CB]/40 flex items-center justify-center p-3 sm:p-4 dark:from-[#261B22] dark:to-[#171116]">
+              {/* Soft blurred ambient glow */}
               <img
                 src={content.midBanner?.image || "/gallery/bouquet/bouquet12.jpg"}
-                alt="Florist arranging flowers at Midhunyas"
-                className="h-full w-full object-cover object-center image-enhanced"
+                alt=""
+                aria-hidden="true"
+                className="absolute inset-0 h-full w-full object-cover blur-lg opacity-25 scale-110 pointer-events-none"
+              />
+              {/* Crisp FULL photo with no cropping */}
+              <img
+                src={content.midBanner?.image || "/gallery/bouquet/bouquet12.jpg"}
+                alt="Flowers at Midhunyas"
+                className="relative z-10 max-h-full max-w-full object-contain drop-shadow-md transition-transform duration-500 hover:scale-105 image-enhanced"
                 loading="lazy"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none" />
             </div>
           </div>
         </div>

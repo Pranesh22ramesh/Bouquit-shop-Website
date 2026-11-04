@@ -7,11 +7,10 @@ import SearchModal from "./SearchModal";
 import ToolbarDynamic from "./ToolbarDynamic";
 
 const navItems = [
-  { label: "Flowers", to: "/gallery" },
   { label: "Shop", to: "/gallery" },
-  { label: "Occasions", to: "/#occasions" },
-  { label: "Bridal", to: "/gallery" },
-  { label: "About Us", to: "/about" },
+  { label: "Our story", to: "/about" },
+  { label: "Love notes", to: "/reviews" },
+  { label: "Contact", to: "/contact" },
 ];
 
 const Navbar = () => {
@@ -23,7 +22,6 @@ const Navbar = () => {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [showAnnouncement, setShowAnnouncement] = useState(() => sessionStorage.getItem("announcementDismissed") !== "true");
   const [isDarkMode, setIsDarkMode] = useState(() => localStorage.getItem("theme") === "dark");
   const cartCount = items?.reduce((sum, item) => sum + (item.quantity || 1), 0) || 0;
   const isHome = location.pathname === "/";
@@ -61,45 +59,27 @@ const Navbar = () => {
   };
 
   const shell = isScrolled
-    ? "border-[#C5A15B]/40 bg-[#FAF5EE]/95 shadow-[0_4px_20px_rgba(101,31,60,0.06)] backdrop-blur-xl dark:border-[#493640] dark:bg-[#211820]/95"
+    ? "border-[#C5A15B]/40 bg-[#FAF5EE]/95 shadow-[0_8px_30px_rgba(101,31,60,0.08)] backdrop-blur-xl dark:border-[#493640] dark:bg-[#211820]/95"
     : isHome
-      ? "border-transparent bg-[#FAF5EE]/80 backdrop-blur-md dark:bg-[#171116]/80"
+      ? "border-transparent bg-[#FAF5EE]/70 backdrop-blur-md dark:bg-[#171116]/70"
       : "border-[#E8DDD5] bg-[#FAF5EE] dark:border-[#493640] dark:bg-[#211820]";
 
   return (
     <>
       <SearchModal isOpen={showSearch} onClose={() => setShowSearch(false)} />
-      {showAnnouncement && (
-        <div className="relative z-50 flex items-center justify-between bg-[#FCE8DE] px-3 sm:px-4 py-1.5 text-xs font-medium text-[#651F3C] border-b border-[#F5D5C6] dark:bg-[#301F28] dark:text-[#E8BDC8] dark:border-[#4A2D3C]">
-          <div className="mx-auto flex items-center gap-1.5 tracking-wide font-sans text-[11px] sm:text-xs">
-            <span>🌸</span>
-            <span>Same day delivery available until 2:30PM | Karur & all Tamil Nadu</span>
-          </div>
-          <button
-            onClick={() => {
-              setShowAnnouncement(false);
-              sessionStorage.setItem("announcementDismissed", "true");
-            }}
-            aria-label="Close announcement"
-            className="text-[#651F3C] hover:text-[#30232A] dark:text-[#E8BDC8] dark:hover:text-white p-0.5 rounded transition-colors"
-          >
-            <FiX className="text-sm" />
-          </button>
-        </div>
-      )}
-      <header className={`sticky top-0 z-50 border-b transition-all duration-300 ${shell} ${isScrolled ? "h-[58px] sm:h-[62px]" : "h-[68px] sm:h-[74px]"}`}>
-        <div className="mx-auto flex h-full max-w-[1440px] items-center justify-between px-4 sm:px-6 xl:px-10">
-          <button type="button" onClick={() => setShowMobileMenu(true)} className="grid h-9 w-9 place-items-center text-lg text-[#30232A] lg:hidden dark:text-[#FAF5EF]" aria-label="Open navigation"><FiMenu /></button>
+      <header className={`sticky top-0 z-50 border-b transition-all duration-300 ${shell} ${isScrolled ? "h-[72px]" : "h-[96px]"}`}>
+        <div className="mx-auto flex h-full max-w-[1440px] items-center justify-between px-5 sm:px-8 xl:px-14">
+          <button type="button" onClick={() => setShowMobileMenu(true)} className="grid h-10 w-10 place-items-center text-xl text-[#30232A] lg:hidden dark:text-[#FAF5EF]" aria-label="Open navigation"><FiMenu /></button>
 
           <Link to="/" className="group flex items-center" aria-label="Midhunyas home">
-            <img src="/logo.png" alt="Midhunyas Petals Logo" className={`w-auto object-contain transition-all duration-300 group-hover:scale-105 dark:brightness-125 dark:drop-shadow-[0_0_2px_rgba(255,255,255,0.5)] ${isScrolled ? "h-[36px] sm:h-[40px]" : "h-[44px] sm:h-[50px]"}`} />
+            <img src="/logo.png" alt="Midhunyas Petals Logo" className={`w-auto object-contain transition-all duration-300 group-hover:scale-105 dark:brightness-125 dark:drop-shadow-[0_0_2px_rgba(255,255,255,0.5)] ${isScrolled ? "h-[48px]" : "h-[64px]"}`} />
           </Link>
 
-          <nav className="hidden items-center gap-6 lg:flex xl:gap-8">
+          <nav className="hidden items-center gap-8 lg:flex xl:gap-10">
             {navItems.map((item) => (
-              <Link key={item.label} to={item.to} onClick={(event) => handleNav(event, item.to)} className={`relative py-4 text-[13px] font-medium transition hover:text-[#C5A15B] ${location.pathname === item.to ? "text-[#651F3C] dark:text-[#D5B36C]" : "text-[#30232A] dark:text-[#FAF5EF]"}`}>
+              <Link key={item.label} to={item.to} onClick={(event) => handleNav(event, item.to)} className={`relative py-7 text-[13px] font-medium transition hover:text-[#C5A15B] ${location.pathname === item.to ? "text-[#651F3C] dark:text-[#D5B36C]" : "text-[#30232A] dark:text-[#FAF5EF]"}`}>
                 {item.label}
-                {location.pathname === item.to && <span className="absolute bottom-2 left-0 right-0 h-0.5 bg-[#651F3C] dark:bg-[#D5B36C] rounded-full" />}
+                {location.pathname === item.to && <span className="absolute bottom-5 left-0 right-0 h-0.5 bg-[#651F3C] dark:bg-[#D5B36C] rounded-full" />}
               </Link>
             ))}
           </nav>

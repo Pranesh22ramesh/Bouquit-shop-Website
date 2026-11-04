@@ -549,25 +549,25 @@ const HomePage = () => {
         </div>
       </motion.section>
 
-      {/* ── 4. STORY SPLIT BANNER (Hasfarm Organic Split Banner) ── */}
-      <motion.section {...reveal} className="px-3 sm:px-6 lg:px-8 py-3 sm:py-5">
-        <div className="mx-auto max-w-[1440px]">
-          <div className="relative overflow-hidden rounded-[24px] sm:rounded-[32px] border border-[#ECD9CE] shadow-xs grid lg:grid-cols-2 dark:border-[#493640]">
+      {/* ── 4. STORY SPLIT BANNER (Compact Small Size) ── */}
+      <motion.section {...reveal} className="px-3 sm:px-6 lg:px-8 py-2.5 sm:py-4">
+        <div className="mx-auto max-w-4xl lg:max-w-5xl">
+          <div className="relative overflow-hidden rounded-[20px] sm:rounded-[24px] border border-[#ECD9CE] shadow-xs grid grid-cols-1 sm:grid-cols-2 min-h-[190px] sm:h-[220px] md:h-[240px] dark:border-[#493640]">
             
             {/* Left Peach Content */}
-            <div className="relative bg-[#FCE8DE] p-6 sm:p-8 md:p-10 flex flex-col justify-center dark:bg-[#261B22]">
-              <span className="text-[#C5A15B] text-lg select-none mb-1.5">✦</span>
-              <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-black uppercase tracking-tight text-[#30232A] dark:text-[#FAF1EC] leading-[1.1]">
+            <div className="relative bg-[#FCE8DE] p-4 sm:p-5 md:p-6 flex flex-col justify-center dark:bg-[#261B22]">
+              <span className="text-[#C5A15B] text-sm select-none mb-1">✦</span>
+              <h2 className="font-serif text-lg sm:text-xl md:text-2xl font-bold uppercase tracking-tight text-[#30232A] dark:text-[#FAF1EC] leading-snug">
                 {content.midBanner?.title || "FLOWERS THAT TELL BEAUTIFUL STORIES"}
               </h2>
-              <p className="mt-2.5 text-xs sm:text-sm leading-relaxed text-[#51454B] dark:text-[#C4B1B8] max-w-md">
+              <p className="mt-1 text-xs text-[#51454B] dark:text-[#C4B1B8] max-w-sm line-clamp-2">
                 {content.midBanner?.subtitle ||
                   "We source the finest blooms and design with heart to bring beauty, joy and meaning to every moment."}
               </p>
-              <div className="mt-4 sm:mt-5">
+              <div className="mt-3">
                 <Link
                   to={content.midBanner?.buttonLink || "/about"}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-[#D9C9C3] bg-white/70 px-5 py-2 text-xs font-bold uppercase tracking-wider text-[#30232A] hover:bg-[#651F3C] hover:text-white hover:border-[#651F3C] transition-all dark:border-[#493640] dark:bg-white/10 dark:text-[#FAF1EC] shadow-xs"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-[#D9C9C3] bg-white/80 px-4 py-1.5 text-[11px] font-bold uppercase tracking-wider text-[#30232A] hover:bg-[#651F3C] hover:text-white hover:border-[#651F3C] transition-all dark:border-[#493640] dark:bg-white/10 dark:text-[#FAF1EC] shadow-xs"
                 >
                   <span>{content.midBanner?.buttonLabel || "OUR STORY"}</span>
                   <span>🌸</span>
@@ -575,15 +575,15 @@ const HomePage = () => {
               </div>
             </div>
 
-            {/* Right Photo: Florist Arranging Flowers */}
-            <div className="relative aspect-[16/10] lg:aspect-auto min-h-[220px] sm:min-h-[260px] overflow-hidden bg-[#FAF5EF]">
+            {/* Right Photo: Florist Arranging Flowers (constrained to banner height) */}
+            <div className="relative h-44 sm:h-full w-full overflow-hidden bg-[#FAF5EF]">
               <img
                 src={content.midBanner?.image || "/gallery/bouquet/bouquet12.jpg"}
                 alt="Florist arranging flowers at Midhunyas"
-                className="h-full w-full object-cover image-enhanced"
+                className="h-full w-full object-cover object-center image-enhanced"
                 loading="lazy"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none" />
             </div>
           </div>
         </div>

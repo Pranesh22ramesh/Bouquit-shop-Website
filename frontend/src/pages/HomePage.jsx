@@ -1,222 +1,288 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { Link, useNavigate } from "react-router-dom";
 import {
   FiArrowRight,
-  FiCalendar,
   FiCheck,
-  FiGift,
   FiHeart,
   FiShoppingBag,
   FiStar,
   FiTruck,
+  FiFeather,
+  FiGift,
+  FiClock,
+  FiSend,
 } from "react-icons/fi";
+import { FaWhatsapp } from "react-icons/fa";
+import { toast } from "react-hot-toast";
 import axios from "../api/axios";
 import { galleryService } from "../api/galleryService";
+import { useCart } from "../context/CartContext";
 import { SITE_EVENTS, subscribeToSiteEvent } from "../lib/siteEvents";
 import { subscribeToTable } from "../lib/supabaseRealtime";
 import SeoHead from "../seo/SeoHead.jsx";
 import { usePageSeo } from "../seo/useSeo.js";
 import CarouselSlider from "../components/CarouselSlider.jsx";
+import OfferPopupModal from "../components/OfferPopupModal.jsx";
 
-const defaultHomeCategoryTiles = [
-  { id: "bouquets", name: "Bouquets", note: "For every dreamlike love story", image: "/gallery/bouquet/bouquet12.jpg" },
-  { id: "hairstyles", name: "Hairstyles", note: "Ethereal floral crowns & bridal weaves", image: "/gallery/hairstyle/hairstyle_1.jpg" },
-  { id: "bridal-flowers", name: "Bridal Flowers", note: "Sacred blossoms suspended in time", image: "/gallery/bridal/flower11.jpg" },
-  { id: "gift-arrangements", name: "Gift Arrangements", note: "Poetry woven in fragrant petals", image: "/gallery/bouquet/bouquet13.jpg" },
+const defaultHomeOccasionTiles = [
+  { id: "occasion-1", name: "Birthday", note: "Joyful blooms to make their day brighter", image: "/gallery/bouquet/bouquet1.jpg", link: "/gallery?occasion=birthday" },
+  { id: "occasion-2", name: "Anniversary", note: "Romantic arrangements celebrating eternal love", image: "/gallery/bouquet/bouquet13.jpg", link: "/gallery?occasion=anniversary" },
+  { id: "occasion-3", name: "Congratulations", note: "Vibrant blossoms for milestones and success", image: "/gallery/bouquet/bouquet4.jpg", link: "/gallery?occasion=congratulations" },
+  { id: "occasion-4", name: "Love & Romance", note: "Deep crimson roses and blushing reveries", image: "/gallery/bouquet/bouquet7.jpg", link: "/gallery?occasion=romance" },
+  { id: "occasion-5", name: "Bridal & Wedding", note: "Sacred wedding florals, malai, and hair jadai", image: "/gallery/bridal/flower11.jpg", link: "/gallery?occasion=bridal" },
+  { id: "occasion-6", name: "Traditional & Mandap", note: "Heirloom garlands and stage flower decor", image: "/gallery/garlands/garland1.jpg", link: "/gallery?occasion=traditional" },
 ];
 
-const defaultHomeInspirationTiles = [
-  { id: "rose-stories", src: "/gallery/bouquet/bouquet1.jpg", label: "Midnight Roses", className: "sm:row-span-2" },
-  { id: "bridal-details", src: "/gallery/bridal/flower12.jpg", label: "Bridal Reverie", className: "" },
-  { id: "floral-traditions", src: "/gallery/bouquet/bouquet4.jpg", label: "Ethereal Weaves", className: "" },
-  { id: "gifts-with-heart", src: "/gallery/bouquet/bouquet10.jpg", label: "Dreams in Bloom", className: "sm:col-span-2" },
+const defaultHomeWhyChooseUs = [
+  { id: "why-1", title: "Farm Fresh Flowers", note: "Sourced from trusted growers every single morning", icon: "FiFeather" },
+  { id: "why-2", title: "Fast & Reliable Delivery", note: "On-time delivery across Karur and all Tamil Nadu", icon: "FiTruck" },
+  { id: "why-3", title: "Beautiful Arrangements", note: "Handcrafted by expert florists with love and passion", icon: "FiHeart" },
+  { id: "why-4", title: "Perfect For Every Occasion", note: "Bespoke designs tailored to your cherished moments", icon: "FiGift" },
 ];
 
-const defaultHomeFallbackProductImages = [
-  "/gallery/bouquet/bouquet1.jpg",
-  "/gallery/bouquet/bouquet4.jpg",
-  "/gallery/bouquet/bouquet13.jpg",
-  "/gallery/bouquet/bouquet7.jpg",
-];
+const defaultDeliveryBanner = {
+  title: "Same Day Flower Delivery",
+  subtitle: "Beautiful flowers at your doorstep, right on time. We deliver all over Karur and Tamil Nadu.",
+  buttonLabel: "Order on WhatsApp →",
+  buttonLink: "https://wa.me/919942071721?text=Hello%20MIDHUNYAS%20Petals!%20I%20would%20like%20to%20order%20same%20day%20flower%20delivery.",
+  image: "/gallery/bouquet/bouquet15.jpg",
+};
+
+const defaultMidBanner = {
+  eyebrow: "FLOWERS THAT SPEAK YOUR HEART",
+  title: "Flowers That Speak Your Heart",
+  subtitle: "From birthdays to 'just because' to sacred weddings, find your perfect bouquet.",
+  buttonLabel: "Explore Collections →",
+  buttonLink: "/gallery",
+  badgeText: "More Love Less Ordinary ♡",
+  image: "/gallery/bouquet/bouquet12.jpg",
+};
+
+const defaultOfferPopup = {
+  enabled: true,
+  badge: "LIMITED TIME EXCLUSIVE OFFER ✦",
+  title: "Flat 15% OFF On Your Order",
+  subtitle: "Welcome to MIDHUNYAS Petals & Bridal Flowers",
+  description: "Handcrafted bridal flowers, luxury bouquets, and elegant stage decor. Fresh blossoms harvested daily across Karur & Tamil Nadu.",
+  couponCode: "MIDHUNYAS15",
+  buttonLabel: "Claim 15% Off & Shop Now →",
+  buttonLink: "/gallery",
+  whatsappMessage: "Hello MIDHUNYAS! I would like to claim 15% OFF with coupon code MIDHUNYAS15 for my order.",
+  image: "/gallery/bouquet/bouquet13.jpg",
+};
 
 const defaultContent = {
-  heroText: "Crafting Your Eternal Memories",
+  heroText: "Flowers for A Kinder World",
   heroDescription:
-    "Handcrafted bouquets, elegant garlands, and floral experiences tailored to your celebration. and We can deliver allover Tamilnadu",
-  badgeText: "Karur's Surreal Botanical Atelier",
-  primaryButtonLabel: "Explore Blooms",
+    "Handcrafted bouquets, elegant bridal jadai, and floral experiences tailored to your celebration. Delivered fresh across Karur and all Tamil Nadu.",
+  badgeText: "FLOWERS. HAPPIER DAYS.",
+  primaryButtonLabel: "Shop Now →",
   primaryButtonLink: "/gallery",
   secondaryButtonLabel: "Custom Order",
   secondaryButtonLink: "/contact",
   homeImagesEditableVersion: 1,
-  banners: ["/gallery/bouquet/bouquet13.jpg"],
+  banners: [
+    "/gallery/bouquet/bouquet13.jpg",
+    "/gallery/bouquet/bouquet1.jpg",
+    "/gallery/bouquet/bouquet12.jpg",
+    "/gallery/bouquet/bouquet4.jpg",
+    "/gallery/bridal/flower11.jpg",
+  ],
   featuredProductIds: [],
-  promotionalSections: [],
-  categoryTiles: defaultHomeCategoryTiles,
-  eventImage: "/gallery/bouquet/bouquet6.jpg",
-  inspirationTiles: defaultHomeInspirationTiles,
-  fallbackProductImages: defaultHomeFallbackProductImages,
-  features: ["Handcrafted in reverie", "Express divine delivery", "Made to your taste"],
-  floatingBadgeTitle: "Ethereal Artistry",
-  floatingBadgeSubtitle: "Suspended in pure beauty",
+  occasionTiles: defaultHomeOccasionTiles,
+  whyChooseUs: defaultHomeWhyChooseUs,
+  deliveryBanner: defaultDeliveryBanner,
+  midBanner: defaultMidBanner,
+  offerPopup: defaultOfferPopup,
+  features: ["Same Day Delivery", "Freshness Guaranteed", "Made With Love"],
+  floatingBadgeTitle: "Good Flowers Brighter Days ♡",
+  floatingBadgeSubtitle: "Handcrafted with love in Karur",
 };
 
 const fallbackProducts = [
-  { _id: "rose-basket", name: "Blushing Rose Basket", category: "Celestial Bouquet", price: 1899, image: "/gallery/bouquet/bouquet1.jpg", badge: "Bestseller" },
-  { _id: "pastel-wrap", name: "Pastel Poetry", category: "Hand-tied Dream", price: 1499, image: "/gallery/bouquet/bouquet4.jpg", badge: "New" },
-  { _id: "celebration", name: "The Celebration Edit", category: "Ethereal Arrangement", price: 2499, image: "/gallery/bouquet/bouquet13.jpg", badge: "Signature" },
-  { _id: "rose-love", name: "Endless Romance", category: "Scarlet Reverie", price: 1299, image: "/gallery/bouquet/bouquet7.jpg", badge: "Popular" },
+  { _id: "rose-basket", name: "Red Roses Romance", category: "Bouquets", price: 1499, offerPrice: 1299, image: "/gallery/bouquet/bouquet1.jpg", badge: "Bestseller", rating: 5, reviewsCount: 94 },
+  { _id: "pastel-wrap", name: "Pastel Dream", category: "Bouquets", price: 1899, offerPrice: 1699, image: "/gallery/bouquet/bouquet4.jpg", badge: "Customer Favorite", rating: 5, reviewsCount: 88 },
+  { _id: "celebration", name: "Sunshine Bouquet", category: "Bouquets", price: 1399, offerPrice: 1199, image: "/gallery/bouquet/bouquet10.jpg", badge: "Popular", rating: 5, reviewsCount: 76 },
+  { _id: "white-lily", name: "White Lily Grace", category: "Bridal Flowers", price: 2199, offerPrice: 1999, image: "/gallery/bouquet/bouquet13.jpg", badge: "Signature", rating: 5, reviewsCount: 62 },
+  { _id: "bridal-jadai", name: "Royal Bridal Jadai", category: "Hairstyles", price: 2499, offerPrice: 2299, image: "/gallery/bridal/flower11.jpg", badge: "Bridal Special", rating: 5, reviewsCount: 112 },
+  { _id: "mandap-garland", name: "Temple Malai Garland", category: "Garlands", price: 1799, offerPrice: 1599, image: "/gallery/garlands/garland1.jpg", badge: "Traditional", rating: 5, reviewsCount: 81 },
+  { _id: "rose-love", name: "Blushing Rose Box", category: "Gift Sets", price: 1299, offerPrice: 1099, image: "/gallery/bouquet/bouquet7.jpg", badge: "Best Value", rating: 5, reviewsCount: 57 },
+  { _id: "ceremony-bloom", name: "Ceremony Cascade", category: "Bridal Flowers", price: 2999, offerPrice: 2699, image: "/gallery/bouquet/bouquet12.jpg", badge: "Luxury", rating: 5, reviewsCount: 43 },
 ];
 
-const reviews = [
-  { quote: "The flowers felt like something straight out of a beautiful dream. Every petal glowed with fresh vitality.", name: "Nivetha R.", event: "Botanical Bouquet" },
-  { quote: "Our wedding stage and bridal jadai were utterly surreal. The entire hall felt transformed into an enchanted sanctuary.", name: "Sowmya & Arun", event: "Sacred Union" },
-  { quote: "Luminous floral presentation and instant delivery across Karur. The craftsmanship is pure art.", name: "Harini K.", event: "Celebration Gift" },
+const customerReviews = [
+  {
+    quote: "Absolutely beautiful flowers! The quality and service were outstanding. The bridal jadai was fresh and vibrant all day.",
+    name: "Ayesha K.",
+    event: "Bridal Jadai",
+    avatar: "/gallery/hairstyle/hairstyle_1.jpg",
+  },
+  {
+    quote: "Petals made our anniversary so special! The bouquet was fresh, elegant, and delivered right on time in Karur.",
+    name: "Usman & Priya",
+    event: "Anniversary Bouquet",
+    avatar: "/gallery/bouquet/bouquet1.jpg",
+  },
+  {
+    quote: "Fast delivery and the most fragrant roses I have ever ordered. The packaging looked utterly royal and premium.",
+    name: "Saravanan R.",
+    event: "Celebration Gift",
+    avatar: "/gallery/bouquet/bouquet10.jpg",
+  },
 ];
 
 const reveal = {
-  initial: { opacity: 0, y: 32 },
+  initial: { opacity: 0, y: 28 },
   whileInView: { opacity: 1, y: 0 },
   viewport: { once: true, amount: 0.15 },
-  transition: { duration: 0.75, ease: [0.16, 1, 0.3, 1] },
+  transition: { duration: 0.65, ease: [0.16, 1, 0.3, 1] },
 };
 
 const SectionHeading = ({ eyebrow, title, copy, align = "center" }) => (
   <div className={align === "left" ? "max-w-2xl" : "mx-auto max-w-2xl text-center"}>
-    <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.32em] text-[#C5A15B] dark:text-[#D5B36C] flex items-center justify-center gap-2">
-      <span className="w-1.5 h-1.5 rounded-full bg-[#651F3C] animate-ping" />
-      {eyebrow}
-      <span className="w-1.5 h-1.5 rounded-full bg-[#651F3C] animate-ping" />
-    </p>
-    <h2 className="text-4xl font-medium leading-tight sm:text-5xl text-[#30232A] dark:text-white">
+    {eyebrow && (
+      <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.3em] text-[#C5A15B] dark:text-[#D5B36C] flex items-center justify-center gap-2">
+        <span className="w-1.5 h-1.5 rounded-full bg-[#651F3C] animate-ping" />
+        {eyebrow}
+        <span className="w-1.5 h-1.5 rounded-full bg-[#651F3C] animate-ping" />
+      </p>
+    )}
+    <h2 className="text-3xl font-serif font-bold text-[#30232A] dark:text-[#FAF5EE] sm:text-4xl md:text-5xl leading-tight">
       {title}
     </h2>
-    {copy && <p className="mt-4 leading-7 text-[#51454B] dark:text-zinc-400 text-sm sm:text-base">{copy}</p>}
+    {copy && <p className="mt-3 leading-relaxed text-[#51454B] dark:text-zinc-400 text-sm sm:text-base">{copy}</p>}
   </div>
 );
 
-const ProductCard = ({ product }) => {
-  const image = product.image || product.images?.[0] || "";
-  const price = Number(product.offerPrice || product.price || product.basePrice || 0);
+// Standardized Product Card with Direct Add to Cart
+const ProductCardItem = ({ product }) => {
+  const navigate = useNavigate();
+  const { addItem } = useCart();
+  const [isAdding, setIsAdding] = useState(false);
+
+  const image = product.image || product.images?.[0] || "/gallery/bouquet/bouquet1.jpg";
+  const price = Number(product.offerPrice || product.price || 1499);
+  const originalPrice = product.offerPrice ? Number(product.price) : null;
+
+  const handleAddToCart = async (e) => {
+    e.stopPropagation();
+    setIsAdding(true);
+    try {
+      await addItem({
+        productId: product._id || product.id,
+        quantity: 1,
+        price,
+        image,
+        name: product.name,
+      });
+      toast.success(`${product.name} added to cart!`);
+    } catch {
+      toast.error("Could not add to cart");
+    } finally {
+      setIsAdding(false);
+    }
+  };
 
   return (
     <motion.article
-      whileHover={{ y: -10, scale: 1.015 }}
-      transition={{ duration: 0.35, ease: "easeOut" }}
-      className="group relative overflow-hidden rounded-[26px] border border-[#E8DDD5] bg-white shadow-[0_15px_45px_rgba(101,31,60,0.08)] backdrop-blur-xl dark:border-[#493640] dark:bg-[#231722] dark:shadow-[0_15px_45px_rgba(0,0,0,0.5)] hover:border-[#C5A15B]/70 transition-all duration-300"
+      whileHover={{ y: -6 }}
+      transition={{ duration: 0.25 }}
+      onClick={() => navigate(`/product/${product._id || product.id}`)}
+      className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-[#E8DDD5] bg-white p-3.5 shadow-sm hover:shadow-xl hover:border-[#C5A15B]/60 transition-all dark:border-[#493640] dark:bg-[#231722] cursor-pointer"
     >
-      <div className="relative aspect-[4/5] overflow-hidden bg-gradient-to-br from-[#FAF5EE] to-[#F6ECE7] dark:from-[#211720] dark:to-[#160F17]">
-        {image ? (
+      <div>
+        {/* Photo with Wishlist Heart */}
+        <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-[#FAF5EE] dark:bg-[#1E1420]">
           <img
             src={image}
-            alt={product.name || product.title}
-            className="h-full w-full object-cover transition duration-700 group-hover:scale-110 image-enhanced"
+            alt={product.name}
             loading="lazy"
             decoding="async"
+            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 image-enhanced"
           />
-        ) : (
-          <div className="grid h-full place-items-center bg-[#FAF5EE] text-sm text-[#81747A] dark:bg-[#211720] dark:text-zinc-400">No image</div>
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/10 opacity-60 group-hover:opacity-40 transition-opacity" />
-        <span className="absolute left-4 top-4 rounded-full bg-white/95 px-3.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#651F3C] border border-[#C5A15B]/30 backdrop-blur-md shadow-sm dark:bg-[#1E1420]/95 dark:text-[#D5B36C] dark:border-[#493640]">
-          {product.badge || (product.offerPrice ? "Special" : "✦ Reverie")}
-        </span>
-        <Link
-          to="/favorites"
-          aria-label="Save to wishlist"
-          className="absolute right-4 top-4 grid h-10 w-10 place-items-center rounded-full bg-white/90 text-[#30232A] shadow-md backdrop-blur transition hover:bg-[#651F3C] hover:text-white dark:bg-[#1E1420]/90 dark:text-white"
-        >
-          <FiHeart />
-        </Link>
-        <Link
-          to="/gallery"
-          className="absolute inset-x-4 bottom-4 translate-y-4 rounded-full bg-white/95 py-3 text-center text-xs font-bold uppercase tracking-wider text-[#30232A] opacity-0 shadow-xl backdrop-blur transition duration-300 group-hover:translate-y-0 group-hover:opacity-100 dark:bg-[#1E1420]/95 dark:text-white hover:bg-[#651F3C] hover:text-white"
-        >
-          View in Atelier
-        </Link>
-      </div>
-      <div className="p-5">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#C5A15B] dark:text-[#D5B36C]">{product.category || "Fresh blooms"}</p>
-        <div className="mt-2 flex items-start justify-between gap-3">
-          <h3 className="text-xl font-medium text-[#30232A] dark:text-white truncate">{product.name || product.title}</h3>
-          <p className="shrink-0 pt-1 text-sm font-bold text-[#651F3C] dark:text-[#D5B36C]">₹{price.toLocaleString("en-IN")}</p>
+          {product.badge && (
+            <span className="absolute left-2.5 top-2.5 rounded-full bg-white/95 dark:bg-[#1E1420]/95 px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[#651F3C] dark:text-[#D5B36C] border border-[#C5A15B]/30 shadow-sm">
+              {product.badge}
+            </span>
+          )}
+          <Link
+            to="/favorites"
+            onClick={(e) => e.stopPropagation()}
+            aria-label="Wishlist"
+            className="absolute right-2.5 top-2.5 grid h-8 w-8 place-items-center rounded-full bg-white/90 text-[#30232A] shadow hover:bg-[#651F3C] hover:text-white transition-colors dark:bg-[#1E1420]/90 dark:text-white"
+          >
+            <FiHeart className="text-xs" />
+          </Link>
         </div>
-        <Link to="/gallery" className="mt-4 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#30232A] transition hover:text-[#651F3C] dark:text-zinc-200">
-          Acquire Bloom <FiArrowRight />
-        </Link>
+
+        {/* Product Info */}
+        <div className="mt-3.5">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-[#81747A] dark:text-zinc-400">
+            {product.category || "Bouquets"}
+          </p>
+          <h3 className="mt-1 font-serif text-base font-bold text-[#30232A] dark:text-white truncate">
+            {product.name}
+          </h3>
+
+          {/* Star Rating */}
+          <div className="mt-1 flex items-center gap-1 text-[11px] text-[#C5A15B]">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <FiStar key={i} fill="currentColor" className="text-xs" />
+            ))}
+            <span className="ml-1 text-[10px] font-medium text-[#81747A] dark:text-zinc-400">
+              ({product.reviewsCount || 86})
+            </span>
+          </div>
+
+          {/* Pricing */}
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-base font-bold text-[#651F3C] dark:text-[#D5B36C]">
+              ₹{price.toLocaleString("en-IN")}
+            </span>
+            {originalPrice && (
+              <span className="text-xs text-[#81747A] line-through">
+                ₹{originalPrice.toLocaleString("en-IN")}
+              </span>
+            )}
+          </div>
+        </div>
       </div>
+
+      {/* Add to Cart Button */}
+      <button
+        type="button"
+        disabled={isAdding}
+        onClick={handleAddToCart}
+        className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-[#651F3C] py-2.5 text-xs font-bold text-white shadow-sm hover:bg-[#4D172D] active:scale-[0.98] transition-all dark:bg-[#651F3C] dark:hover:bg-[#C5A15B] dark:hover:text-[#30232A]"
+      >
+        <FiShoppingBag className="text-xs" />
+        {isAdding ? "Adding..." : "Add to Cart"}
+      </button>
     </motion.article>
   );
 };
 
-const renderHeroText = (text) => {
-  if (!text) return "";
-  const lower = text.toLowerCase();
-  if (lower.includes("crafting your eternal memories")) {
-    return (
-      <>
-        Crafting Your<br />
-        <span className="bg-gradient-to-r from-[#651F3C] via-[#C5A15B] to-[#78836B] bg-clip-text text-transparent italic font-serif">
-          Eternal Memories
-        </span>
-      </>
-    );
-  }
-  if (lower.includes("crafting eternal memories")) {
-    return (
-      <>
-        Crafting<br />
-        <span className="bg-gradient-to-r from-[#651F3C] via-[#C5A15B] to-[#78836B] bg-clip-text text-transparent italic font-serif">
-          Eternal Memories
-        </span>
-      </>
-    );
-  }
-  return text;
-};
-
-const renderHeroDescription = (text) => {
-  if (!text) return "";
-  const regex = /(We can deliver all\s*over Tamil\s*nadu)/i;
-  const parts = text.split(regex);
-  if (parts.length > 1) {
-    return parts.map((part, index) => {
-      if (regex.test(part)) {
-        return (
-          <span key={index} className="font-semibold text-[#651F3C] dark:text-[#D5B36C] bg-[#651F3C]/10 dark:bg-[#C5A15B]/10 px-2.5 py-0.5 rounded-lg border border-[#651F3C]/20 dark:border-[#C5A15B]/20 shadow-sm mx-1 inline-block">
-            {part}
-          </span>
-        );
-      }
-      return part;
-    });
-  }
-  return text;
-};
-
 const HomePage = () => {
-  const pageSeo = usePageSeo('home');
+  const pageSeo = usePageSeo("home");
   const [content, setContent] = useState(defaultContent);
-  const [featuredProducts, setFeaturedProducts] = useState([]);
+  const [allProducts, setAllProducts] = useState([]);
+  const [activeCollectionTab, setActiveCollectionTab] = useState("all");
+  const [newsletterEmail, setNewsletterEmail] = useState("");
 
   const loadHome = async () => {
     try {
-      const [contentRes, featuredRes] = await Promise.all([
+      const [contentRes, galleryRes] = await Promise.all([
         axios.get("/content/home-highlight"),
-        galleryService.list({ featured: true, limit: 8 }),
+        galleryService.list({ limit: 40 }),
       ]);
       const nextContent = { ...defaultContent, ...(contentRes.data || {}) };
-      const products = featuredRes.products || featuredRes.data?.products || [];
       setContent(nextContent);
-      if (nextContent.featuredProductIds?.length) {
-        const byId = new Map(products.map((product) => [product._id, product]));
-        setFeaturedProducts(nextContent.featuredProductIds.map((id) => byId.get(id)).filter(Boolean));
-      } else {
-        setFeaturedProducts(products.slice(0, 4));
-      }
+      const list = galleryRes.products || galleryRes.data?.products || [];
+      setAllProducts(list.length ? list : fallbackProducts);
     } catch (error) {
       console.error("Failed to load home content", error);
+      setAllProducts(fallbackProducts);
     }
   };
 
@@ -231,392 +297,463 @@ const HomePage = () => {
     return () => unsubscribers.forEach((unsubscribe) => unsubscribe?.());
   }, []);
 
-  const categoryTiles = useMemo(
-    () => (content.categoryTiles?.length ? content.categoryTiles : defaultHomeCategoryTiles),
-    [content.categoryTiles]
-  );
-  const inspirationTiles = useMemo(
-    () => (content.inspirationTiles?.length ? content.inspirationTiles : defaultHomeInspirationTiles),
-    [content.inspirationTiles]
-  );
-  const products = useMemo(() => {
-    if (featuredProducts.length) return featuredProducts;
-    const fallbackImages = content.fallbackProductImages?.length ? content.fallbackProductImages : defaultHomeFallbackProductImages;
-    return fallbackProducts.map((product, index) => ({
-      ...product,
-      image: fallbackImages[index] || "",
-    }));
-  }, [content.fallbackProductImages, featuredProducts]);
-  const heroImage = content.banners?.[0] || "";
-  const eventImage = content.eventImage || "";
+  // Best sellers: featured products if configured, else first 4 products
+  const bestSellers = useMemo(() => {
+    if (content.featuredProductIds?.length && allProducts.length) {
+      const byId = new Map(allProducts.map((p) => [p._id, p]));
+      const featured = content.featuredProductIds.map((id) => byId.get(id)).filter(Boolean);
+      if (featured.length) return featured.slice(0, 4);
+    }
+    return allProducts.slice(0, 4);
+  }, [allProducts, content.featuredProductIds]);
+
+  // Occasions list
+  const occasions = useMemo(() => {
+    return content.occasionTiles?.length ? content.occasionTiles : defaultHomeOccasionTiles;
+  }, [content.occasionTiles]);
+
+  // Filtered Collection products
+  const collectionCategories = [
+    { key: "all", label: "All Flowers" },
+    { key: "bouquets", label: "Bouquets" },
+    { key: "bridal", label: "Bridal Flowers" },
+    { key: "hairstyles", label: "Hairstyles & Jadai" },
+    { key: "garlands", label: "Garlands" },
+  ];
+
+  const filteredCollection = useMemo(() => {
+    if (activeCollectionTab === "all") return allProducts.slice(0, 8);
+    return allProducts
+      .filter((p) => {
+        const cat = (p.category || "").toLowerCase();
+        if (activeCollectionTab === "bouquets") return cat.includes("bouquet");
+        if (activeCollectionTab === "bridal") return cat.includes("bridal") || cat.includes("wedding");
+        if (activeCollectionTab === "hairstyles") return cat.includes("hair") || cat.includes("jadai");
+        if (activeCollectionTab === "garlands") return cat.includes("garland") || cat.includes("malai");
+        return true;
+      })
+      .slice(0, 8);
+  }, [allProducts, activeCollectionTab]);
 
   const heroSlides = useMemo(() => {
-    if (content.banners && content.banners.length > 1) {
+    if (content.banners && content.banners.length > 0) {
       return content.banners.map((img, idx) => ({ id: idx + 1, img }));
     }
-    return [
-      { id: 1, img: content.banners?.[0] || "/gallery/bouquet/bouquet13.jpg" },
-      { id: 2, img: "https://images.unsplash.com/photo-1518780664697-55e3ad937233?q=80&w=1200&auto=format&fit=crop" },
-      { id: 3, img: "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?q=80&w=1200&auto=format&fit=crop" },
-      { id: 4, img: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1200&auto=format&fit=crop" },
-      { id: 5, img: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1200&auto=format&fit=crop" },
-      { id: 6, img: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=1200&auto=format&fit=crop" },
-    ];
+    return defaultContent.banners.map((img, idx) => ({ id: idx + 1, img }));
   }, [content.banners]);
+
+  const handleNewsletterSubmit = (e) => {
+    e.preventDefault();
+    if (!newsletterEmail.trim()) return;
+    toast.success("Welcome to our floral community! Check your email for special offers.");
+    setNewsletterEmail("");
+  };
 
   return (
     <div className="relative overflow-hidden bg-[#FAF5EE] text-[#30232A] transition-colors dark:bg-[#160F17] dark:text-[#F5F5F5]">
-      <SeoHead seoOverride={pageSeo} breadcrumbs={[{ name: 'Home', url: '/' }]} />
+      <SeoHead seoOverride={pageSeo} breadcrumbs={[{ name: "Home", url: "/" }]} />
 
-      {/* ── Surreal Ambient Glowing Orbs ── */}
-      <div className="surreal-orb top-[-100px] left-[15%] w-[500px] h-[500px] bg-[#651F3C]/15 dark:bg-[#651F3C]/18" />
-      <div className="surreal-orb top-[450px] right-[-100px] w-[550px] h-[550px] bg-[#C5A15B]/15 dark:bg-[#C5A15B]/12" />
-      <div className="surreal-orb top-[1300px] left-[-80px] w-[450px] h-[450px] bg-[#78836B]/15 dark:bg-[#78836B]/15" />
-      <div className="surreal-orb top-[2300px] right-[-60px] w-[500px] h-[500px] bg-[#651F3C]/12 dark:bg-[#651F3C]/15" />
-      <div className="surreal-orb top-[3300px] left-[10%] w-[550px] h-[550px] bg-[#C5A15B]/12 dark:bg-[#C5A15B]/12" />
+      {/* ── 0. POPUP OFFER POSTER ON LOAD / REFRESH ── */}
+      <OfferPopupModal offerData={content.offerPopup} />
 
-      {/* ── 1. Surrealist Hero Section ── */}
-      <section className="relative min-h-[calc(100vh-80px)] overflow-hidden bg-[radial-gradient(ellipse_at_50%_0%,#FFFDFC_0%,#FAF5EE_45%,#F5ECE3_100%)] dark:bg-[radial-gradient(ellipse_at_50%_0%,#261522_0%,#1A1018_55%,#140C12_100%)]">
-        <span className="hero-petal left-[8%] top-[16%] rotate-12" />
-        <span className="hero-petal left-[46%] top-[10%] -rotate-12 [animation-delay:1.8s]" />
-        <span className="hero-petal right-[7%] top-[24%] rotate-45 [animation-delay:3.4s]" />
-        <span className="hero-petal bottom-[12%] left-[42%] rotate-90 [animation-delay:2.6s]" />
+      {/* ── Ambient Glow Radiance ── */}
+      <div className="surreal-orb top-[-100px] left-[15%] w-[450px] h-[450px] bg-[#651F3C]/12 dark:bg-[#651F3C]/15" />
+      <div className="surreal-orb top-[500px] right-[-100px] w-[500px] h-[500px] bg-[#C5A15B]/12 dark:bg-[#C5A15B]/10" />
 
-        <div className="mx-auto grid min-h-[calc(100vh-80px)] max-w-[1440px] items-center gap-10 px-5 py-14 sm:px-8 lg:grid-cols-[0.95fr_1.05fr] lg:px-12 lg:py-16 xl:px-20">
-          <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.85 }} className="relative z-10 max-w-2xl">
-            {/* Surreal Badge */}
-            <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-[#C5A15B]/35 bg-white/80 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.28em] text-[#651F3C] shadow-sm backdrop-blur-xl dark:border-[#493640] dark:bg-[#231722]/80 dark:text-[#D5B36C]">
-              <span className="h-2 w-2 rounded-full bg-[#651F3C] dark:bg-[#D5B36C] animate-ping" />
-              ✦ {content.badgeText}
-            </div>
+      {/* ── 1. HERO SECTION (PetalNest style layout) ── */}
+      <section className="relative overflow-hidden pt-8 pb-16 sm:py-16 md:py-20 lg:py-24 bg-[radial-gradient(ellipse_at_50%_0%,#FFFDFC_0%,#FAF5EE_50%,#F5ECE3_100%)] dark:bg-[radial-gradient(ellipse_at_50%_0%,#241420_0%,#1A1018_55%,#140C12_100%)]">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+            {/* Left Column: Headlines, CTA, Trust Badges */}
+            <motion.div initial={{ opacity: 0, x: -24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }} className="max-w-xl">
+              <span className="inline-block rounded-full border border-[#C5A15B]/40 bg-white/80 dark:bg-[#231722]/80 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.25em] text-[#651F3C] dark:text-[#D5B36C] shadow-sm">
+                ✦ {content.badgeText || "FLOWERS. HAPPIER DAYS."}
+              </span>
 
-            <h1 className="text-[clamp(3.35rem,6.8vw,7rem)] font-medium leading-[0.92] tracking-[-0.04em] text-[#30232A] dark:text-white">
-              {renderHeroText(content.heroText)}
-            </h1>
+              <h1 className="mt-5 text-4xl font-serif font-bold tracking-tight text-[#30232A] dark:text-white sm:text-5xl md:text-6xl leading-[1.05]">
+                {content.heroText || "Flowers for A Kinder World"}
+              </h1>
 
-            <p className="mt-7 max-w-xl text-base leading-8 text-[#51454B] dark:text-zinc-300 sm:text-lg">
-              {renderHeroDescription(content.heroDescription)}
-            </p>
+              <p className="mt-5 text-base sm:text-lg leading-relaxed text-[#51454B] dark:text-zinc-300">
+                {content.heroDescription ||
+                  "Handcrafted bouquets for every occasion, delivered with love. Express delivery across Karur and all Tamil Nadu."}
+              </p>
 
-            <div className="mt-9 flex flex-col gap-3.5 sm:flex-row">
-              <Link to={content.primaryButtonLink || "/gallery"} className="btn-luxury">
-                {content.primaryButtonLabel || "Explore Blooms"} <FiArrowRight />
-              </Link>
-              <Link to={content.secondaryButtonLink || "/contact"} className="btn-luxury-outline">
-                {content.secondaryButtonLabel || "Custom Order"}
-              </Link>
-            </div>
-
-            <div className="mt-10 flex flex-wrap gap-x-8 gap-y-3 text-xs font-medium text-[#78836B] dark:text-[#D5B36C]">
-              {content.features?.map((feature, idx) => (
-                <span key={idx} className="flex items-center gap-2">
-                  <FiCheck className="text-[#651F3C] dark:text-[#D5B36C]" /> {feature}
-                </span>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Surreal Portal Arch Composition */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.92 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1, delay: 0.2 }}
-            className="relative mx-auto w-full max-w-[700px] lg:ml-auto"
-          >
-            {/* Glowing Aurora Portal Aura */}
-            <div className="absolute -inset-4 rounded-[180px_180px_40px_40px] bg-gradient-to-tr from-[#651F3C]/15 via-[#C5A15B]/15 to-[#78836B]/15 blur-2xl -z-10" />
-
-            <div className="relative ml-auto aspect-[4/5] max-h-[720px] overflow-hidden rounded-[180px_180px_36px_36px] border-[10px] border-white/90 bg-white/20 shadow-[0_35px_90px_rgba(101,31,60,0.18)] backdrop-blur-xl dark:border-[#493640] dark:bg-[#231722]/30 sm:border-[14px]">
-              {heroSlides && heroSlides.length > 1 ? (
-                <CarouselSlider slides={heroSlides} />
-              ) : heroImage ? (
-                <img
-                  src={heroImage}
-                  alt="Midhunyas surreal floral arrangement"
-                  className="h-full w-full object-cover image-enhanced animate-surreal-float"
-                  loading="eager"
-                  decoding="async"
-                />
-              ) : (
-                <div className="grid h-full place-items-center bg-[#FAF5EE] text-sm text-[#81747A] dark:bg-[#211720] dark:text-zinc-400">Hero image not set</div>
-              )}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-white/10 pointer-events-none" />
-            </div>
-
-            {/* Floating Glassmorphic Pill */}
-            <div className="absolute -bottom-6 left-2 flex items-center gap-3.5 rounded-2xl border border-[#C5A15B]/30 bg-white/95 p-4 pr-7 shadow-2xl backdrop-blur-2xl dark:border-[#493640] dark:bg-[#1E1420]/95">
-              <div className="grid h-12 w-12 place-items-center rounded-full bg-gradient-to-br from-[#651F3C] to-[#30232A] text-white shadow-md">
-                <FiGift className="text-xl" />
+              {/* CTAs */}
+              <div className="mt-8 flex flex-wrap gap-4">
+                <Link
+                  to={content.primaryButtonLink || "/gallery"}
+                  className="inline-flex items-center gap-2 rounded-full bg-[#651F3C] px-8 py-3.5 text-sm font-bold text-white shadow-lg shadow-[#651F3C]/25 hover:bg-[#4D172D] hover:scale-105 active:scale-95 transition-all"
+                >
+                  {content.primaryButtonLabel || "Shop Now →"}
+                </Link>
+                <Link
+                  to={content.secondaryButtonLink || "/contact"}
+                  className="inline-flex items-center gap-2 rounded-full border border-[#C5A15B]/60 bg-white/70 dark:bg-white/5 px-7 py-3.5 text-sm font-bold text-[#30232A] dark:text-white hover:border-[#651F3C] hover:bg-white transition-all"
+                >
+                  {content.secondaryButtonLabel || "Custom Order"}
+                </Link>
               </div>
-              <div>
-                <p className="text-sm font-bold tracking-wide text-[#30232A] dark:text-white">
-                  {content.floatingBadgeTitle || "Ethereal Artistry"}
-                </p>
-                <p className="text-[11px] text-[#81747A] dark:text-zinc-400">
-                  {content.floatingBadgeSubtitle || "Suspended in pure beauty"}
-                </p>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
 
-      {/* ── 2. Feature Bar (The Realm of Wonders) ── */}
-      <section className="border-y border-[#C5A15B]/25 bg-gradient-to-r from-[#FAF5EE]/95 via-[#F5ECE3]/85 to-[#FAF5EE]/95 dark:border-[#493640] dark:from-[#211720]/95 dark:via-[#281A27]/90 dark:to-[#211720]/95 backdrop-blur-md">
-        <div className="mx-auto grid max-w-7xl grid-cols-2 divide-x divide-[#C5A15B]/20 dark:divide-[#493640]/60 px-4 md:grid-cols-4">
-          {[
-            [FiTruck, "Express Delivery", "Karur & All Tamil Nadu"],
-            [FiGift, "Surreal Packaging", "Gilded Floral Wraps"],
-            [FiCalendar, "Custom Bridal Styling", "Bespoke Jadai & Malai"],
-            [FiShoppingBag, "Harvested Fresh", "Crafted in Reverie"],
-          ].map(([Icon, title, note]) => (
-            <div key={title} className="flex items-center gap-3.5 px-4 py-5 sm:px-7">
-              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/90 border border-[#C5A15B]/25 dark:bg-[#30202B]/80 text-[#651F3C] dark:text-[#D5B36C] shadow-sm">
-                <Icon className="text-lg" />
-              </div>
-              <div>
-                <p className="text-xs font-bold sm:text-sm text-[#30232A] dark:text-gray-100">{title}</p>
-                <p className="mt-0.5 text-[10px] text-[#81747A] dark:text-zinc-400 sm:text-xs">{note}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ── 3. Category Portals (Visions in Bloom) ── */}
-      <motion.section {...reveal} className="mx-auto max-w-7xl px-5 py-24 sm:px-8 sm:py-28">
-        <SectionHeading
-          eyebrow="Visions in Bloom"
-          title="Floral Portals of Reverie"
-          copy="Step into collections designed to evoke wonder—from bridal crowns to transcendent bouquets."
-        />
-        <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {categoryTiles.map((category, index) => (
-            <motion.div
-              key={category.id || category.name || index}
-              whileHover={{ y: -10 }}
-              transition={{ duration: 0.3 }}
-            >
-              <Link to="/gallery" className="group block">
-                <div className="relative aspect-[4/5] overflow-hidden rounded-[28px] border border-[#C5A15B]/30 hover:border-[#C5A15B] bg-white shadow-[0_16px_40px_rgba(101,31,60,0.10)] hover:shadow-[0_24px_55px_rgba(101,31,60,0.20)] backdrop-blur-xl dark:border-[#493640] dark:bg-[#231722] transition-all duration-300">
-                  {category.image ? (
-                    <img
-                      src={category.image}
-                      alt={category.name}
-                      className="h-full w-full object-cover transition duration-700 group-hover:scale-110 image-enhanced"
-                      loading="lazy"
-                    />
-                  ) : (
-                    <div className="grid h-full place-items-center bg-[#FAF5EE] text-sm text-[#81747A] dark:bg-[#211720] dark:text-zinc-400">No image</div>
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                  <div className="absolute inset-x-0 bottom-0 p-6 text-white">
-                    <span className="mb-2 block text-[10px] font-bold uppercase tracking-[0.28em] text-[#C5A15B]">
-                      ✦ 0{index + 1}
-                    </span>
-                    <h3 className="text-2xl font-serif font-medium">{category.name}</h3>
-                    <p className="mt-1 text-xs text-white/80 line-clamp-1">{category.note}</p>
-                    <span className="mt-4 inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-[#FAF5EE] group-hover:text-[#C5A15B] transition-colors">
-                      Enter Portal <FiArrowRight />
-                    </span>
+              {/* 3 Trust Badges underneath CTA (exactly like reference) */}
+              <div className="mt-12 grid grid-cols-3 gap-3 border-t border-[#E8DDD5] pt-6 dark:border-[#493640]">
+                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2 text-center sm:text-left">
+                  <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white dark:bg-[#231722] text-[#651F3C] dark:text-[#D5B36C] shadow-sm border border-[#E8DDD5] dark:border-[#493640]">
+                    <FiTruck className="text-base" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-[#30232A] dark:text-white">Same Day</p>
+                    <p className="text-[10px] text-[#81747A] dark:text-zinc-400">Delivery in Karur</p>
                   </div>
                 </div>
-              </Link>
+
+                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2 text-center sm:text-left">
+                  <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white dark:bg-[#231722] text-[#651F3C] dark:text-[#D5B36C] shadow-sm border border-[#E8DDD5] dark:border-[#493640]">
+                    <FiFeather className="text-base" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-[#30232A] dark:text-white">Freshness</p>
+                    <p className="text-[10px] text-[#81747A] dark:text-zinc-400">Guaranteed Harvest</p>
+                  </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2 text-center sm:text-left">
+                  <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white dark:bg-[#231722] text-[#651F3C] dark:text-[#D5B36C] shadow-sm border border-[#E8DDD5] dark:border-[#493640]">
+                    <FiHeart className="text-base" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-[#30232A] dark:text-white">Made With</p>
+                    <p className="text-[10px] text-[#81747A] dark:text-zinc-400">Love & Devotion</p>
+                  </div>
+                </div>
+              </div>
             </motion.div>
+
+            {/* Right Column: Hero Visual Showcase with Carousel & Love Note Tag */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.94 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.85, delay: 0.15 }}
+              className="relative mx-auto w-full max-w-[540px] lg:max-w-none"
+            >
+              <div className="relative aspect-[4/5] max-h-[640px] overflow-hidden rounded-[36px] border-[8px] border-white/90 bg-white/30 shadow-[0_30px_70px_rgba(101,31,60,0.18)] dark:border-[#493640] dark:bg-[#231722]">
+                <CarouselSlider slides={heroSlides} />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+              </div>
+
+              {/* Floating Love Note Card (from reference image) */}
+              <div className="absolute -bottom-6 -left-4 sm:left-4 rounded-2xl border border-[#C5A15B]/35 bg-white/95 dark:bg-[#1E1420]/95 p-4 shadow-2xl backdrop-blur-md max-w-[220px]">
+                <p className="font-serif italic text-sm font-semibold text-[#651F3C] dark:text-[#D5B36C]">
+                  {content.floatingBadgeTitle || "Good Flowers Brighter Days ♡"}
+                </p>
+                <p className="mt-1 text-[11px] text-[#81747A] dark:text-zinc-400">
+                  {content.floatingBadgeSubtitle || "Handcrafted with love in Karur"}
+                </p>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── 2. OUR BEST SELLERS (reference left middle) ── */}
+      <motion.section {...reveal} className="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-10">
+          <SectionHeading
+            align="left"
+            title="Our Best Sellers"
+            copy="Customer favorites, crafted with care for unforgettable moments."
+          />
+          <Link
+            to="/gallery"
+            className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#651F3C] dark:text-[#D5B36C] hover:underline shrink-0"
+          >
+            View All Best Sellers <FiArrowRight />
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-4">
+          {bestSellers.map((product) => (
+            <ProductCardItem key={product._id || product.id} product={product} />
           ))}
         </div>
       </motion.section>
 
-      {/* ── 4. The Favourites (The Cherished Collections) ── */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-[#FAF5EE] via-[#F6ECE7] to-[#FAF5EE] border-y border-[#C5A15B]/20 px-5 py-24 dark:from-[#160F17] dark:via-[#221620] dark:to-[#160F17] dark:border-[#493640]/40 sm:px-8 sm:py-28">
-        <motion.div {...reveal} className="mx-auto max-w-7xl">
-          <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
-            <SectionHeading
-              align="left"
-              eyebrow="Ethereal Creations"
-              title="The Cherished Collections"
-              copy="Living floral art requested time and again, crafted fresh for your celebration."
-            />
-            <Link to="/gallery" className="inline-flex items-center gap-2 text-sm font-bold text-[#651F3C] hover:text-[#C5A15B] transition-colors">
-              View All Works <FiArrowRight />
-            </Link>
-          </div>
-          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {products.slice(0, 4).map((product) => (
-              <ProductCard key={product._id || product.id} product={product} />
+      {/* ── 3. SHOP BY OCCASION (reference right top) ── */}
+      <motion.section {...reveal} className="bg-gradient-to-b from-[#FAF5EE] via-[#F6ECE7] to-[#FAF5EE] dark:from-[#160F17] dark:via-[#221620] dark:to-[#160F17] border-y border-[#C5A15B]/20 py-20 sm:py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <SectionHeading
+            title="Shop by Occasion"
+            copy="Because every moment deserves fresh flowers tailored to its feeling."
+          />
+
+          <div className="mt-12 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-5">
+            {occasions.map((occasion, idx) => (
+              <motion.div
+                key={occasion.id || idx}
+                whileHover={{ y: -6 }}
+                transition={{ duration: 0.25 }}
+              >
+                <Link
+                  to={occasion.link || `/gallery?occasion=${encodeURIComponent(occasion.name.toLowerCase())}`}
+                  className="group block text-center"
+                >
+                  <div className="relative aspect-[4/5] overflow-hidden rounded-2xl border border-[#E8DDD5] bg-white shadow-sm hover:shadow-xl hover:border-[#C5A15B] transition-all dark:border-[#493640] dark:bg-[#231722]">
+                    <img
+                      src={occasion.image || "/gallery/bouquet/bouquet1.jpg"}
+                      alt={occasion.name}
+                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110 image-enhanced"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                    <span className="absolute bottom-3 inset-x-2 text-center text-xs font-bold text-white drop-shadow">
+                      {occasion.name}
+                    </span>
+                  </div>
+                  <p className="mt-2.5 text-xs font-bold text-[#30232A] dark:text-zinc-200 group-hover:text-[#651F3C] dark:group-hover:text-[#D5B36C] transition-colors">
+                    {occasion.name}
+                  </p>
+                </Link>
+              </motion.div>
             ))}
           </div>
-        </motion.div>
-      </section>
+        </div>
+      </motion.section>
 
-      {/* ── 5. The Surreal Botanical Atelier (Sculpting Living Petals) ── */}
-      <section className="mx-auto grid max-w-7xl scroll-mt-24 gap-12 px-5 py-24 sm:px-8 sm:py-28 lg:grid-cols-2 lg:items-center">
-        <motion.div {...reveal} className="relative">
-          <div className="aspect-[5/6] overflow-hidden rounded-[140px_28px_28px_28px] border-[8px] border-[#C5A15B]/30 bg-white shadow-[0_30px_70px_rgba(101,31,60,0.16)] backdrop-blur-xl dark:border-[#493640] dark:bg-[#231722]">
-            {eventImage ? (
+      {/* ── 4. SAME DAY FLOWER DELIVERY BANNER (reference right middle) ── */}
+      <motion.section {...reveal} className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+        <div className="relative overflow-hidden rounded-[32px] border border-[#C5A15B]/35 bg-gradient-to-r from-[#FAF5EE] via-[#F6ECE7] to-[#FAF5EE] dark:from-[#231722] dark:via-[#1B1019] dark:to-[#231722] p-8 sm:p-12 lg:p-16 shadow-[0_20px_60px_rgba(101,31,60,0.08)]">
+          <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+            <div>
+              <span className="inline-block rounded-full bg-[#C5A15B]/20 px-3.5 py-1 text-[10px] font-bold uppercase tracking-[0.25em] text-[#651F3C] dark:text-[#D5B36C]">
+                ✦ Express Service
+              </span>
+              <h2 className="mt-4 text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-[#30232A] dark:text-white leading-tight">
+                {content.deliveryBanner?.title || "Same Day Flower Delivery"}
+              </h2>
+              <p className="mt-4 max-w-xl text-sm sm:text-base leading-relaxed text-[#51454B] dark:text-zinc-300">
+                {content.deliveryBanner?.subtitle ||
+                  "Beautiful flowers at your doorstep, right on time. We deliver all over Karur and all Tamil Nadu for birthdays, weddings, and urgent celebrations."}
+              </p>
+              <div className="mt-8 flex flex-wrap items-center gap-4">
+                <a
+                  href={content.deliveryBanner?.buttonLink || "https://wa.me/919942071721?text=Hello%20MIDHUNYAS!%20I%20need%20same%20day%20flower%20delivery."}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full bg-[#25D366] hover:bg-[#20ba59] px-7 py-3 text-sm font-bold text-white shadow-lg shadow-green-600/20 active:scale-95 transition-all"
+                >
+                  <FaWhatsapp className="text-base" /> {content.deliveryBanner?.buttonLabel || "Order on WhatsApp →"}
+                </a>
+                <Link
+                  to="/gallery"
+                  className="inline-flex items-center gap-2 rounded-full border border-[#C5A15B] px-6 py-3 text-sm font-bold text-[#651F3C] dark:text-[#D5B36C] hover:bg-white dark:hover:bg-white/10 transition-all"
+                >
+                  Browse Flowers
+                </Link>
+              </div>
+            </div>
+
+            {/* Right Photo */}
+            <div className="relative aspect-[16/10] overflow-hidden rounded-2xl border border-white/80 dark:border-[#493640] shadow-xl">
               <img
-                src={eventImage}
-                alt="Surreal botanical arrangement"
+                src={content.deliveryBanner?.image || "/gallery/bouquet/bouquet15.jpg"}
+                alt="Same day delivery"
                 className="h-full w-full object-cover image-enhanced"
                 loading="lazy"
               />
-            ) : (
-              <div className="grid h-full place-items-center bg-[#FAF5EE] text-sm text-[#81747A] dark:bg-[#211720] dark:text-zinc-400">Atelier image not set</div>
-            )}
-          </div>
-          <div className="absolute -bottom-7 -right-2 hidden w-56 rounded-2xl border border-[#C5A15B]/35 bg-white/95 p-5 shadow-2xl backdrop-blur-2xl dark:border-[#493640] dark:bg-[#1E1420]/95 sm:block">
-            <p className="text-3xl text-[#C5A15B] font-serif">"</p>
-            <p className="-mt-2 text-xs leading-5 text-[#51454B] dark:text-gray-300">
-              Every petal is woven with intention, belonging to your sacred celebration.
-            </p>
-          </div>
-        </motion.div>
-
-        <motion.div {...reveal} className="lg:pl-10">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-[#C5A15B] dark:text-[#D5B36C]">
-            ✦ The Botanical Atelier
-          </p>
-          <h2 className="mt-4 text-4xl sm:text-5xl font-medium leading-[1.05] text-[#30232A] dark:text-white">
-            Sculpting Dreams from <span className="bg-gradient-to-r from-[#651F3C] to-[#C5A15B] bg-clip-text text-transparent italic font-serif">Living Petals</span>.
-          </h2>
-          <p className="mt-6 max-w-lg leading-8 text-[#51454B] dark:text-zinc-300">
-            From heirloom-inspired bridal jadai and royal lotus dollars to atmospheric venue styling, we harmonize natural blooms into living poetry.
-          </p>
-          <div className="mt-8 grid gap-4 sm:grid-cols-2">
-            {[
-              "Personal Floral Consultation",
-              "Bespoke Color Harmony",
-              "Fresh Premium Harvest",
-              "Express Setup Across Tamil Nadu"
-            ].map((item) => (
-              <p key={item} className="flex items-center gap-3 text-sm font-medium text-[#51454B] dark:text-gray-200">
-                <span className="grid h-6 w-6 place-items-center rounded-full bg-[#FAF5EE] border border-[#C5A15B]/30 text-[#651F3C] dark:bg-[#30232A] dark:text-[#D5B36C]">
-                  <FiCheck className="text-xs" />
-                </span>
-                {item}
-              </p>
-            ))}
-          </div>
-          <Link to="/contact" className="btn-luxury mt-9 inline-flex">
-            Consult the Atelier <FiArrowRight />
-          </Link>
-        </motion.div>
-      </section>
-
-      {/* ── 6. Surreal Aurora Custom Creation Banner ── */}
-      <section className="px-5 py-10 sm:px-8">
-        <motion.div
-          {...reveal}
-          className="relative mx-auto max-w-7xl overflow-hidden rounded-[36px] bg-gradient-to-r from-[#2B121E] via-[#1D0C15] to-[#361626] px-6 py-16 text-white shadow-[0_30px_90px_rgba(43,18,30,0.45)] sm:px-12 lg:px-20 lg:py-20 border-2 border-[#C5A15B]/40"
-        >
-          <div className="surreal-orb top-[-50px] right-[10%] w-[350px] h-[350px] bg-[#651F3C]/30" />
-          <div className="surreal-orb bottom-[-50px] left-[10%] w-[400px] h-[400px] bg-[#C5A15B]/20" />
-
-          <div className="relative grid gap-10 lg:grid-cols-[1fr_auto] lg:items-center">
-            <div className="max-w-3xl">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-[#C5A15B]">
-                ✦ Your Imagination in Bloom
-              </p>
-              <h2 className="mt-4 text-3xl sm:text-5xl font-medium leading-tight">
-                Conjure a floral design that is <span className="italic font-serif text-[#C5A15B]">entirely yours</span>.
-              </h2>
-              <p className="mt-5 max-w-2xl leading-7 text-white/85 text-sm sm:text-base">
-                Share your mood, colors, flowers, and message. Our master florists will handcraft your vision into a living masterpiece.
-              </p>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+              <div className="absolute bottom-4 left-4 rounded-xl bg-white/90 dark:bg-black/80 px-4 py-2 backdrop-blur shadow">
+                <p className="text-xs font-bold text-[#651F3C] dark:text-[#D5B36C]">Fast Karur Dispatch</p>
+                <p className="text-[10px] text-[#81747A] dark:text-zinc-400">Doorstep delivery within hours</p>
+              </div>
             </div>
-            <Link
-              to="/gallery"
-              className="inline-flex h-14 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#651F3C] via-[#C5A15B] to-[#651F3C] px-8 text-sm font-bold uppercase tracking-wider text-white shadow-xl transition hover:scale-105"
-            >
-              Start Creating <FiArrowRight />
-            </Link>
           </div>
-        </motion.div>
-      </section>
-
-      {/* ── 7. Inspiration Gallery (Whispers of Bloom) ── */}
-      <motion.section {...reveal} className="mx-auto max-w-7xl px-5 py-24 sm:px-8 sm:py-28">
-        <SectionHeading
-          eyebrow="The Atelier Edit"
-          title="Echoes of Floral Inspiration"
-          copy="Actual botanical works handcrafted for memorable unions in Karur and beyond."
-        />
-        <div className="mt-14 grid auto-rows-[250px] gap-4 sm:grid-cols-3 sm:auto-rows-[230px]">
-          {inspirationTiles.map((tile, index) => (
-            <Link
-              key={tile.id || tile.src || index}
-              to="/gallery"
-              className={`group relative overflow-hidden rounded-[26px] border border-[#E8DDD5] hover:border-[#C5A15B]/70 shadow-md dark:border-[#493640] transition-colors ${tile.className || ""}`}
-            >
-              {tile.src ? (
-                <img
-                  src={tile.src}
-                  alt={tile.label}
-                  className="h-full w-full object-cover transition duration-700 group-hover:scale-110 image-enhanced"
-                  loading="lazy"
-                />
-              ) : (
-                <div className="grid h-full place-items-center bg-[#FAF5EE] text-sm text-[#81747A] dark:bg-[#211720] dark:text-zinc-400">No image</div>
-              )}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent" />
-              <p className="absolute bottom-5 left-5 text-xl font-serif font-medium text-white group-hover:text-[#C5A15B] transition-colors">
-                {tile.label}
-              </p>
-            </Link>
-          ))}
         </div>
       </motion.section>
 
-      {/* ── 8. Kind Words (Love Notes in Petals) ── */}
-      <section className="bg-gradient-to-b from-[#FAF5EE] via-[#F6ECE7]/70 to-[#FAF5EE] px-5 py-24 dark:from-[#160F17] dark:via-[#221721] dark:to-[#160F17] backdrop-blur-md sm:px-8 sm:py-28 border-t border-[#C5A15B]/25 dark:border-[#493640]/40">
-        <motion.div {...reveal} className="mx-auto max-w-7xl">
-          <SectionHeading
-            eyebrow="Heartfelt Reveries"
-            title="Love Notes Delivered"
-            copy="The deepest joy of our art is gracing the moments that define your life."
-          />
-          <div className="mt-12 grid gap-6 md:grid-cols-3">
-            {reviews.map((review) => (
-              <article
-                key={review.name}
-                className="rounded-[26px] border border-[#E8DDD5] bg-white p-7 shadow-lg backdrop-blur-xl dark:border-[#493640] dark:bg-[#231722] sm:p-8 hover:border-[#C5A15B]/50 transition-colors"
+      {/* ── 5. FLOWERS THAT SPEAK YOUR HEART (Split Promo Banner, reference left middle-bottom) ── */}
+      <motion.section {...reveal} className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
+        <div className="grid gap-8 lg:grid-cols-2 lg:items-center rounded-[32px] border border-[#E8DDD5] bg-white p-8 sm:p-12 shadow-sm dark:border-[#493640] dark:bg-[#231722]">
+          <div>
+            <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#C5A15B] dark:text-[#D5B36C]">
+              ✦ {content.midBanner?.eyebrow || "FLOWERS THAT SPEAK YOUR HEART"}
+            </span>
+            <h2 className="mt-3 text-3xl sm:text-4xl font-serif font-bold text-[#30232A] dark:text-white leading-tight">
+              {content.midBanner?.title || "Flowers That Speak Your Heart"}
+            </h2>
+            <p className="mt-4 text-sm sm:text-base leading-relaxed text-[#51454B] dark:text-zinc-300">
+              {content.midBanner?.subtitle ||
+                "From birthdays to 'just because' to sacred weddings, find your perfect bouquet handcrafted fresh."}
+            </p>
+            <div className="mt-8">
+              <Link
+                to={content.midBanner?.buttonLink || "/gallery"}
+                className="inline-flex items-center gap-2 rounded-full bg-[#651F3C] px-7 py-3 text-xs font-bold uppercase tracking-wider text-white shadow-md hover:bg-[#4D172D] active:scale-95 transition-all"
               >
+                {content.midBanner?.buttonLabel || "Explore Collections →"}
+              </Link>
+            </div>
+          </div>
+
+          <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-[#E8DDD5] dark:border-[#493640]">
+            <img
+              src={content.midBanner?.image || "/gallery/bouquet/bouquet12.jpg"}
+              alt="Flowers that speak your heart"
+              className="h-full w-full object-cover image-enhanced"
+              loading="lazy"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent" />
+            <div className="absolute bottom-4 right-4 rounded-xl bg-white/95 dark:bg-black/85 p-3.5 shadow-xl max-w-[200px]">
+              <p className="font-serif italic text-xs font-bold text-[#651F3C] dark:text-[#D5B36C]">
+                {content.midBanner?.badgeText || "More Love Less Ordinary ♡"}
+              </p>
+            </div>
+          </div>
+        </div>
+      </motion.section>
+
+      {/* ── 6. OUR COLLECTION (Tabbed filter grid, reference left bottom) ── */}
+      <motion.section {...reveal} className="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
+        <SectionHeading
+          title="Our Collection"
+          copy="Explore our catalog of hand-tied bouquets, bridal crowns, and celebration flowers."
+        />
+
+        {/* Filter Pills */}
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-2">
+          {collectionCategories.map((cat) => (
+            <button
+              key={cat.key}
+              type="button"
+              onClick={() => setActiveCollectionTab(cat.key)}
+              className={`rounded-full px-5 py-2 text-xs font-bold uppercase tracking-wider transition-all ${
+                activeCollectionTab === cat.key
+                  ? "bg-[#651F3C] text-white shadow-md"
+                  : "bg-white text-[#51454B] border border-[#E8DDD5] hover:border-[#C5A15B] dark:bg-[#231722] dark:text-zinc-300 dark:border-[#493640]"
+              }`}
+            >
+              {cat.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Product Grid */}
+        <div className="mt-10 grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-4">
+          {filteredCollection.map((product) => (
+            <ProductCardItem key={product._id || product.id} product={product} />
+          ))}
+        </div>
+
+        <div className="mt-12 text-center">
+          <Link
+            to="/gallery"
+            className="inline-flex items-center gap-2 rounded-full border border-[#C5A15B] bg-white dark:bg-[#231722] px-8 py-3 text-xs font-bold uppercase tracking-wider text-[#651F3C] dark:text-[#D5B36C] hover:bg-[#651F3C] hover:text-white transition-all shadow-sm"
+          >
+            Explore Complete Atelier Gallery <FiArrowRight />
+          </Link>
+        </div>
+      </motion.section>
+
+      {/* ── 7. WHY CHOOSE MIDHUNYAS? (reference right lower-middle) ── */}
+      <motion.section {...reveal} className="bg-gradient-to-b from-[#FAF5EE] via-[#F6ECE7] to-[#FAF5EE] dark:from-[#160F17] dark:via-[#221620] dark:to-[#160F17] border-y border-[#C5A15B]/20 py-20 sm:py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <SectionHeading
+            title="Why Choose Midhunyas?"
+            copy="More than flowers, we deliver feelings."
+          />
+
+          <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {(content.whyChooseUs || defaultHomeWhyChooseUs).map((item, idx) => (
+              <div
+                key={item.id || idx}
+                className="rounded-2xl border border-[#E8DDD5] bg-white p-6 text-center shadow-sm hover:shadow-md hover:border-[#C5A15B] transition-all dark:border-[#493640] dark:bg-[#231722]"
+              >
+                <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-[#FAF5EE] dark:bg-[#30202B] text-[#651F3C] dark:text-[#D5B36C] border border-[#C5A15B]/30 shadow-sm">
+                  {idx === 0 && <FiFeather className="text-2xl" />}
+                  {idx === 1 && <FiTruck className="text-2xl" />}
+                  {idx === 2 && <FiHeart className="text-2xl" />}
+                  {idx === 3 && <FiGift className="text-2xl" />}
+                </div>
+                <h3 className="mt-4 font-serif text-lg font-bold text-[#30232A] dark:text-white">
+                  {item.title}
+                </h3>
+                <p className="mt-2 text-xs leading-relaxed text-[#81747A] dark:text-zinc-400">
+                  {item.note}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </motion.section>
+
+      {/* ── 8. WHAT OUR CUSTOMERS SAY (reference right bottom) ── */}
+      <motion.section {...reveal} className="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
+        <SectionHeading
+          title="What Our Customers Say"
+          copy="Real stories. Real happiness."
+        />
+
+        <div className="mt-12 grid gap-6 md:grid-cols-3">
+          {customerReviews.map((review) => (
+            <article
+              key={review.name}
+              className="rounded-2xl border border-[#E8DDD5] bg-white p-6 shadow-sm hover:shadow-md hover:border-[#C5A15B]/60 transition-all dark:border-[#493640] dark:bg-[#231722] flex flex-col justify-between"
+            >
+              <div>
                 <div className="flex gap-1 text-[#C5A15B]">
                   {Array.from({ length: 5 }).map((_, i) => (
                     <FiStar key={i} fill="currentColor" />
                   ))}
                 </div>
-                <p className="mt-6 text-xl sm:text-2xl font-serif italic leading-8 text-[#30232A] dark:text-gray-100">
+                <p className="mt-4 font-serif italic text-base leading-relaxed text-[#30232A] dark:text-zinc-200">
                   "{review.quote}"
                 </p>
-                <div className="mt-7 border-t border-[#E8DDD5] pt-5 dark:border-[#493640]">
-                  <p className="text-sm font-bold text-[#30232A] dark:text-white">{review.name}</p>
-                  <p className="mt-0.5 text-xs text-[#81747A] dark:text-zinc-400">{review.event}</p>
+              </div>
+              <div className="mt-6 flex items-center gap-3 border-t border-[#E8DDD5] pt-4 dark:border-[#493640]">
+                <img
+                  src={review.avatar}
+                  alt={review.name}
+                  className="h-10 w-10 rounded-full object-cover border border-[#C5A15B]/40"
+                />
+                <div>
+                  <p className="text-xs font-bold text-[#30232A] dark:text-white">{review.name}</p>
+                  <p className="text-[10px] text-[#81747A] dark:text-zinc-400">{review.event}</p>
                 </div>
-              </article>
-            ))}
-          </div>
-          <div className="mt-10 text-center">
-            <Link to="/reviews" className="inline-flex items-center gap-2 text-sm font-bold text-[#651F3C] hover:text-[#C5A15B] transition-colors">
-              Read Every Love Note <FiArrowRight />
-            </Link>
-          </div>
-        </motion.div>
-      </section>
+              </div>
+            </article>
+          ))}
+        </div>
+      </motion.section>
 
-      {content.promotionalSections?.length > 0 && (
-        <section className="mx-auto max-w-7xl px-5 pb-24 sm:px-8">
-          <div className="grid gap-4 md:grid-cols-3">
-            {content.promotionalSections.map((section) => (
-              <article key={section.id} className="rounded-[22px] border border-[#E8DDD5] bg-white p-7 shadow-md backdrop-blur-xl dark:border-[#493640] dark:bg-[#231722]">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#651F3C] dark:text-[#D5B36C]">Atelier Special</p>
-                <h3 className="mt-3 text-2xl font-serif text-[#30232A] dark:text-white">{section.title}</h3>
-                <p className="mt-3 text-sm leading-7 text-[#51454B] dark:text-zinc-400">{section.description}</p>
-              </article>
-            ))}
+      {/* ── 9. JOIN OUR FLORAL COMMUNITY (reference right bottom banner) ── */}
+      <motion.section {...reveal} className="mx-auto max-w-7xl px-4 pb-20 sm:px-6 sm:pb-24 lg:px-8">
+        <div className="relative overflow-hidden rounded-[32px] border border-[#C5A15B]/30 bg-gradient-to-r from-[#FAF5EE] via-[#F6ECE7] to-[#FAF5EE] dark:from-[#231722] dark:via-[#1D121B] dark:to-[#231722] p-8 sm:p-12 text-center shadow-sm">
+          <div className="mx-auto max-w-xl">
+            <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[#651F3C] dark:text-[#D5B36C]">
+              Join Our Floral Community
+            </h2>
+            <p className="mt-2 text-xs sm:text-sm text-[#51454B] dark:text-zinc-300">
+              Get exclusive offers, flower care tips, and new arrivals straight to your inbox.
+            </p>
+
+            <form onSubmit={handleNewsletterSubmit} className="mt-6 flex flex-col sm:flex-row gap-2 max-w-md mx-auto">
+              <input
+                type="email"
+                required
+                value={newsletterEmail}
+                onChange={(e) => setNewsletterEmail(e.target.value)}
+                placeholder="Enter your email address"
+                className="flex-1 rounded-full border border-[#E8DDD5] bg-white px-4 py-2.5 text-xs text-[#30232A] outline-none focus:border-[#651F3C] dark:border-[#493640] dark:bg-[#1E1420] dark:text-white"
+              />
+              <button
+                type="submit"
+                className="rounded-full bg-[#651F3C] px-6 py-2.5 text-xs font-bold text-white hover:bg-[#4D172D] transition-all shrink-0 active:scale-95 shadow-md"
+              >
+                Subscribe →
+              </button>
+            </form>
           </div>
-        </section>
-      )}
+        </div>
+      </motion.section>
     </div>
   );
 };

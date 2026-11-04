@@ -34,21 +34,65 @@ const defaultHomeFallbackProductImages = [
   "/gallery/bouquet/bouquet7.jpg",
 ];
 
+const defaultHomeOccasionTiles = [
+  { id: "occasion-1", name: "Birthday", note: "Joyful blooms to make their day brighter", image: "/gallery/bouquet/bouquet1.jpg", link: "/gallery?occasion=birthday" },
+  { id: "occasion-2", name: "Anniversary", note: "Romantic arrangements celebrating eternal love", image: "/gallery/bouquet/bouquet13.jpg", link: "/gallery?occasion=anniversary" },
+  { id: "occasion-3", name: "Congratulations", note: "Vibrant blossoms for milestones and success", image: "/gallery/bouquet/bouquet4.jpg", link: "/gallery?occasion=congratulations" },
+  { id: "occasion-4", name: "Love & Romance", note: "Deep crimson roses and blushing reveries", image: "/gallery/bouquet/bouquet7.jpg", link: "/gallery?occasion=romance" },
+  { id: "occasion-5", name: "Bridal & Wedding", note: "Sacred wedding florals, malai, and hair jadai", image: "/gallery/bridal/flower11.jpg", link: "/gallery?occasion=bridal" },
+  { id: "occasion-6", name: "Temple & Traditional", note: "Heirloom garlands and stage flower decor", image: "/gallery/garlands/garland1.jpg", link: "/gallery?occasion=traditional" },
+];
+
+const defaultDeliveryBanner = {
+  title: "Same Day Flower Delivery",
+  subtitle: "Beautiful flowers at your doorstep, right on time. We deliver all over Karur and Tamil Nadu.",
+  buttonLabel: "Order on WhatsApp →",
+  buttonLink: "https://wa.me/919942071721?text=Hello%20MIDHUNYAS%20Petals!%20I%20would%20like%20to%20order%20same%20day%20flower%20delivery.",
+  image: "/gallery/bouquet/bouquet15.jpg",
+};
+
+const defaultMidBanner = {
+  eyebrow: "FLOWERS THAT SPEAK YOUR HEART",
+  title: "Flowers That Speak Your Heart",
+  subtitle: "From birthdays to 'just because' to sacred weddings, find your perfect bouquet.",
+  buttonLabel: "Explore Collections →",
+  buttonLink: "/gallery",
+  badgeText: "More Love Less Ordinary ♡",
+  image: "/gallery/bouquet/bouquet12.jpg",
+};
+
+const defaultOfferPopup = {
+  enabled: true,
+  badge: "LIMITED TIME EXCLUSIVE OFFER ✦",
+  title: "Flat 15% OFF On Your Order",
+  subtitle: "Welcome to MIDHUNYAS Petals & Bridal Flowers",
+  description: "Handcrafted bridal flowers, luxury bouquets, and elegant stage decor. Fresh blossoms harvested daily across Karur & Tamil Nadu.",
+  couponCode: "MIDHUNYAS15",
+  buttonLabel: "Claim 15% Off & Shop Now →",
+  buttonLink: "/gallery",
+  whatsappMessage: "Hello MIDHUNYAS! I would like to claim 15% OFF with coupon code MIDHUNYAS15 for my order.",
+  image: "/gallery/bouquet/bouquet13.jpg",
+};
+
 const createDefaultHomeContent = () => ({
-  heroText: "",
-  heroDescription: "",
-  badgeText: "",
-  primaryButtonLabel: "",
-  primaryButtonLink: "",
-  secondaryButtonLabel: "",
-  secondaryButtonLink: "",
-  features: [],
-  floatingBadgeTitle: "",
-  floatingBadgeSubtitle: "",
-  banners: [],
+  heroText: "Flowers for A Kinder World",
+  heroDescription: "Handcrafted bouquets, elegant bridal jadai, and floral experiences tailored to your celebration. Delivered fresh across Karur and all Tamil Nadu.",
+  badgeText: "FLOWERS. HAPPIER DAYS.",
+  primaryButtonLabel: "Shop Now →",
+  primaryButtonLink: "/gallery",
+  secondaryButtonLabel: "Custom Order",
+  secondaryButtonLink: "/contact",
+  features: ["Same Day Delivery", "Freshness Guaranteed", "Made With Love"],
+  floatingBadgeTitle: "Good Flowers Brighter Days ♡",
+  floatingBadgeSubtitle: "Handcrafted with love in Karur",
+  banners: ["/gallery/bouquet/bouquet13.jpg", "/gallery/bouquet/bouquet1.jpg", "/gallery/bouquet/bouquet12.jpg"],
   featuredProductIds: [],
   promotionalSections: [],
   categoryTiles: defaultHomeCategoryTiles,
+  occasionTiles: defaultHomeOccasionTiles,
+  deliveryBanner: defaultDeliveryBanner,
+  midBanner: defaultMidBanner,
+  offerPopup: defaultOfferPopup,
   eventImage: "/gallery/bouquet/bouquet6.jpg",
   inspirationTiles: defaultHomeInspirationTiles,
   fallbackProductImages: defaultHomeFallbackProductImages,
@@ -115,9 +159,14 @@ const AdminDashboardPage = () => {
   const [contactContent, setContactContent] = useState(createDefaultContactContent());
   const [homeBannerFiles, setHomeBannerFiles] = useState([]);
   const [homeCategoryImageFiles, setHomeCategoryImageFiles] = useState({});
+  const [homeOccasionImageFiles, setHomeOccasionImageFiles] = useState({});
   const [homeEventImageFile, setHomeEventImageFile] = useState(null);
+  const [homeOfferPosterFile, setHomeOfferPosterFile] = useState(null);
+  const [homeMidBannerFile, setHomeMidBannerFile] = useState(null);
+  const [homeDeliveryBannerFile, setHomeDeliveryBannerFile] = useState(null);
   const [homeInspirationImageFiles, setHomeInspirationImageFiles] = useState({});
   const [homeFallbackProductImageFiles, setHomeFallbackProductImageFiles] = useState({});
+  const [showOfferPreview, setShowOfferPreview] = useState(false);
   const [aboutHeroFile, setAboutHeroFile] = useState(null);
   const [aboutGalleryFiles, setAboutGalleryFiles] = useState([]);
 
@@ -404,8 +453,15 @@ const AdminDashboardPage = () => {
     const payload = { bannerFiles: homeBannerFiles };
 
     if (homeEventImageFile) payload.homeEventImageFile = homeEventImageFile;
+    if (homeOfferPosterFile) payload.offerPosterImageFile = homeOfferPosterFile;
+    if (homeMidBannerFile) payload.midBannerImageFile = homeMidBannerFile;
+    if (homeDeliveryBannerFile) payload.deliveryBannerImageFile = homeDeliveryBannerFile;
+
     Object.entries(homeCategoryImageFiles).forEach(([index, file]) => {
       if (file) payload[`homeCategoryImage_${index}`] = file;
+    });
+    Object.entries(homeOccasionImageFiles).forEach(([index, file]) => {
+      if (file) payload[`homeOccasionImage_${index}`] = file;
     });
     Object.entries(homeInspirationImageFiles).forEach(([index, file]) => {
       if (file) payload[`homeInspirationImage_${index}`] = file;
@@ -424,6 +480,29 @@ const AdminDashboardPage = () => {
       return { ...current, [collection]: nextItems };
     });
 
+  const addOccasionTile = () => {
+    setHomeContent((current) => ({
+      ...current,
+      occasionTiles: [
+        ...(current.occasionTiles || []),
+        {
+          id: `occasion-${Date.now()}`,
+          name: "New Occasion",
+          note: "Handcrafted flowers",
+          image: "/gallery/bouquet/bouquet1.jpg",
+          link: "/gallery",
+        },
+      ],
+    }));
+  };
+
+  const removeOccasionTile = (index) => {
+    setHomeContent((current) => ({
+      ...current,
+      occasionTiles: (current.occasionTiles || []).filter((_, i) => i !== index),
+    }));
+  };
+
   const updateHomeFallbackImage = (index, value) =>
     setHomeContent((current) => {
       const nextImages = [...(current.fallbackProductImages || [])];
@@ -438,10 +517,14 @@ const AdminDashboardPage = () => {
       setHomeContent({ ...createDefaultHomeContent(), ...(updated || {}) });
       setHomeBannerFiles([]);
       setHomeCategoryImageFiles({});
+      setHomeOccasionImageFiles({});
       setHomeEventImageFile(null);
+      setHomeOfferPosterFile(null);
+      setHomeMidBannerFile(null);
+      setHomeDeliveryBannerFile(null);
       setHomeInspirationImageFiles({});
       setHomeFallbackProductImageFiles({});
-      toast.success("Home content updated");
+      toast.success("Home content & Offer Poster updated");
       await fetchAnalytics();
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to update home content");
@@ -755,8 +838,156 @@ const AdminDashboardPage = () => {
 
           <div className="flex-1 bg-white dark:bg-gray-800 p-6 rounded-xl shadow border border-gray-100 dark:border-gray-700">
             {contentTab === "home" && (
-              <form onSubmit={saveHomeContent} className="space-y-5">
-                <h2 className="text-xl font-bold dark:text-white border-b pb-2">Home Page Management</h2>
+              <form onSubmit={saveHomeContent} className="space-y-6">
+                <div className="flex items-center justify-between border-b pb-2">
+                  <h2 className="text-xl font-bold dark:text-white">Home Page Management</h2>
+                  <span className="text-xs text-[#651F3C] dark:text-[#D5B36C] font-semibold">PetalNest Layout Configuration</span>
+                </div>
+
+                {/* ── 0. OFFER POPUP POSTER MANAGEMENT ── */}
+                <div className="rounded-2xl border-2 border-[#C5A15B]/50 bg-gradient-to-br from-[#FAF5EE] to-white p-5 dark:from-[#231722] dark:to-[#1A111A] space-y-4 shadow-sm">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b pb-3 dark:border-gray-700">
+                    <div>
+                      <h3 className="font-bold text-base text-[#651F3C] dark:text-[#D5B36C] flex items-center gap-2">
+                        <span>🎉</span> Offer Poster Popup (Shows on Website Enter &amp; Refresh)
+                      </h3>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Controls the promotional offer poster shown when users open or refresh the site.</p>
+                    </div>
+                    <label className="inline-flex items-center gap-2 cursor-pointer bg-white dark:bg-gray-700 px-3.5 py-1.5 rounded-lg border border-[#C5A15B]/40 shadow-sm shrink-0">
+                      <input
+                        type="checkbox"
+                        checked={homeContent.offerPopup?.enabled !== false}
+                        onChange={(e) => setHomeContent({
+                          ...homeContent,
+                          offerPopup: { ...(homeContent.offerPopup || {}), enabled: e.target.checked }
+                        })}
+                        className="rounded text-[#651F3C] focus:ring-[#651F3C]"
+                      />
+                      <span className="text-xs font-bold text-gray-800 dark:text-gray-200">
+                        {homeContent.offerPopup?.enabled !== false ? "Popup Active ✓" : "Popup Disabled"}
+                      </span>
+                    </label>
+                  </div>
+
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div>
+                      <label className="block text-xs font-semibold mb-1 text-gray-700 dark:text-gray-300">Offer Title / Heading</label>
+                      <input
+                        className="w-full border p-2 rounded text-sm dark:bg-gray-700 dark:border-gray-600 font-bold"
+                        placeholder="Flat 15% OFF On Your Order"
+                        value={homeContent.offerPopup?.title || ""}
+                        onChange={(e) => setHomeContent({
+                          ...homeContent,
+                          offerPopup: { ...(homeContent.offerPopup || {}), title: e.target.value }
+                        })}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold mb-1 text-gray-700 dark:text-gray-300">Offer Subtitle</label>
+                      <input
+                        className="w-full border p-2 rounded text-sm dark:bg-gray-700 dark:border-gray-600"
+                        placeholder="Welcome to MIDHUNYAS Petals"
+                        value={homeContent.offerPopup?.subtitle || ""}
+                        onChange={(e) => setHomeContent({
+                          ...homeContent,
+                          offerPopup: { ...(homeContent.offerPopup || {}), subtitle: e.target.value }
+                        })}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid gap-4 md:grid-cols-3">
+                    <div>
+                      <label className="block text-xs font-semibold mb-1 text-gray-700 dark:text-gray-300">Promo Coupon Code</label>
+                      <input
+                        className="w-full border p-2 rounded text-sm font-mono font-bold text-[#651F3C] dark:text-[#D5B36C] dark:bg-gray-700 dark:border-gray-600"
+                        placeholder="MIDHUNYAS15"
+                        value={homeContent.offerPopup?.couponCode || ""}
+                        onChange={(e) => setHomeContent({
+                          ...homeContent,
+                          offerPopup: { ...(homeContent.offerPopup || {}), couponCode: e.target.value }
+                        })}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold mb-1 text-gray-700 dark:text-gray-300">Button Label</label>
+                      <input
+                        className="w-full border p-2 rounded text-sm dark:bg-gray-700 dark:border-gray-600"
+                        placeholder="Claim 15% Off & Shop Now →"
+                        value={homeContent.offerPopup?.buttonLabel || ""}
+                        onChange={(e) => setHomeContent({
+                          ...homeContent,
+                          offerPopup: { ...(homeContent.offerPopup || {}), buttonLabel: e.target.value }
+                        })}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold mb-1 text-gray-700 dark:text-gray-300">Button Link</label>
+                      <input
+                        className="w-full border p-2 rounded text-sm dark:bg-gray-700 dark:border-gray-600"
+                        placeholder="/gallery"
+                        value={homeContent.offerPopup?.buttonLink || ""}
+                        onChange={(e) => setHomeContent({
+                          ...homeContent,
+                          offerPopup: { ...(homeContent.offerPopup || {}), buttonLink: e.target.value }
+                        })}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold mb-1 text-gray-700 dark:text-gray-300">Offer Description</label>
+                    <textarea
+                      rows="2"
+                      className="w-full border p-2 rounded text-sm dark:bg-gray-700 dark:border-gray-600"
+                      placeholder="Handcrafted bridal flowers, luxury bouquets, and elegant stage decor..."
+                      value={homeContent.offerPopup?.description || ""}
+                      onChange={(e) => setHomeContent({
+                        ...homeContent,
+                        offerPopup: { ...(homeContent.offerPopup || {}), description: e.target.value }
+                      })}
+                    />
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row items-center gap-4 border-t pt-3 dark:border-gray-700">
+                    <div className="w-24 h-24 rounded-xl overflow-hidden border border-[#C5A15B]/40 bg-gray-100 shrink-0">
+                      <img
+                        src={homeContent.offerPopup?.image || "/gallery/bouquet/bouquet13.jpg"}
+                        alt="Offer Poster Preview"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="flex-1 space-y-2 w-full">
+                      <p className="text-xs font-medium text-gray-600 dark:text-gray-300">
+                        Poster Image Path or Direct URL:
+                      </p>
+                      <input
+                        type="text"
+                        className="w-full border p-2 rounded text-xs dark:bg-gray-700 dark:border-gray-600"
+                        value={homeContent.offerPopup?.image || ""}
+                        onChange={(e) => setHomeContent({
+                          ...homeContent,
+                          offerPopup: { ...(homeContent.offerPopup || {}), image: e.target.value }
+                        })}
+                        placeholder="/gallery/bouquet/bouquet13.jpg or https://..."
+                      />
+                      <div className="flex items-center gap-3">
+                        <label className="cursor-pointer rounded-lg bg-[#651F3C] px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-[#4D172D] transition-colors">
+                          Upload New Poster Image File
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => setHomeOfferPosterFile(e.target.files?.[0] || null)}
+                          />
+                        </label>
+                        {homeOfferPosterFile && (
+                          <span className="text-xs font-bold text-emerald-600">{homeOfferPosterFile.name} ready to upload!</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
                 <div className="grid gap-4 md:grid-cols-2">
                   <div>
@@ -990,6 +1221,193 @@ const AdminDashboardPage = () => {
                         </div>
                       </div>
                     ))}
+                  </div>
+                </div>
+
+                {/* ── SHOP BY OCCASION MANAGEMENT ── */}
+                <div className="space-y-4 rounded-2xl border border-gray-200 p-5 dark:border-gray-700 bg-white dark:bg-gray-800">
+                  <div className="flex items-center justify-between border-b pb-2 dark:border-gray-700">
+                    <div>
+                      <h3 className="font-bold text-base text-[#30232A] dark:text-white">Shop by Occasion Cards</h3>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Cards shown in the "Shop by Occasion" section on the landing page.</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={addOccasionTile}
+                      className="flex items-center gap-1.5 rounded-lg bg-[#F5EAE9] px-3 py-1.5 text-xs font-bold text-[#651F3C] hover:bg-[#C5A15B] hover:text-white transition-colors"
+                    >
+                      <FaPlus /> Add Occasion
+                    </button>
+                  </div>
+
+                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    {(homeContent.occasionTiles || defaultHomeOccasionTiles).map((tile, index) => (
+                      <div key={tile.id || index} className="rounded-xl border border-gray-200 p-3.5 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/80">
+                        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg bg-gray-100">
+                          <img src={tile.image || "/gallery/bouquet/bouquet1.jpg"} alt={tile.name} className="h-full w-full object-cover" />
+                          <button
+                            type="button"
+                            onClick={() => removeOccasionTile(index)}
+                            className="absolute top-2 right-2 rounded-full bg-white/90 p-1.5 text-red-500 shadow hover:bg-red-50"
+                          >
+                            <FaTrash className="text-xs" />
+                          </button>
+                        </div>
+                        {homeOccasionImageFiles[index] && (
+                          <p className="mt-1 text-xs font-bold text-emerald-600">{homeOccasionImageFiles[index].name} ready.</p>
+                        )}
+                        <div className="mt-3 space-y-2">
+                          <input
+                            className="w-full border p-1.5 rounded text-xs font-bold dark:bg-gray-700 dark:border-gray-600"
+                            placeholder="Occasion Name"
+                            value={tile.name || ""}
+                            onChange={(e) => updateHomeListItem("occasionTiles", index, "name", e.target.value)}
+                          />
+                          <input
+                            className="w-full border p-1.5 rounded text-xs text-gray-600 dark:bg-gray-700 dark:border-gray-600"
+                            placeholder="Image Path (/gallery/...)"
+                            value={tile.image || ""}
+                            onChange={(e) => updateHomeListItem("occasionTiles", index, "image", e.target.value)}
+                          />
+                          <input
+                            className="w-full border p-1.5 rounded text-xs text-gray-600 dark:bg-gray-700 dark:border-gray-600"
+                            placeholder="Link (/gallery?occasion=...)"
+                            value={tile.link || ""}
+                            onChange={(e) => updateHomeListItem("occasionTiles", index, "link", e.target.value)}
+                          />
+                          <label className="block text-center cursor-pointer rounded-lg bg-[#FAF5EE] dark:bg-gray-700 px-3 py-1.5 text-xs font-semibold text-[#651F3C] dark:text-[#D5B36C] border border-[#C5A15B]/30 hover:bg-[#F5EAE9]">
+                            Upload / Replace Photo
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={(e) => setHomeOccasionImageFiles((curr) => ({ ...curr, [index]: e.target.files?.[0] || null }))}
+                            />
+                          </label>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* ── DELIVERY BANNER & MID-PAGE BANNER MANAGEMENT ── */}
+                <div className="grid gap-6 md:grid-cols-2">
+                  {/* Delivery Banner */}
+                  <div className="rounded-2xl border border-gray-200 p-5 dark:border-gray-700 space-y-3 bg-white dark:bg-gray-800">
+                    <h3 className="font-bold text-sm text-[#30232A] dark:text-white">Same Day Delivery Banner</h3>
+                    <input
+                      className="w-full border p-2 rounded text-xs font-semibold dark:bg-gray-700 dark:border-gray-600"
+                      placeholder="Title"
+                      value={homeContent.deliveryBanner?.title || ""}
+                      onChange={(e) => setHomeContent({
+                        ...homeContent,
+                        deliveryBanner: { ...(homeContent.deliveryBanner || {}), title: e.target.value }
+                      })}
+                    />
+                    <textarea
+                      rows="2"
+                      className="w-full border p-2 rounded text-xs dark:bg-gray-700 dark:border-gray-600"
+                      placeholder="Subtitle"
+                      value={homeContent.deliveryBanner?.subtitle || ""}
+                      onChange={(e) => setHomeContent({
+                        ...homeContent,
+                        deliveryBanner: { ...(homeContent.deliveryBanner || {}), subtitle: e.target.value }
+                      })}
+                    />
+                    <div className="flex gap-2">
+                      <input
+                        className="w-1/2 border p-2 rounded text-xs dark:bg-gray-700 dark:border-gray-600"
+                        placeholder="Button Label"
+                        value={homeContent.deliveryBanner?.buttonLabel || ""}
+                        onChange={(e) => setHomeContent({
+                          ...homeContent,
+                          deliveryBanner: { ...(homeContent.deliveryBanner || {}), buttonLabel: e.target.value }
+                        })}
+                      />
+                      <input
+                        className="w-1/2 border p-2 rounded text-xs dark:bg-gray-700 dark:border-gray-600"
+                        placeholder="Button Link / WhatsApp URL"
+                        value={homeContent.deliveryBanner?.buttonLink || ""}
+                        onChange={(e) => setHomeContent({
+                          ...homeContent,
+                          deliveryBanner: { ...(homeContent.deliveryBanner || {}), buttonLink: e.target.value }
+                        })}
+                      />
+                    </div>
+                    {homeContent.deliveryBanner?.image && (
+                      <img src={homeContent.deliveryBanner.image} alt="Delivery banner" className="h-28 w-full object-cover rounded-lg" />
+                    )}
+                    <div className="flex items-center gap-2">
+                      <label className="cursor-pointer rounded-lg bg-[#F5EAE9] px-3 py-1.5 text-xs font-semibold text-[#651F3C]">
+                        Upload / Replace Image
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => setHomeDeliveryBannerFile(e.target.files?.[0] || null)}
+                        />
+                      </label>
+                      {homeDeliveryBannerFile && <span className="text-xs text-emerald-600 font-bold">{homeDeliveryBannerFile.name} ready</span>}
+                    </div>
+                  </div>
+
+                  {/* Mid-Page Banner */}
+                  <div className="rounded-2xl border border-gray-200 p-5 dark:border-gray-700 space-y-3 bg-white dark:bg-gray-800">
+                    <h3 className="font-bold text-sm text-[#30232A] dark:text-white">Mid-Page Banner ("Flowers That Speak Your Heart")</h3>
+                    <input
+                      className="w-full border p-2 rounded text-xs font-semibold dark:bg-gray-700 dark:border-gray-600"
+                      placeholder="Title"
+                      value={homeContent.midBanner?.title || ""}
+                      onChange={(e) => setHomeContent({
+                        ...homeContent,
+                        midBanner: { ...(homeContent.midBanner || {}), title: e.target.value }
+                      })}
+                    />
+                    <textarea
+                      rows="2"
+                      className="w-full border p-2 rounded text-xs dark:bg-gray-700 dark:border-gray-600"
+                      placeholder="Subtitle"
+                      value={homeContent.midBanner?.subtitle || ""}
+                      onChange={(e) => setHomeContent({
+                        ...homeContent,
+                        midBanner: { ...(homeContent.midBanner || {}), subtitle: e.target.value }
+                      })}
+                    />
+                    <div className="flex gap-2">
+                      <input
+                        className="w-1/2 border p-2 rounded text-xs dark:bg-gray-700 dark:border-gray-600"
+                        placeholder="Button Label"
+                        value={homeContent.midBanner?.buttonLabel || ""}
+                        onChange={(e) => setHomeContent({
+                          ...homeContent,
+                          midBanner: { ...(homeContent.midBanner || {}), buttonLabel: e.target.value }
+                        })}
+                      />
+                      <input
+                        className="w-1/2 border p-2 rounded text-xs dark:bg-gray-700 dark:border-gray-600"
+                        placeholder="Badge Text"
+                        value={homeContent.midBanner?.badgeText || ""}
+                        onChange={(e) => setHomeContent({
+                          ...homeContent,
+                          midBanner: { ...(homeContent.midBanner || {}), badgeText: e.target.value }
+                        })}
+                      />
+                    </div>
+                    {homeContent.midBanner?.image && (
+                      <img src={homeContent.midBanner.image} alt="Mid banner" className="h-28 w-full object-cover rounded-lg" />
+                    )}
+                    <div className="flex items-center gap-2">
+                      <label className="cursor-pointer rounded-lg bg-[#F5EAE9] px-3 py-1.5 text-xs font-semibold text-[#651F3C]">
+                        Upload / Replace Image
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => setHomeMidBannerFile(e.target.files?.[0] || null)}
+                        />
+                      </label>
+                      {homeMidBannerFile && <span className="text-xs text-emerald-600 font-bold">{homeMidBannerFile.name} ready</span>}
+                    </div>
                   </div>
                 </div>
 

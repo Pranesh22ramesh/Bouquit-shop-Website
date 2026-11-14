@@ -113,7 +113,7 @@ async function main() {
   console.log('Seeding database...');
   
   // Seed admin user
-  const adminEmail = (process.env.ADMIN_EMAIL || 'miudhunyas2012@gmail.com').toLowerCase();
+  const adminEmail = (process.env.ADMIN_EMAIL || 'midhunyas2012karur@gmail.com').toLowerCase();
   const adminPassword = process.env.ADMIN_PASSWORD;
 
   if (!adminPassword && process.env.NODE_ENV === 'production') {

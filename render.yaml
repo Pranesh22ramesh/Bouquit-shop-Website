@@ -38,3 +38,4 @@ services:
         value: midhunyas2012karur@gmail.com
       - key: ADMIN_PASSWORD
         sync: false
+

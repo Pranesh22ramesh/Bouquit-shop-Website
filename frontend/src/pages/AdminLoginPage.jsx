@@ -32,11 +32,19 @@ const AdminLoginPage = () => {
   const mutation = useMutation({
     mutationFn: adminLogin,
     onSuccess: () => {
-      toast.success("Admin login successful");
+      toast.success("Admin login successful! Welcome back.");
       navigate("/admin", { replace: true });
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message || error.message || "Admin login failed");
+      if (error.response?.status === 404) {
+        toast.error("Backend server is waking up on Render. Please wait 30 seconds and try again.");
+      } else if (error.response?.status === 401) {
+        toast.error("Invalid admin email or password. Please verify your credentials.");
+      } else if (error.response?.status === 403) {
+        toast.error(error.response?.data?.message || "Access denied. Only the configured administrator can log in.");
+      } else {
+        toast.error(error.response?.data?.message || error.message || "Admin login failed");
+      }
     },
   });
 

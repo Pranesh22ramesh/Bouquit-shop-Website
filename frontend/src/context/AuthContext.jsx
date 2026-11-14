@@ -100,7 +100,7 @@ export const AuthProvider = ({ children }) => {
       value={{
         user,
         isAuthenticated: Boolean(user),
-        isAdmin: user?.role === "admin" || user?.isAdmin,
+        isAdmin: user?.role === "admin" || user?.role === "ADMIN" || Boolean(user?.isAdmin),
         signup,
         login,
         adminLogin,

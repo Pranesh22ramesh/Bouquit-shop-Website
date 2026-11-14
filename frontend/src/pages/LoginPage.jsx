@@ -42,7 +42,11 @@ const LoginPage = () => {
       }
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message || error.message || "Login failed");
+      if (error.response?.status === 404) {
+        toast.error("Backend server is starting up. Please wait 30 seconds and try again.");
+      } else {
+        toast.error(error.response?.data?.message || error.message || "Login failed");
+      }
     },
   });
 
@@ -121,6 +125,13 @@ const LoginPage = () => {
               {mutation.isPending ? "Signing in..." : "Sign in"}
             </button>
           </form>
+
+          <div className="mt-6 pt-4 border-t border-[#E8DDD5] dark:border-[#493640] flex items-center justify-between text-xs text-[#81747A] dark:text-[#8E7A83]">
+            <span>Store Administrator?</span>
+            <Link to="/admin/login" className="font-semibold text-[#651F3C] dark:text-[#D5B36C] hover:underline">
+              Admin Login Portal →
+            </Link>
+          </div>
         </div>
 
         {/* Right Side: Branding */}

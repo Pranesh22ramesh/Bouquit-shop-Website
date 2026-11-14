@@ -15,7 +15,7 @@ const ProtectedRoute = ({ adminOnly = false }) => {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace state={{ from: location }} />;
+    return <Navigate to={adminOnly ? "/admin/login" : "/login"} replace state={{ from: location }} />;
   }
 
   if (adminOnly && !isAdmin) {

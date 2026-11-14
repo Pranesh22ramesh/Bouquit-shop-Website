@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route, Outlet } from "react-router-dom";
+import { Navigate, Routes, Route, Outlet } from "react-router-dom";
 import Navbar from "./components/Navbar.jsx";
 import Footer from "./components/Footer.jsx";
 import AIChatbot from "./components/AIChatbot.jsx";
@@ -16,6 +16,7 @@ const ContactPage = lazy(() => import("./pages/ContactPage.jsx"));
 const GalleryPage = lazy(() => import("./pages/GalleryPage.jsx"));
 const ProductDetailsPage = lazy(() => import("./pages/ProductDetailsPage.jsx"));
 const LoginPage = lazy(() => import("./pages/LoginPage.jsx"));
+const AdminLoginPage = lazy(() => import("./pages/AdminLoginPage.jsx"));
 const SignupPage = lazy(() => import("./pages/SignupPage.jsx"));
 const MyOrdersPage = lazy(() => import("./pages/MyOrdersPage.jsx"));
 const AdminDashboardPage = lazy(() => import("./pages/AdminDashboardPage.jsx"));
@@ -90,6 +91,8 @@ const App = () => {
         <Route path="product/:id" element={<ProductDetailsPage />} />
         <Route path="favorites" element={<FavoritesPage />} />
         <Route path="login" element={<LoginPage />} />
+        <Route path="admin/login" element={<AdminLoginPage />} />
+        <Route path="admin-login" element={<AdminLoginPage />} />
         <Route path="forgot-password" element={<ForgotPasswordPage />} />
         <Route path="reset-password/:token" element={<ResetPasswordPage />} />
         <Route path="signup" element={<SignupPage />} />
@@ -100,6 +103,7 @@ const App = () => {
         <Route element={<ProtectedRoute adminOnly />}>
           <Route path="admin" element={<AdminDashboardPage />} />
         </Route>
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>
   );

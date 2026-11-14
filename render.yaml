@@ -1,0 +1,40 @@
+services:
+  - type: web
+    name: bouquit-shop-backend
+    env: node
+    plan: free
+    region: singapore
+    rootDir: backend
+    buildCommand: npm install && npx prisma generate && npx prisma db push && node prisma/seed.js
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: DIRECT_URL
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: SUPABASE_STORAGE_BUCKET
+        value: site-assets
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: JWT_RESET_SECRET
+        generateValue: true
+      - key: ACCESS_TOKEN_TTL
+        value: 15m
+      - key: REFRESH_TOKEN_TTL_DAYS
+        value: 30
+      - key: REFRESH_COOKIE_NAME
+        value: bb_refresh_token
+      - key: FRONTEND_URL
+        value: https://karurflowershop.vercel.app
+      - key: ADMIN_EMAIL
+        value: midhunyas2012karur@gmail.com
+      - key: ADMIN_PASSWORD
+        sync: false

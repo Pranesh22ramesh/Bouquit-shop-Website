@@ -4,6 +4,7 @@ import { clearAccessToken, getAccessToken, setAccessToken } from "../lib/authSto
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "/api",
   withCredentials: true,
+  timeout: 20000, // 20 second timeout — prevents infinite loading when backend is down
 });
 
 let refreshPromise = null;

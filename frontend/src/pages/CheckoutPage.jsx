@@ -31,6 +31,7 @@ const CheckoutPage = () => {
   const [paymentMethod, setPaymentMethod] = useState("Cash on Delivery");
   const [deliveryDate, setDeliveryDate] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isDarkMode] = useState(() => document.documentElement.classList.contains("dark"));
 
   // WhatsApp Popup State
   const [showWhatsAppPopup, setShowWhatsAppPopup] = useState(false);
@@ -131,8 +132,6 @@ const CheckoutPage = () => {
     setShowWhatsAppPopup(false);
     navigate(`/order-confirmation?order=${completedOrder._id}`);
   };
-
-  const [isDarkMode] = React.useState(() => document.documentElement.classList.contains("dark"));
 
   return (
     <div className={`min-h-screen py-10 transition-colors duration-300 ${isDarkMode ? "bg-[#160F17] text-[#FAF5EE]" : "bg-[#FAF5EE] text-[#30232A]"}`}>

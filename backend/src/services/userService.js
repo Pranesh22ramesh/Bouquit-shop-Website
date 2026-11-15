@@ -52,19 +52,21 @@ const getUserById = async (userId) => {
 };
 
 const updateProfile = async (userId, { fullName, email, phoneNumber, address, password }) => {
-  const normalizedEmail = String(email).toLowerCase();
-  const existing = await userRepository.findByEmail(normalizedEmail);
+  const payload = {};
 
-  if (existing && existing.id !== userId) {
-    throw new ApiError(409, 'Email address is already registered');
+  if (fullName !== undefined) payload.fullName = fullName;
+  if (email !== undefined) {
+    const normalizedEmail = String(email).trim().toLowerCase();
+    const existing = await userRepository.findByEmail(normalizedEmail);
+
+    if (existing && existing.id !== userId) {
+      throw new ApiError(409, 'Email address is already registered');
+    }
+
+    payload.email = normalizedEmail;
   }
-
-  const payload = {
-    fullName,
-    email: normalizedEmail,
-    phoneNumber: phoneNumber || null,
-    address: address || null,
-  };
+  if (phoneNumber !== undefined) payload.phoneNumber = phoneNumber || null;
+  if (address !== undefined) payload.address = address || null;
 
   if (password) payload.passwordHash = await bcrypt.hash(password, 12);
 

@@ -40,11 +40,6 @@ class ErrorBoundary extends React.Component {
             <p className="text-sm text-[#81747A] dark:text-[#8E7A83] mb-6">
               A temporary display glitch occurred while rendering. We apologize for the inconvenience.
             </p>
-            {this.state.error && process.env.NODE_ENV !== 'production' && (
-              <pre className="text-left text-xs bg-red-50 text-red-700 p-3 rounded-xl mb-6 overflow-auto max-h-32 dark:bg-red-950/40 dark:text-red-300">
-                {String(this.state.error?.message || this.state.error)}
-              </pre>
-            )}
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <button
                 type="button"

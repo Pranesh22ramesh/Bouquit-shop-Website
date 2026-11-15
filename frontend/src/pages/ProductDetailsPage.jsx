@@ -87,7 +87,8 @@ const ProductDetailsPage = () => {
           stones: custom.stones,
           beads: custom.beads,
           notes: custom.notes,
-          referencePreview: custom.referencePreview
+          referenceImageName: custom.referenceName || "",
+          hasReferencePhoto: Boolean(custom.referencePreview)
         }
       });
       toast.success("Added to cart");

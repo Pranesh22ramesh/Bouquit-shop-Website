@@ -175,10 +175,16 @@ const HasfarmProductCard = ({ product }) => {
 
   const handleAddToCart = async (e) => {
     e.stopPropagation();
+    const productId = product._id || product.id;
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(productId || ""))) {
+      toast("This preview is not available to order yet. Browse the current collection instead.");
+      navigate("/gallery");
+      return;
+    }
     setIsAdding(true);
     try {
       await addItem({
-        productId: product._id || product.id,
+        productId,
         quantity: 1,
         price,
         image,
@@ -196,7 +202,11 @@ const HasfarmProductCard = ({ product }) => {
     <motion.article
       whileHover={{ y: -4 }}
       transition={{ duration: 0.2 }}
-      onClick={() => navigate(`/product/${product._id || product.id}`)}
+      onClick={() => {
+        const productId = product._id || product.id;
+        const isServerProduct = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(productId || ""));
+        navigate(isServerProduct ? `/product/${productId}` : "/gallery");
+      }}
       className="group relative flex flex-col justify-between overflow-hidden rounded-[20px] sm:rounded-[22px] border border-[#F0DFD5] bg-[#FBF0EA] p-3 shadow-xs hover:shadow-lg hover:border-[#C5A15B] transition-all dark:border-[#493640] dark:bg-[#231722] cursor-pointer"
     >
       <div>

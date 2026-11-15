@@ -15,7 +15,7 @@ const { serializeUser } = require('../utils/serializers');
 const userRepository = require('../repositories/userRepository');
 
 const reserveAdminEmail = (email) => {
-  if (String(email).toLowerCase() === env.adminEmail.toLowerCase()) {
+  if (env.adminEmail && String(email).trim().toLowerCase() === env.adminEmail) {
     throw new ApiError(403, 'That email is reserved for the administrator account');
   }
 };
@@ -46,36 +46,34 @@ const buildSession = async (user) => {
 };
 
 const seedAdminUser = async () => {
-  if (!env.adminPassword) {
-    console.warn('[AUTH] Skipping admin user seed: ADMIN_PASSWORD is not set.');
+  if (!env.adminEmail || !env.adminPassword) {
+    console.warn('[AUTH] Skipping admin user seed: configure ADMIN_EMAIL and ADMIN_PASSWORD to create one.');
     return;
   }
 
   await prisma.user.updateMany({
     where: {
       role: Role.ADMIN,
-      email: { not: env.adminEmail.toLowerCase() },
+      email: { not: env.adminEmail },
     },
     data: { role: Role.USER },
   });
 
-  const passwordHash = await bcrypt.hash(env.adminPassword, 12);
   const existing = await prisma.user.findUnique({
-    where: { email: env.adminEmail.toLowerCase() },
+    where: { email: env.adminEmail },
   });
 
   if (existing) {
     await prisma.user.update({
       where: { id: existing.id },
       data: {
-        fullName: existing.fullName || 'Administrator',
-        passwordHash,
         role: Role.ADMIN,
-        isActive: true,
       },
     });
     return;
   }
+
+  const passwordHash = await bcrypt.hash(env.adminPassword, 12);
 
   await prisma.user.create({
     data: {

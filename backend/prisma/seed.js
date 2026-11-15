@@ -112,29 +112,33 @@ const sampleProducts = [
 async function main() {
   console.log('Seeding database...');
   
-  // Seed admin user
-  const adminEmail = (process.env.ADMIN_EMAIL || 'midhunyas2012karur@gmail.com').toLowerCase();
-  const adminPassword = process.env.ADMIN_PASSWORD;
-
-  if (!adminPassword && process.env.NODE_ENV === 'production') {
-    throw new Error('FATAL: ADMIN_PASSWORD environment variable must be set to run seed in production!');
+  // Never ship or reapply a built-in administrator password.
+  const adminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase() || '';
+  const adminPassword = process.env.ADMIN_PASSWORD || '';
+  if (!adminEmail || !adminPassword) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('FATAL: ADMIN_EMAIL and ADMIN_PASSWORD must be configured before production seeding.');
+    }
+    console.warn('Admin seed skipped. Configure ADMIN_EMAIL and ADMIN_PASSWORD to create an administrator.');
+  } else {
+    const existingAdmin = await prisma.user.findUnique({ where: { email: adminEmail } });
+    if (existingAdmin) {
+      await prisma.user.update({ where: { id: existingAdmin.id }, data: { role: Role.ADMIN } });
+      console.log('Configured administrator role verified.');
+    } else {
+      const passwordHash = await bcrypt.hash(adminPassword, 12);
+      await prisma.user.create({
+        data: {
+          email: adminEmail,
+          fullName: 'MIDHUNYAS Admin',
+          passwordHash,
+          role: Role.ADMIN,
+          phoneNumber: '+91 9942071721',
+        },
+      });
+      console.log('Configured administrator account created.');
+    }
   }
-
-  const finalPassword = adminPassword || 'DevAdminPass123!';
-  const passwordHash = await bcrypt.hash(finalPassword, 12);
-  
-  await prisma.user.upsert({
-    where: { email: adminEmail },
-    update: { role: Role.ADMIN, passwordHash },
-    create: {
-      email: adminEmail,
-      fullName: 'MIDHUNYAS Admin',
-      passwordHash,
-      role: Role.ADMIN,
-      phoneNumber: '+91 9942071721',
-    },
-  });
-  console.log(`Admin user seeded: ${adminEmail}`);
 
   // Seed sample products if database has no products
   const count = await prisma.product.count();
@@ -150,12 +154,7 @@ async function main() {
   // Seed default home-highlight content section
   await prisma.contentSection.upsert({
     where: { key: 'home-highlight' },
-    update: {
-      data: {
-        heroText: 'Crafting Your Eternal Memories',
-        heroDescription: 'Handcrafted bouquets, elegant garlands, and floral experiences tailored to your celebration. and We can deliver allover Tamilnadu',
-      },
-    },
+    update: {},
     create: {
       key: 'home-highlight',
       data: {

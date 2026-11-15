@@ -188,7 +188,7 @@ const updateCartItem = async (userId, { itemId, quantity }) => {
 
   await prisma.cartItem.update({
     where: { id: existing.id },
-    data: { quantity: Math.max(1, Number(quantity) || 1) },
+    data: { quantity: Math.min(99, Math.max(1, Number(quantity) || 1)) },
   });
 
   await logActivity({
@@ -196,7 +196,7 @@ const updateCartItem = async (userId, { itemId, quantity }) => {
     action: 'cart_item_updated',
     resourceType: 'cart',
     resourceId: itemId,
-    details: { quantity: Math.max(1, Number(quantity) || 1) },
+    details: { quantity: Math.min(99, Math.max(1, Number(quantity) || 1)) },
   });
 
   pushEventToUser(userId, 'cart.changed', {});

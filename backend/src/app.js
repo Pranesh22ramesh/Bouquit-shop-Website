@@ -60,7 +60,7 @@ app.use(globalLimiter);
 
 // Payload size limits to mitigate large-body denial-of-service
 app.use(express.json({ limit: '2mb' }));
-app.use(express.urlencoded({ extended: true, limit: '2mb' }));
+app.use(express.urlencoded({ extended: true, limit: '100kb', parameterLimit: 200 }));
 app.use(cookieParser());
 
 // Global XSS and prototype pollution sanitizer

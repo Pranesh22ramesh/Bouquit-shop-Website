@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { getBotResponse, SHOP_INFO } from '../utils/chatbotBrain';
+import { galleryService } from '../api/galleryService';
+import toast from 'react-hot-toast';
 
 const AIChatbot = () => {
     const { user, isAuthenticated } = useAuth();
@@ -70,10 +72,19 @@ const AIChatbot = () => {
         }
 
         try {
+            const result = await galleryService.list({ search: product.name, limit: 20 });
+            const catalogueProduct = (result.products || []).find(
+                (item) => item.name?.trim().toLowerCase() === product.name?.trim().toLowerCase()
+            );
+            if (!catalogueProduct) {
+                toast('That suggestion is not in today’s catalogue. Choose an available design from the gallery.');
+                navigate(`/gallery?category=${encodeURIComponent(product.category || '')}`);
+                setIsOpen(false);
+                return;
+            }
             await addItem({
-                productId: product.id,
+                productId: catalogueProduct._id || catalogueProduct.id,
                 quantity: 1,
-                price: product.offerPrice || product.price,
                 customization: {}
             });
             setAddedCartId(product.id);

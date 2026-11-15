@@ -1,22 +1,24 @@
 const path = require('path');
 const dotenv = require('dotenv');
+const crypto = require('crypto');
 
 dotenv.config({ path: path.join(__dirname, '..', '..', '.env') });
 
 const nodeEnv = process.env.NODE_ENV || 'development';
 
-// Validate critical secrets in production to prevent running with insecure defaults
-if (nodeEnv === 'production') {
-  const insecureSecrets = [];
-  if (!process.env.JWT_ACCESS_SECRET || process.env.JWT_ACCESS_SECRET.includes('replace-')) {
-    insecureSecrets.push('JWT_ACCESS_SECRET');
+const secret = (name) => {
+  const value = process.env[name];
+  if (nodeEnv === 'production' && (!value || value.length < 32 || /generate|replace|example|placeholder/i.test(value))) {
+    throw new Error(`${name} must be set to a unique random value of at least 32 characters in production`);
   }
-  if (!process.env.JWT_REFRESH_SECRET || process.env.JWT_REFRESH_SECRET.includes('replace-')) {
-    insecureSecrets.push('JWT_REFRESH_SECRET');
-  }
-  if (insecureSecrets.length > 0) {
-    console.error(`[CRITICAL SECURITY WARNING] Missing production secrets: ${insecureSecrets.join(', ')}`);
-  }
+  return value || crypto.randomBytes(48).toString('hex');
+};
+
+const jwtAccessSecret = secret('JWT_ACCESS_SECRET');
+const jwtRefreshSecret = secret('JWT_REFRESH_SECRET');
+const jwtResetSecret = secret('JWT_RESET_SECRET');
+if (nodeEnv === 'production' && new Set([jwtAccessSecret, jwtRefreshSecret, jwtResetSecret]).size !== 3) {
+  throw new Error('JWT_ACCESS_SECRET, JWT_REFRESH_SECRET, and JWT_RESET_SECRET must be different values in production');
 }
 
 const env = {
@@ -27,14 +29,14 @@ const env = {
   supabaseUrl: process.env.SUPABASE_URL || '',
   supabaseServiceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY || '',
   supabaseStorageBucket: process.env.SUPABASE_STORAGE_BUCKET || 'site-assets',
-  jwtAccessSecret: process.env.JWT_ACCESS_SECRET || 'dev-access-secret-for-local-only-do-not-use-in-prod',
-  jwtRefreshSecret: process.env.JWT_REFRESH_SECRET || 'dev-refresh-secret-for-local-only-do-not-use-in-prod',
-  jwtResetSecret: process.env.JWT_RESET_SECRET || 'dev-reset-secret-for-local-only-do-not-use-in-prod',
+  jwtAccessSecret,
+  jwtRefreshSecret,
+  jwtResetSecret,
   accessTokenTtl: process.env.ACCESS_TOKEN_TTL || '15m',
   refreshTokenTtlDays: Number(process.env.REFRESH_TOKEN_TTL_DAYS || 30),
   refreshCookieName: process.env.REFRESH_COOKIE_NAME || 'bb_refresh_token',
   uploadDir: process.env.UPLOAD_DIR || 'uploads',
-  adminEmail: (process.env.ADMIN_EMAIL || 'midhunyas2012karur@gmail.com').toLowerCase(),
+  adminEmail: process.env.ADMIN_EMAIL?.trim().toLowerCase() || '',
   adminPassword: process.env.ADMIN_PASSWORD || '',
 
   // Configurable Rate Limiting Thresholds (all overridable via env vars)

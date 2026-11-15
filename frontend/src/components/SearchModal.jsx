@@ -57,6 +57,8 @@ const SearchModal = ({ isOpen, onClose }) => {
         }
         addItem({
             ...product,
+            productId: product._id || product.id,
+            quantity: 1,
             customization: {
                 mainColor: "Red",
                 quantity: 1

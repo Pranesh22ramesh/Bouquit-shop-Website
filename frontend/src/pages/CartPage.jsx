@@ -1,6 +1,6 @@
 // src/pages/CartPage.jsx
 import React, { useState } from "react";
-import { useCart } from "../context/CartContext";
+import { getCartItemUnitPrice, useCart } from "../context/CartContext";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { userService } from "../api/userService";
@@ -67,15 +67,14 @@ const CartPage = () => {
       const product = item.productId && typeof item.productId === 'object' ? item.productId : item;
       const name = product.name || product.title || "Product";
 
-      const basePrice =
-        product?.offerPrice && product?.badge === "Offer"
-          ? Number(product.offerPrice)
-          : Number(product?.price || item.unitPrice || item.price || 0);
-
-      const stonesExtra = item.customization?.stones ? 200 : 0;
+      const basePrice = product?.offerPrice && product?.badge === "Offer"
+        ? Number(product.offerPrice)
+        : Number(product?.price || item.unitPrice || item.price || 0);
+      const stones = Array.isArray(item.customization?.stones) ? item.customization.stones : item.customization?.stones ? ["Stones"] : [];
+      const flowers = Array.isArray(item.customization?.selectedFlowers) ? item.customization.selectedFlowers : [];
+      const stonesExtra = 0;
       const beadsExtra = item.customization?.beads ? 120 : 0;
-      const extrasPrice = stonesExtra + beadsExtra;
-      const unitTotal = basePrice + extrasPrice;
+      const unitTotal = getCartItemUnitPrice(item);
       const lineTotal = unitTotal * (item.quantity || 1);
       calculatedSubtotal += lineTotal;
 
@@ -94,6 +93,9 @@ const CartPage = () => {
       message += `   🔢 Qty: ${item.quantity} × ₹${unitTotal.toLocaleString("en-IN")} = *₹${lineTotal.toLocaleString("en-IN")}*\n`;
 
       if (item.customization) {
+        if (stones.length) message += `   Stones: ${stones.join(", ")}\n`;
+        if (flowers.length) message += `   Flowers: ${flowers.join(", ")}\n`;
+        if (item.customization.hasReferencePhoto || item.customization.referenceImageName || item.customization.referencePreview) message += `   Reference photo to be shared separately\n`;
         if (item.customization.mainColor) {
           const c1 = hexToColorName(item.customization.mainColor);
           const c2 = item.customization.secondaryColor ? hexToColorName(item.customization.secondaryColor) : "None";
@@ -146,15 +148,7 @@ const CartPage = () => {
               const name = product.name || product.title || "Product";
               const image = product.image || product.src || "";
 
-              const basePrice =
-                product?.offerPrice && product?.badge === "Offer"
-                  ? Number(product.offerPrice)
-                  : Number(product?.price || item.unitPrice || item.price || 0);
-
-              const extrasPrice =
-                (item.customization?.stones ? 200 : 0) +
-                (item.customization?.beads ? 120 : 0);
-              const unitPrice = basePrice + extrasPrice;
+              const unitPrice = getCartItemUnitPrice(item);
               const lineTotal = unitPrice * (item.quantity || 1);
 
               const actionId = item._id || item.cartId;

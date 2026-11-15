@@ -128,7 +128,9 @@ const ProductModal = ({ product, open, onClose }) => {
   };
 
   const pricing = useMemo(() => {
-    let base = product.basePrice || product.price || 0;
+    let base = product.offerPrice && product.badge === "Offer"
+      ? Number(product.offerPrice)
+      : Number(product.basePrice || product.price || 0);
     
     if (product.hasVariants && product.variants?.[selectedVariant]?.price) {
       base = Number(product.variants[selectedVariant].price);

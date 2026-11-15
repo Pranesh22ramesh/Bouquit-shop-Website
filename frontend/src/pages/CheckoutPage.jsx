@@ -62,28 +62,9 @@ const CheckoutPage = () => {
     setLoading(true);
 
     try {
-      const orderItems = items.map((item) => {
-        const productObj = item.productId && typeof item.productId === 'object' ? item.productId : null;
-        const productId = productObj ? productObj._id : item.productId;
-
-        return {
-          product: productId,
-          name: productObj?.name || item.title || "Product",
-          qty: item.quantity,
-          image: productObj?.image || item.image || item.src || item.thumbnail || "",
-          price: productObj?.price || item.price || 0,
-          customization: item.customization || {}
-        };
-      });
-
       const orderData = {
-        orderItems,
         shippingAddress: shipping,
         paymentMethod,
-        itemsPrice: subtotal,
-        taxPrice: tax,
-        shippingPrice: delivery,
-        totalPrice: grandTotal,
         deliveryDate: deliveryDate || null,
       };
 
@@ -129,9 +110,11 @@ const CheckoutPage = () => {
           const c2 = item.customization.secondaryColor ? hexToColorName(item.customization.secondaryColor) : "None";
           message += `   Color: ${c1}/${c2}\n`;
         }
-        if (item.customization.stones) message += `   + Stones\n`;
+        if (item.customization.stones) message += `   + ${Array.isArray(item.customization.stones) ? item.customization.stones.join(", ") : "Stones"}\n`;
+        if (item.customization.selectedFlowers?.length) message += `   Flowers: ${item.customization.selectedFlowers.join(", ")}\n`;
         if (item.customization.beads) message += `   + Beads\n`;
         if (item.customization.notes) message += `   Note: ${item.customization.notes}\n`;
+        if (item.customization.hasReferencePhoto || item.customization.referenceImageName) message += `   Reference photo to be shared separately\n`;
       }
     });
 

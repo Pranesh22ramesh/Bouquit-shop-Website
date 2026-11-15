@@ -359,19 +359,19 @@ const HomePage = () => {
             <div className="pointer-events-none absolute top-6 right-10 text-[#C5A15B]/35 text-xl select-none">✦</div>
             <div className="pointer-events-none absolute bottom-8 left-8 text-[#D9B8B8]/40 text-2xl select-none">🌸</div>
 
-            <div className="grid gap-6 lg:gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+            <div className="grid min-w-0 grid-cols-1 gap-6 lg:gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
               {/* Left Column: 3-Tier Bold Headline, Copy, Pill Button */}
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.7 }}
-                className="relative z-10 max-w-xl"
+                className="relative z-10 w-full min-w-0 max-w-xl"
               >
                 <div className="space-y-0.5 sm:space-y-1">
                   <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight text-[#30232A] dark:text-[#FAF1EC] leading-[0.94] uppercase">
                     {content.heroHeadline1 || "BIGGER."}
                   </h1>
-                  <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight text-[#D96B4E] dark:text-[#E07558] leading-[0.94] uppercase flex items-center gap-2 sm:gap-3">
+                  <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight text-[#D96B4E] dark:text-[#E07558] leading-[0.94] uppercase flex min-w-0 flex-wrap items-center gap-2 sm:gap-3">
                     <span>{content.heroHeadline2 || "BRIGHTER."}</span>
                     <span className="text-2xl sm:text-4xl md:text-5xl animate-pulse">🌸</span>
                   </h1>
@@ -402,7 +402,7 @@ const HomePage = () => {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.7, delay: 0.1 }}
-                className="relative z-10 mx-auto w-full max-w-[380px] sm:max-w-[420px] lg:max-w-none"
+                className="relative z-10 mx-auto w-full min-w-0 max-w-[380px] sm:max-w-[420px] lg:max-w-none"
               >
                 <div className="relative aspect-[4/4.6] max-h-[480px] w-full overflow-hidden rounded-[24px] sm:rounded-[32px] border-4 border-white/80 bg-white shadow-[0_15px_40px_rgba(48,35,42,0.10)] dark:border-[#493640] dark:bg-[#231722]">
                   <AnimatePresence mode="wait">

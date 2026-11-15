@@ -8,10 +8,10 @@ const { env } = require('./config/env');
 const { notFound } = require('./middleware/notFound');
 const { errorHandler } = require('./middleware/errorMiddleware');
 const { sanitizeInput } = require('./middleware/sanitizeInput');
+const { strictRequest } = require('./middleware/strictRequest');
 const {
   globalLimiter,
   publicLimiter,
-  authenticatedLimiter,
 } = require('./middleware/rateLimiter');
 
 const authRoutes = require('./routes/authRoutes');
@@ -26,6 +26,11 @@ const eventRoutes = require('./routes/eventRoutes');
 const seoRoutes = require('./routes/seoRoutes');
 
 const app = express();
+const knownFrontendOrigins = new Set(['https://karurflowershop.vercel.app']);
+
+// Set the number of trusted reverse-proxy hops explicitly in production so IP limits
+// use the client address without trusting arbitrary forwarded headers.
+app.set('trust proxy', env.trustProxyHops);
 
 // Security HTTP headers with Helmet
 app.use(
@@ -40,11 +45,19 @@ app.use(
 app.use(
   cors({
     origin: function (origin, callback) {
+      let configuredOrigin = '';
+      try {
+        configuredOrigin = new URL(env.frontendUrl).origin;
+      } catch (_) {
+        configuredOrigin = '';
+      }
+      const isLocalDevelopmentOrigin = env.nodeEnv !== 'production' &&
+        /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin || '');
       if (
         !origin ||
-        origin.startsWith('http://localhost:') ||
-        origin === 'https://karurflowershop.vercel.app' ||
-        origin.endsWith('.vercel.app')
+        origin === configuredOrigin ||
+        knownFrontendOrigins.has(origin) ||
+        isLocalDevelopmentOrigin
       ) {
         callback(null, true);
       } else {
@@ -66,7 +79,8 @@ app.use(cookieParser());
 // Global XSS and prototype pollution sanitizer
 app.use(sanitizeInput);
 
-app.use(morgan(env.nodeEnv === 'production' ? 'combined' : 'dev'));
+morgan.token('safe-path', (req) => (req.route ? `${req.baseUrl}${req.route.path}` : '/unmatched'));
+app.use(morgan(':method :safe-path :status :response-time ms'));
 
 // Secure static delivery of uploaded files:
 // - Directory indexing disabled
@@ -87,7 +101,7 @@ app.use(
   })
 );
 
-app.get('/api/health', (req, res) => {
+app.get('/api/health', publicLimiter, strictRequest(), (req, res) => {
   res.json({ ok: true, status: 'healthy', timestamp: new Date().toISOString() });
 });
 
@@ -95,15 +109,15 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 
 // Authenticated user action endpoints (looser rate limits)
-app.use('/api/users', authenticatedLimiter, userRoutes);
-app.use('/api/orders', authenticatedLimiter, orderRoutes);
-app.use('/api/admin', authenticatedLimiter, adminRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/orders', orderRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Public browse endpoints (moderate rate limits)
 app.use('/api/products', publicLimiter, productRoutes);
 app.use('/api/gallery', publicLimiter, productRoutes);
-app.get('/api/categories', publicLimiter, productController.listCategories);
-app.get('/api/categories/list', publicLimiter, productController.listCategories);
+app.get('/api/categories', publicLimiter, strictRequest(), productController.listCategories);
+app.get('/api/categories/list', publicLimiter, strictRequest(), productController.listCategories);
 app.use('/api/reviews', reviewRoutes); // Has internal publicLimiter / authenticatedLimiter by method
 app.use('/api/content', contentRoutes);
 app.use('/api/events', eventRoutes);

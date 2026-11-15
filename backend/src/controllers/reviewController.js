@@ -7,24 +7,31 @@ const createValidators = [
     .notEmpty().withMessage('Rating is required')
     .isInt({ min: 1, max: 5 }).withMessage('Rating must be an integer between 1 and 5'),
   body('comment')
+    .isString().bail()
     .trim()
     .notEmpty().withMessage('Comment is required')
     .isLength({ min: 3, max: 1000 }).withMessage('Comment must be between 3 and 1000 characters'),
   body('author')
     .optional({ values: 'falsy' })
+    .isString().bail()
     .trim()
     .isLength({ min: 2, max: 70 }).withMessage('Author name must be between 2 and 70 characters'),
   body('productId')
     .optional({ values: 'falsy' })
     .trim()
-    .isLength({ min: 1, max: 64 }).withMessage('Invalid product ID format'),
+    .isUUID().withMessage('Invalid product ID format'),
+];
+
+const listValidators = [
+  query('userId').optional().isUUID().withMessage('Invalid user ID format'),
+  query('productId').optional().isUUID().withMessage('Invalid product ID format'),
 ];
 
 const reviewIdValidator = [
   param('id')
     .trim()
     .notEmpty().withMessage('Review ID is required')
-    .isLength({ min: 1, max: 64 }).withMessage('Invalid review ID format'),
+    .isUUID().withMessage('Invalid review ID format'),
 ];
 
 const updateValidators = [
@@ -33,9 +40,13 @@ const updateValidators = [
     .notEmpty().withMessage('Rating is required')
     .isInt({ min: 1, max: 5 }).withMessage('Rating must be an integer between 1 and 5'),
   body('comment')
+    .isString().bail()
     .trim()
     .notEmpty().withMessage('Comment is required')
     .isLength({ min: 3, max: 1000 }).withMessage('Comment must be between 3 and 1000 characters'),
+  body('userName').optional().isString().trim().isLength({ min: 2, max: 70 }).withMessage('Name must be between 2 and 70 characters'),
+  body('isHidden').optional().isBoolean({ strict: true }).custom((_, { req }) => req.user.role === 'ADMIN').withMessage('Only administrators may change review visibility'),
+  body('isPinned').optional().isBoolean({ strict: true }).custom((_, { req }) => req.user.role === 'ADMIN').withMessage('Only administrators may pin reviews'),
 ];
 
 const listReviews = asyncHandler(async (req, res) => {
@@ -64,6 +75,7 @@ const deleteReview = asyncHandler(async (req, res) => {
 module.exports = {
   createReview,
   createValidators,
+  listValidators,
   deleteReview,
   listReviews,
   reviewIdValidator,

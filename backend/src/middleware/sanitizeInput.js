@@ -1,70 +1,36 @@
-/**
- * Global Request Sanitizer Middleware
- * Prevents:
- * 1. Cross-Site Scripting (XSS) via injected HTML / JS tags
- * 2. Prototype Pollution attacks
- * 3. Null-byte injection and control character attacks
- */
+const UNSAFE_TEXT = /(?:<\s*\/?\s*(?:script|iframe|object|embed)\b|javascript\s*:|<[^>]+\bon[a-z]+\s*=)/i;
+const FORBIDDEN_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
 
-const DANGEROUS_PATTERNS = [
-  /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
-  /javascript:/gi,
-  /on\w+\s*=/gi,
-  /<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi,
-  /<embed\b[^<]*(?:(?!<\/embed>)<[^<]*)*<\/embed>/gi,
-  /<object\b[^<]*(?:(?!<\/object>)<[^<]*)*<\/object>/gi,
-];
-
-const sanitizeValue = (val) => {
-  if (typeof val === 'string') {
-    // 1. Strip null bytes
-    let clean = val.replace(/\0/g, '').trim();
-
-    // 2. Strip dangerous script/event tags if detected
-    for (const pattern of DANGEROUS_PATTERNS) {
-      clean = clean.replace(pattern, '');
+const inspectValue = (value, path, invalid) => {
+  if (typeof value === 'string') {
+    if (UNSAFE_TEXT.test(value)) invalid.push(path);
+    return;
+  }
+  if (Array.isArray(value)) {
+    value.forEach((item, index) => inspectValue(item, `${path}[${index}]`, invalid));
+    return;
+  }
+  if (value && typeof value === 'object') {
+    for (const [key, child] of Object.entries(value)) {
+      if (FORBIDDEN_KEYS.has(key)) invalid.push(`${path}.${key}`);
+      inspectValue(child, `${path}.${key}`, invalid);
     }
-
-    return clean;
   }
-
-  if (Array.isArray(val)) {
-    return val.map(sanitizeValue);
-  }
-
-  if (val !== null && typeof val === 'object') {
-    return sanitizeObject(val);
-  }
-
-  return val;
 };
 
-const sanitizeObject = (obj) => {
-  if (!obj || typeof obj !== 'object') return obj;
-
-  const sanitized = {};
-  for (const [key, value] of Object.entries(obj)) {
-    // Block Prototype Pollution
-    if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
-      continue;
-    }
-    sanitized[key] = sanitizeValue(value);
-  }
-  return sanitized;
-};
-
+// Reject unsafe input in place instead of silently rewriting it before validation.
 const sanitizeInput = (req, res, next) => {
-  if (req.body && typeof req.body === 'object') {
-    req.body = sanitizeObject(req.body);
+  const invalid = [];
+  inspectValue(req.body, 'body', invalid);
+  inspectValue(req.query, 'query', invalid);
+  inspectValue(req.params, 'params', invalid);
+  if (invalid.length) {
+    return res.status(400).json({
+      message: 'Request contains invalid input.',
+      errors: [...new Set(invalid)].map((field) => ({ field, message: 'Unsupported value' })),
+    });
   }
-  if (req.query && typeof req.query === 'object') {
-    req.query = sanitizeObject(req.query);
-  }
-  if (req.params && typeof req.params === 'object') {
-    req.params = sanitizeObject(req.params);
-  }
-  next();
+  return next();
 };
 
 module.exports = { sanitizeInput };
-

@@ -1,28 +1,35 @@
-const { body, param } = require('express-validator');
+const { body, param, query } = require('express-validator');
 const { asyncHandler } = require('../utils/asyncHandler');
 const userService = require('../services/userService');
 
 const profileValidators = [
   body('fullName')
     .optional()
+    .isString().bail()
     .trim()
-    .isLength({ min: 2, max: 70 }).withMessage('Full name must be between 2 and 70 characters'),
+    .isLength({ min: 2, max: 70 })
+    .matches(/^[\p{L}\p{M}\s.'-]+$/u).withMessage('Full name contains invalid characters'),
   body('name')
     .optional()
+    .isString().bail()
     .trim()
-    .isLength({ min: 2, max: 70 }).withMessage('Full name must be between 2 and 70 characters'),
+    .isLength({ min: 2, max: 70 })
+    .matches(/^[\p{L}\p{M}\s.'-]+$/u).withMessage('Full name contains invalid characters'),
   body('email')
     .optional()
+    .isString().bail()
     .trim()
     .isEmail().withMessage('Enter a valid email address')
     .normalizeEmail()
     .isLength({ max: 100 }).withMessage('Email address is too long'),
   body('phoneNumber')
     .optional({ values: 'falsy' })
+    .isString().bail()
     .trim()
     .matches(/^\+?[0-9]{10,15}$/).withMessage('Enter a valid phone number (10 to 15 digits)'),
   body('mobile')
     .optional({ values: 'falsy' })
+    .isString().bail()
     .trim()
     .matches(/^\+?[0-9]{10,15}$/).withMessage('Enter a valid phone number (10 to 15 digits)'),
   body('address')
@@ -35,6 +42,17 @@ const profileValidators = [
     .isLength({ min: 8, max: 100 }).withMessage('Password must be between 8 and 100 characters'),
 ];
 
+const userListValidators = [
+  query('search').optional().isString().isLength({ max: 100 }).withMessage('Search text must not exceed 100 characters'),
+  query('role').optional().isIn(['admin', 'user']).withMessage('Role must be admin or user'),
+  query('status').optional().isIn(['active', 'disabled']).withMessage('Status must be active or disabled'),
+];
+
+const adminProfileValidators = [
+  ...profileValidators,
+  body('role').optional().isIn(['admin', 'user']).withMessage('Role must be admin or user'),
+];
+
 const passwordValidators = [
   body('password')
     .isString().withMessage('Password must be a string')
@@ -44,34 +62,67 @@ const passwordValidators = [
 
 const cartValidators = [
   body('productId')
+    .isString().bail()
     .trim()
     .notEmpty().withMessage('Product ID is required')
-    .isLength({ min: 1, max: 64 }).withMessage('Invalid product ID format'),
+    .isUUID().withMessage('Invalid product ID format'),
   body('quantity')
     .notEmpty().withMessage('Quantity is required')
+    .custom((value) => typeof value === 'number').withMessage('Quantity must be a number')
+    .bail()
     .isInt({ min: 1, max: 99 }).withMessage('Quantity must be between 1 and 99'),
+  body('customization')
+    .optional()
+    .isObject({ strict: true }).withMessage('Customization must be an object')
+    .custom((value) => {
+      const allowed = new Set(['variant', 'primaryColor', 'secondaryColors', 'selectedFlowers', 'stones', 'notes', 'referenceImageName', 'mainColor', 'secondaryColor', 'beads', 'hasReferencePhoto', 'quantity']);
+      if (Object.keys(value).some((key) => !allowed.has(key))) throw new Error('Unsupported customization field');
+      for (const [key, entry] of Object.entries(value)) {
+        if (key === 'quantity') {
+          if (typeof entry !== 'number' || !Number.isInteger(entry) || entry < 1 || entry > 99) throw new Error('Customization quantity is invalid');
+        } else if (key === 'stones' && typeof entry === 'boolean') {
+          continue;
+        } else if (key === 'secondaryColors' && typeof entry === 'string') {
+          if (entry.length > 40) throw new Error('Customization color is too long');
+        } else if (['secondaryColors', 'selectedFlowers', 'stones'].includes(key)) {
+          if (!Array.isArray(entry) || entry.length > 20 || entry.some((item) => typeof item !== 'string' || item.length > 40)) throw new Error('Invalid customization option list');
+        } else if (['beads', 'hasReferencePhoto'].includes(key)) {
+          if (typeof entry !== 'boolean') throw new Error('Customization flags must be boolean');
+        } else if (entry !== null && (typeof entry !== 'string' || entry.length > 500)) {
+          throw new Error('Customization values must be short strings');
+        }
+      }
+      return true;
+    }),
 ];
 
 const updateCartValidators = [
   body('itemId')
+    .isString().bail()
     .trim()
     .notEmpty().withMessage('Cart item ID is required')
-    .isLength({ min: 1, max: 64 }).withMessage('Invalid cart item ID format'),
+    .isUUID().withMessage('Invalid cart item ID format'),
   body('quantity')
     .notEmpty().withMessage('Quantity is required')
+    .custom((value) => typeof value === 'number').withMessage('Quantity must be a number')
+    .bail()
     .isInt({ min: 1, max: 99 }).withMessage('Quantity must be between 1 and 99'),
 ];
 
 const statusValidators = [
-  body('isActive').optional().isBoolean().withMessage('isActive must be a boolean value'),
+  body('isActive').optional().isBoolean({ strict: true }).withMessage('isActive must be a boolean value'),
   body('status').optional().isIn(['ACTIVE', 'INACTIVE', 'SUSPENDED']).withMessage('Invalid status value'),
+  body().custom((value) => {
+    if (value.isActive === undefined && value.status === undefined) throw new Error('A status value is required');
+    return true;
+  }),
 ];
 
 const idParamValidator = [
   param('id')
     .trim()
     .notEmpty().withMessage('ID parameter is required')
-    .isLength({ min: 1, max: 64 }).withMessage('Invalid ID format'),
+    .isUUID().withMessage('Invalid ID format'),
 ];
 
 const getUsers = asyncHandler(async (req, res) => {
@@ -146,7 +197,8 @@ const toggleWishlist = asyncHandler(async (req, res) => {
 });
 
 const updateUserStatus = asyncHandler(async (req, res) => {
-  const updated = await userService.setUserStatus(req.params.id, req.body.isActive);
+  const isActive = req.body.isActive ?? req.body.status === 'ACTIVE';
+  const updated = await userService.setUserStatus(req.params.id, isActive);
   res.json({
     message: updated.isActive ? 'User enabled successfully' : 'User disabled successfully',
     isActive: updated.isActive,
@@ -178,6 +230,8 @@ module.exports = {
   idParamValidator,
   passwordValidators,
   profileValidators,
+  adminProfileValidators,
+  userListValidators,
   removeCart,
   statusValidators,
   toggleLike,

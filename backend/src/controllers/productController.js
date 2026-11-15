@@ -14,10 +14,14 @@ const productValidators = [
     .isLength({ min: 2, max: 60 }).withMessage('Category must be between 2 and 60 characters'),
   body('price')
     .notEmpty().withMessage('Price is required')
-    .isFloat({ min: 0 }).withMessage('Price must be a positive number'),
+    .isLength({ max: 12 }).withMessage('Price is too large')
+    .bail()
+    .isFloat({ min: 0, max: 10000000 }).withMessage('Price must be a valid non-negative amount'),
   body('offerPrice')
     .optional({ values: 'falsy' })
-    .isFloat({ min: 0 }).withMessage('Offer price must be a positive number'),
+    .isLength({ max: 12 }).withMessage('Offer price is too large')
+    .bail()
+    .isFloat({ min: 0, max: 10000000 }).withMessage('Offer price must be a valid non-negative amount'),
   body('description')
     .optional()
     .isString().withMessage('Description must be a string')
@@ -30,16 +34,34 @@ const productValidators = [
     .optional()
     .isIn(['AVAILABLE', 'UNAVAILABLE', 'Available', 'Unavailable'])
     .withMessage('Invalid availability status'),
-  body('featured')
+  body('status')
     .optional()
-    .customSanitizer((val) => val === true || val === 'true'),
+    .isIn(['AVAILABLE', 'UNAVAILABLE', 'Available', 'Unavailable'])
+    .withMessage('Invalid availability status'),
+  body('productStatus')
+    .optional()
+    .isIn(['NORMAL', 'NEW_ARRIVAL', 'OFFER', 'Normal', 'New Arrival', 'Offer'])
+    .withMessage('Invalid product badge'),
+  body('featured').optional().isBoolean({ strict: true }).withMessage('Featured must be a boolean value'),
+  body('customizedAvailable').optional().isBoolean({ strict: true }).withMessage('Customized available must be a boolean value'),
+];
+
+const productListValidators = [
+  query('keyword').optional().isString().isLength({ max: 100 }).withMessage('Keyword must not exceed 100 characters'),
+  query('search').optional().isString().isLength({ max: 100 }).withMessage('Search must not exceed 100 characters'),
+  query('category').optional().isString().isLength({ max: 60 }).withMessage('Category must not exceed 60 characters'),
+  query('filter').optional().isIn(['all', 'latest', 'high-selling', 'offered', 'combo']).withMessage('Invalid product filter'),
+  query('sort').optional().isIn(['latest', 'oldest', 'price-low', 'price-high', 'name-asc', 'high-selling']).withMessage('Invalid product sort order'),
+  query('limit').optional().isInt({ min: 1, max: 1000 }).withMessage('Limit must be between 1 and 1000'),
+  query('featured').optional().isIn(['true', 'false']).withMessage('Featured must be true or false'),
+  query('status').optional().isIn(['available', 'unavailable']).withMessage('Invalid product status'),
 ];
 
 const productIdValidator = [
   param('id')
     .trim()
     .notEmpty().withMessage('Product ID is required')
-    .isLength({ min: 1, max: 64 }).withMessage('Invalid product ID format'),
+    .isUUID().withMessage('Invalid product ID format'),
 ];
 
 const listProducts = asyncHandler(async (req, res) => {
@@ -109,5 +131,6 @@ module.exports = {
   listProducts,
   productIdValidator,
   productValidators,
+  productListValidators,
   updateProduct,
 };

@@ -79,14 +79,15 @@ const updateReview = async (requestUser, reviewId, payload) => {
     throw new ApiError(403, 'Not authorized to update this review');
   }
 
+  const isAdmin = requestUser.role === 'ADMIN';
   const updated = await prisma.review.update({
     where: { id: reviewId },
     data: {
       userName: payload.userName || review.userName,
       rating: Number(payload.rating),
       comment: payload.comment,
-      isHidden: payload.isHidden === true || payload.isHidden === 'true',
-      isPinned: payload.isPinned === true || payload.isPinned === 'true',
+      isHidden: isAdmin && payload.isHidden !== undefined ? payload.isHidden === true || payload.isHidden === 'true' : review.isHidden,
+      isPinned: isAdmin && payload.isPinned !== undefined ? payload.isPinned === true || payload.isPinned === 'true' : review.isPinned,
     },
   });
 

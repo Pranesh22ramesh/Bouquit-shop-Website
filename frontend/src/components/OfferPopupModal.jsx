@@ -27,30 +27,40 @@ export default function OfferPopupModal({ offerData }) {
   };
 
   useEffect(() => {
-    // Show popup immediately when entering or refreshing
     if (offer.enabled) {
+      try {
+        if (sessionStorage.getItem('offerPopupShownThisSession') === 'true') return undefined;
+      } catch (_) {}
       const timer = setTimeout(() => {
         setIsOpen(true);
-      }, 700);
+        try { sessionStorage.setItem('offerPopupShownThisSession', 'true'); } catch (_) {}
+      }, 5000);
       return () => clearTimeout(timer);
     }
   }, [offer.enabled]);
 
-  const handleCopyCode = () => {
+  const closeOffer = () => {
+    setIsOpen(false);
+    try { sessionStorage.setItem('offerPopupShownThisSession', 'true'); } catch (_) {}
+  };
+
+  const handleCopyCode = async () => {
     if (!offer.couponCode) return;
-    navigator.clipboard.writeText(offer.couponCode);
-    setCopied(true);
-    toast.success(`Coupon code ${offer.couponCode} copied!`);
-    setTimeout(() => setCopied(false), 2500);
+    try {
+      await navigator.clipboard.writeText(offer.couponCode);
+      setCopied(true);
+      toast.success(`Coupon code ${offer.couponCode} copied!`);
+      setTimeout(() => setCopied(false), 2500);
+    } catch (_) {
+      toast.error('Could not copy the coupon code. Please copy it manually.');
+    }
   };
 
   const handleWhatsAppClaim = () => {
     const phone = "919942071721";
-    const msg = encodeURIComponent(
-      `🌸 *MIDHUNYAS Petals — Special Offer Claim* 🌸\n\nHello! I would like to place an order and claim *15% OFF* with coupon code: *${offer.couponCode}*.\n\nPlease share today's fresh catalog and designs!`
-    );
-    window.open(`https://wa.me/${phone}?text=${msg}`, "_blank");
-    setIsOpen(false);
+    const msg = encodeURIComponent(offer.whatsappMessage);
+    window.open(`https://wa.me/${phone}?text=${msg}`, "_blank", "noopener,noreferrer");
+    closeOffer();
   };
 
   if (!offer.enabled) return null;
@@ -59,13 +69,13 @@ export default function OfferPopupModal({ offerData }) {
     <>
       <AnimatePresence>
         {isOpen && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto p-3 sm:p-6">
             {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onClick={() => setIsOpen(false)}
+              onClick={closeOffer}
               className="absolute inset-0 bg-black/60 backdrop-blur-md"
             />
 
@@ -75,21 +85,21 @@ export default function OfferPopupModal({ offerData }) {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="relative w-full max-w-2xl overflow-hidden rounded-[28px] border border-[#C5A15B]/40 bg-[#FAF5EE] shadow-[0_25px_70px_rgba(101,31,60,0.35)] dark:border-[#493640] dark:bg-[#1A111A] text-[#30232A] dark:text-[#FAF5EE]"
+              className="relative my-auto max-h-[calc(100dvh-1.5rem)] w-full min-w-0 max-w-2xl overflow-y-auto rounded-[28px] border border-[#C5A15B]/40 bg-[#FAF5EE] shadow-[0_25px_70px_rgba(101,31,60,0.35)] dark:border-[#493640] dark:bg-[#1A111A] text-[#30232A] dark:text-[#FAF5EE] md:overflow-hidden"
             >
               {/* Close Button */}
               <button
                 type="button"
-                onClick={() => setIsOpen(false)}
+                onClick={closeOffer}
                 aria-label="Close offer popup"
                 className="absolute right-3.5 top-3.5 z-20 grid h-10 w-10 place-items-center rounded-full bg-white/80 dark:bg-black/60 text-[#30232A] dark:text-white backdrop-blur shadow-md hover:bg-[#651F3C] hover:text-white transition-all"
               >
                 <FiX className="text-xl" />
               </button>
 
-              <div className="grid md:grid-cols-[1.1fr_1.3fr]">
+              <div className="grid min-w-0 md:grid-cols-[1.1fr_1.3fr]">
                 {/* Left: Poster Image Showcase */}
-                <div className="relative min-h-[220px] md:min-h-full overflow-hidden bg-gradient-to-br from-[#651F3C] to-[#30232A]">
+                <div className="relative min-w-0 min-h-[180px] sm:min-h-[220px] md:min-h-full overflow-hidden bg-gradient-to-br from-[#651F3C] to-[#30232A]">
                   <img
                     src={offer.image}
                     alt={offer.title}
@@ -109,7 +119,7 @@ export default function OfferPopupModal({ offerData }) {
                 </div>
 
                 {/* Right: Offer Details & Actions */}
-                <div className="flex flex-col justify-between p-6 sm:p-8">
+                <div className="flex min-w-0 flex-col justify-between p-4 sm:p-8">
                   <div>
                     <div className="inline-flex items-center gap-1.5 rounded-full border border-[#C5A15B]/40 bg-[#F6ECE7] dark:bg-[#281827] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-[#651F3C] dark:text-[#D5B36C]">
                       <FiTag className="text-xs" /> {offer.badge}
@@ -129,15 +139,15 @@ export default function OfferPopupModal({ offerData }) {
 
                     {/* Promo Code Box */}
                     {offer.couponCode && (
-                      <div className="mt-4 rounded-xl border border-dashed border-[#C5A15B] bg-white/70 dark:bg-white/5 p-3 flex items-center justify-between gap-2 shadow-inner">
-                        <div>
+                      <div className="mt-4 flex min-w-0 flex-wrap items-center justify-between gap-2 rounded-xl border border-dashed border-[#C5A15B] bg-white/70 p-3 shadow-inner dark:bg-white/5">
+                        <div className="min-w-0 flex-1">
                           <p className="text-[10px] uppercase font-bold tracking-wider text-[#81747A] dark:text-zinc-400">Coupon Code</p>
-                          <p className="font-mono text-base font-bold text-[#651F3C] dark:text-[#D5B36C] tracking-wider">{offer.couponCode}</p>
+                          <p className="break-all font-mono text-base font-bold tracking-wider text-[#651F3C] dark:text-[#D5B36C]">{offer.couponCode}</p>
                         </div>
                         <button
                           type="button"
                           onClick={handleCopyCode}
-                          className="flex items-center gap-1 rounded-lg bg-[#651F3C] px-3 py-1.5 text-xs font-bold text-white hover:bg-[#4D172D] transition-all active:scale-95 shadow-sm"
+                          className="flex shrink-0 items-center gap-1 rounded-lg bg-[#651F3C] px-3 py-1.5 text-xs font-bold text-white shadow-sm transition-all hover:bg-[#4D172D] active:scale-95"
                         >
                           {copied ? <FiCheck className="text-emerald-300" /> : <FiCopy />}
                           {copied ? "Copied!" : "Copy"}
@@ -150,7 +160,7 @@ export default function OfferPopupModal({ offerData }) {
                   <div className="mt-6 flex flex-col gap-2.5">
                     <Link
                       to={offer.buttonLink || "/gallery"}
-                      onClick={() => setIsOpen(false)}
+                      onClick={closeOffer}
                       className="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#651F3C] via-[#8A2A52] to-[#651F3C] px-5 py-3 text-center text-xs font-bold uppercase tracking-wider text-white shadow-lg shadow-[#651F3C]/25 hover:brightness-110 active:scale-[0.98] transition-all"
                     >
                       <FiShoppingBag className="text-sm" /> {offer.buttonLabel}

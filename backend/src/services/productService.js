@@ -122,7 +122,7 @@ const listProducts = async (query = {}) => {
     (!query.category || query.category === 'all') &&
     (!query.filter || query.filter === 'all') &&
     (!query.sort || query.sort === 'latest') &&
-    !query.featured &&
+    query.featured !== 'true' && query.featured !== true &&
     !query.status;
 
   const now = Date.now();
@@ -148,7 +148,7 @@ const listProducts = async (query = {}) => {
     };
   }
 
-  if (query.featured) where.featured = true;
+  if (query.featured === true || query.featured === 'true') where.featured = true;
   if (String(query.status || '').toLowerCase() === 'available') {
     where.availability = Availability.AVAILABLE;
   }

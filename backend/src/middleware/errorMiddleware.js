@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const { Prisma } = require('@prisma/client');
 const { ApiError } = require('../utils/apiError');
+const { env } = require('../config/env');
 
 /**
  * Production-grade Centralized Error Handling Middleware.
@@ -9,19 +10,18 @@ const { ApiError } = require('../utils/apiError');
  * - Logs full diagnostics and stack traces server-side with unique correlation IDs.
  */
 const errorHandler = (error, req, res, next) => {
-  const isProduction = process.env.NODE_ENV === 'production';
   const errorId = crypto.randomUUID().slice(0, 8);
 
   // 1. Handled Operational Errors (ApiError)
   if (error instanceof ApiError) {
     return res.status(error.statusCode).json({
       message: error.message,
-      ...(isProduction ? {} : { details: error.details }),
     });
   }
 
   // 2. Prisma Database Specific Errors
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    console.error(`[DATABASE_ERROR][${errorId}] ${req.method} ${req.baseUrl}${req.route?.path || '/unknown'} | IP: ${req.ip} |`, error.stack || error);
     // Unique constraint violation (e.g. duplicate email)
     if (error.code === 'P2002') {
       return res.status(409).json({
@@ -45,7 +45,7 @@ const errorHandler = (error, req, res, next) => {
 
     // Database connection / pool exhaustion / timeout
     if (['P1001', 'P1002', 'P1017', 'P2024'].includes(error.code)) {
-      console.error(`[DB_UNAVAILABLE][${errorId}] Connection issue (${error.code}) from ${req.ip}`);
+      console.error(`[DB_UNAVAILABLE][${errorId}] ${req.method} ${req.baseUrl}${req.route?.path || '/unknown'} | IP: ${req.ip} |`, error.stack || error);
       return res.status(503).json({
         message: 'The database is temporarily unavailable. Please try again shortly.',
         errorId,
@@ -74,7 +74,7 @@ const errorHandler = (error, req, res, next) => {
 
   if (error.code === 'LIMIT_FILE_SIZE') {
     return res.status(400).json({
-      message: 'File size must be 10MB or smaller.',
+      message: `File size must be ${Math.ceil(env.upload.maxFileBytes / (1024 * 1024))}MB or smaller.`,
     });
   }
 
@@ -90,10 +90,26 @@ const errorHandler = (error, req, res, next) => {
     });
   }
 
+  if (['LIMIT_FIELD_COUNT', 'LIMIT_PART_COUNT'].includes(error.code)) {
+    return res.status(400).json({ message: 'Too many form fields in a single request.' });
+  }
+
+  if (error.code === 'LIMIT_FIELD_VALUE') {
+    return res.status(413).json({ message: 'A form field is too large.' });
+  }
+
   if (error.code === 'INVALID_IMAGE_TYPE') {
     return res.status(400).json({
       message: 'Only genuine JPG, PNG, and WebP images are allowed.',
     });
+  }
+
+  if (error.code === 'INVALID_IMAGE_CONTENT') {
+    return res.status(400).json({ message: 'Uploaded file is not a valid supported image.' });
+  }
+
+  if (error.status === 413 || error.type === 'entity.too.large') {
+    return res.status(413).json({ message: 'Request payload is too large.' });
   }
 
   // 5. CORS Rejection
@@ -106,14 +122,12 @@ const errorHandler = (error, req, res, next) => {
   // 6. Unhandled Internal Server Errors
   // Log full stack trace and request context on server only
   console.error(
-    `[SERVER_ERROR][${errorId}] ${req.method} ${req.originalUrl} | IP: ${req.ip} | Error:`,
+    `[SERVER_ERROR][${errorId}] ${req.method} ${req.baseUrl}${req.route?.path || '/unknown'} | IP: ${req.ip} | Error:`,
     error.stack || error
   );
 
   return res.status(500).json({
-    message: isProduction
-      ? 'An unexpected error occurred. Please try again later.'
-      : (error.message || 'Internal server error'),
+    message: 'An unexpected error occurred. Please try again later.',
     errorId,
   });
 };

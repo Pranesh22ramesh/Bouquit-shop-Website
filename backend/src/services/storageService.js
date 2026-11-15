@@ -3,6 +3,7 @@ const path = require('path');
 const sharp = require('sharp');
 const { env } = require('../config/env');
 const { supabase, hasSupabaseConfig } = require('../config/supabase');
+const { ApiError } = require('../utils/apiError');
 
 const localUploadRoot = path.join(__dirname, '..', '..', env.uploadDir);
 
@@ -19,8 +20,18 @@ const ensureLocalDirectory = async (folder) => {
  * and encodes with ultra-high quality WebP.
  */
 const optimizeImage = async (fileBuffer) => {
-  const image = sharp(fileBuffer).rotate();
-  const metadata = await image.metadata();
+  let image;
+  let metadata;
+  try {
+    image = sharp(fileBuffer, { limitInputPixels: env.upload.maxImagePixels }).rotate();
+    metadata = await image.metadata();
+  } catch (_) {
+    throw new ApiError(400, 'Uploaded file is not a valid image.');
+  }
+
+  if (!['jpeg', 'png', 'webp'].includes(metadata.format) || !metadata.width || !metadata.height || metadata.width * metadata.height > env.upload.maxImagePixels) {
+    throw new ApiError(400, 'Uploaded file is not a valid image.');
+  }
 
   const width = metadata.width || 1200;
   const height = metadata.height || 1200;
@@ -61,14 +72,14 @@ const optimizeImage = async (fileBuffer) => {
   });
 
   // 5. Ultra-Clear High-Fidelity WebP Output
-  return pipeline
-    .webp({
-      quality: 94,
-      effort: 6,
-      smartSubsample: true,
-      alphaQuality: 100,
-    })
-    .toBuffer();
+  try {
+    // Decoding and re-encoding produces an isolated WebP payload; original bytes are never served.
+    return await pipeline
+      .webp({ quality: 94, effort: 6, smartSubsample: true, alphaQuality: 100 })
+      .toBuffer();
+  } catch (_) {
+    throw new ApiError(400, 'Uploaded file is not a valid image.');
+  }
 };
 
 const buildStoragePath = (folder, filenameBase) => {
@@ -89,15 +100,24 @@ const extractStoragePath = (url) => {
 
   const marker = `/storage/v1/object/public/${env.supabaseStorageBucket}/`;
   if (url.includes(marker)) {
-    return url.split(marker).pop();
+    return safeStoragePath(url.split(marker).pop());
   }
 
   const localMarker = `/${env.uploadDir}/`;
   if (url.includes(localMarker)) {
-    return url.split(localMarker).pop();
+    return safeStoragePath(url.split(localMarker).pop());
   }
 
   return null;
+};
+
+const safeStoragePath = (value) => {
+  if (typeof value !== 'string') return null;
+  const normalized = value.replace(/\\/g, '/');
+  const segments = normalized.split('/');
+  if (!normalized || normalized.startsWith('/') || segments.some((segment) => !segment || segment === '.' || segment === '..')) return null;
+  if (!/^[a-zA-Z0-9_-]+(?:\/[a-zA-Z0-9_-]+)*\.webp$/.test(normalized)) return null;
+  return normalized;
 };
 
 const uploadImage = async ({ file, folder, filenameBase }) => {
@@ -125,7 +145,7 @@ const uploadImage = async ({ file, folder, filenameBase }) => {
 };
 
 const deleteImage = async (urlOrPath) => {
-  const storagePath = urlOrPath?.includes?.('/') ? extractStoragePath(urlOrPath) || urlOrPath : urlOrPath;
+  const storagePath = extractStoragePath(urlOrPath) || safeStoragePath(urlOrPath);
   if (!storagePath) return;
 
   if (hasSupabaseConfig) {
@@ -136,7 +156,8 @@ const deleteImage = async (urlOrPath) => {
     return;
   }
 
-  const fullPath = path.join(localUploadRoot, storagePath);
+  const fullPath = path.resolve(localUploadRoot, storagePath);
+  if (!fullPath.startsWith(`${path.resolve(localUploadRoot)}${path.sep}`)) return;
   try {
     await fs.promises.unlink(fullPath);
   } catch (error) {

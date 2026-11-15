@@ -3,12 +3,13 @@ const { asyncHandler } = require('../utils/asyncHandler');
 const contentService = require('../services/contentService');
 const { logActivity } = require('../services/activityService');
 const { ApiError } = require('../utils/apiError');
+const { validateContentPayload } = require('../middleware/contentSchema');
 
 const contentKeyValidator = [
   param('key')
     .trim()
     .notEmpty().withMessage('Content key is required')
-    .matches(/^[a-z0-9_-]{2,60}$/).withMessage('Invalid content section key format (alphanumeric, hyphens and underscores only)'),
+    .isIn(['home-highlight', 'about', 'contact']).withMessage('Unsupported content section'),
 ];
 
 const getContent = asyncHandler(async (req, res) => {
@@ -30,6 +31,8 @@ const updateContent = asyncHandler(async (req, res) => {
   if (!payload || typeof payload !== 'object') {
     throw new ApiError(400, 'Content data must be a valid object');
   }
+
+  validateContentPayload(req.params.key, payload, req.files || []);
 
   const updated = await contentService.updateContent(req.params.key, payload, req.files || []);
   await logActivity({

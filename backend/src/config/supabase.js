@@ -1,7 +1,7 @@
 const { createClient } = require('@supabase/supabase-js');
 const { env } = require('./env');
 
-const hasSupabaseConfig = Boolean(env.supabaseUrl && env.supabaseServiceRoleKey);
+const hasSupabaseConfig = Boolean(env.supabaseStorageEnabled && env.supabaseUrl && env.supabaseServiceRoleKey);
 
 const supabase = hasSupabaseConfig
   ? createClient(env.supabaseUrl, env.supabaseServiceRoleKey, {

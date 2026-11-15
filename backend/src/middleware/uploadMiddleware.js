@@ -1,7 +1,9 @@
 const path = require('path');
 const multer = require('multer');
+const sharp = require('sharp');
+const { env } = require('../config/env');
 
-const maxImageSize = 10 * 1024 * 1024; // 10MB max limit
+const maxImageSize = env.upload.maxFileBytes;
 const allowedMimeTypes = new Set(['image/jpeg', 'image/png', 'image/webp']);
 const allowedExtensions = new Set(['.jpg', '.jpeg', '.png', '.webp']);
 
@@ -53,7 +55,10 @@ const multerInstance = multer({
   storage: multer.memoryStorage(),
   limits: {
     fileSize: maxImageSize,
-    files: 8,
+    files: env.upload.maxFilesPerRequest,
+    fields: env.upload.maxFieldsPerRequest,
+    fieldSize: env.upload.maxFieldBytes,
+    parts: env.upload.maxFilesPerRequest + env.upload.maxFieldsPerRequest,
   },
   fileFilter(req, file, cb) {
     const ext = path.extname(file.originalname).toLowerCase();
@@ -84,17 +89,28 @@ const verifyUploadedFiles = (req, res, next) => {
     });
   }
 
-  for (const file of filesToVerify) {
-    if (file && file.buffer) {
-      if (!isValidImageSignature(file.buffer)) {
-        return res.status(400).json({
-          message: 'File security verification failed: Not a genuine image file.',
-        });
-      }
+  Promise.all(filesToVerify.map(async (file) => {
+    if (!file?.buffer || !isValidImageSignature(file.buffer)) {
+      const error = new Error('Invalid image content');
+      error.code = 'INVALID_IMAGE_CONTENT';
+      throw error;
     }
-  }
-
-  next();
+    try {
+      const metadata = await sharp(file.buffer, { limitInputPixels: env.upload.maxImagePixels }).metadata();
+      const expectedFormat = { 'image/jpeg': 'jpeg', 'image/png': 'png', 'image/webp': 'webp' }[file.mimetype];
+      const extension = path.extname(file.originalname).toLowerCase();
+      if (!metadata.format || metadata.format !== expectedFormat || !allowedExtensions.has(extension) || !metadata.width || !metadata.height || metadata.width * metadata.height > env.upload.maxImagePixels) {
+        const error = new Error('Invalid image content');
+        error.code = 'INVALID_IMAGE_CONTENT';
+        throw error;
+      }
+    } catch (error) {
+      if (error.code === 'INVALID_IMAGE_CONTENT') throw error;
+      const invalid = new Error('Invalid image content');
+      invalid.code = 'INVALID_IMAGE_CONTENT';
+      throw invalid;
+    }
+  })).then(() => next(), next);
 };
 
 const upload = {

@@ -1,199 +1,167 @@
+const crypto = require('crypto');
 const rateLimit = require('express-rate-limit');
 const { env } = require('../config/env');
 
-/**
- * Global general rate limiter for all incoming requests.
- */
+const message = (text) => ({ message: text });
+
 const globalLimiter = rateLimit({
   windowMs: env.rateLimit.globalWindowMs,
   max: env.rateLimit.globalMax,
   standardHeaders: true,
   legacyHeaders: false,
-  message: {
-    message: 'Too many requests from this IP. Please slow down and try again later.',
-  },
+  message: message('Too many requests. Please slow down and try again later.'),
 });
 
-/**
- * Moderate rate limiter for public browse endpoints (products, categories, gallery, reviews, content).
- */
 const publicLimiter = rateLimit({
   windowMs: env.rateLimit.publicWindowMs,
   max: env.rateLimit.publicMax,
   standardHeaders: true,
   legacyHeaders: false,
-  message: {
-    message: 'Too many browsing requests. Please try again in a few moments.',
-  },
+  message: message('Too many browsing requests. Please try again in a few moments.'),
 });
 
-/**
- * Looser rate limiter for authenticated user actions (cart, profile, wishlist, orders).
- * Keys on authenticated user ID if available, otherwise falls back to client IP.
- */
+// This middleware must run after protect so the key is the verified user ID.
 const authenticatedLimiter = rateLimit({
   windowMs: env.rateLimit.userWindowMs,
   max: env.rateLimit.userMax,
-  keyGenerator: (req) => (req.user && req.user.id ? `user_${req.user.id}` : req.ip),
+  keyGenerator: (req) => `user:${req.user?.id || req.ip}`,
   standardHeaders: true,
   legacyHeaders: false,
-  message: {
-    message: 'User action rate limit reached. Please wait a moment before trying again.',
-  },
+  message: message('User action rate limit reached. Please wait before trying again.'),
 });
 
-/**
- * Strict limiter for sensitive authentication endpoints (login, forgot-password)
- * Prevents automated credential stuffing by IP address.
- */
 const authLimiter = rateLimit({
   windowMs: env.rateLimit.authWindowMs,
   max: env.rateLimit.authMax,
   standardHeaders: true,
   legacyHeaders: false,
-  message: {
-    message: 'Too many authentication attempts from this IP. Please try again after 15 minutes.',
-  },
+  message: message('Too many authentication requests. Please try again later.'),
 });
 
-/**
- * Limiter for new account creation to prevent automated bot spam.
- */
 const signupLimiter = rateLimit({
   windowMs: env.rateLimit.signupWindowMs,
   max: env.rateLimit.signupMax,
   standardHeaders: true,
   legacyHeaders: false,
-  message: {
-    message: 'Too many accounts created from this IP. Please try again later.',
-  },
+  message: message('Too many accounts created from this IP. Please try again later.'),
 });
 
-/**
- * Limiter for file uploads to prevent resource exhaustion / DoS.
- */
 const uploadLimiter = rateLimit({
   windowMs: env.rateLimit.uploadWindowMs,
   max: env.rateLimit.uploadMax,
   standardHeaders: true,
   legacyHeaders: false,
-  message: {
-    message: 'Upload rate limit reached. Please wait a few moments before uploading more files.',
-  },
+  message: message('Upload rate limit reached. Please wait before uploading more files.'),
 });
 
-// =========================================================================
-// Per-Account Tracking & Exponential Backoff Engine
-// =========================================================================
-
-// In-memory tracking stores for failed attempts
-// Map structure: key => { count: number, firstAttemptAt: number, lastAttemptAt: number, blockedUntil: number }
+// Process-local attempt state. In multi-instance deployments, use a shared rate-limit
+// store so account backoff is consistent across instances.
 const accountAttempts = new Map();
 const ipAttempts = new Map();
+const maxEntries = env.rateLimit.authAttemptMapMaxEntries;
+const attemptWindowMs = env.rateLimit.authWindowMs;
 
-// Periodic cleanup every 10 minutes to prevent memory leak
-setInterval(() => {
-  const now = Date.now();
-  const windowMs = env.rateLimit.authWindowMs;
+const accountKey = (email, scope) => crypto
+  .createHmac('sha256', env.jwtAccessSecret)
+  .update(`${scope}:${String(email).trim().toLowerCase()}`)
+  .digest('hex');
 
-  for (const [key, record] of accountAttempts.entries()) {
-    if (now - record.lastAttemptAt > windowMs) {
-      accountAttempts.delete(key);
-    }
+const authScope = (req) => {
+  if (req.path.endsWith('/login')) return 'login';
+  if (req.path === '/signup') return 'signup';
+  if (req.path === '/forgotpassword') return 'password-reset-request';
+  if (req.path.startsWith('/resetpassword/')) return 'password-reset';
+  return 'auth';
+};
+
+const requestIdentity = (req) => {
+  if (typeof req.body?.email === 'string') return req.body.email;
+  if (typeof req.params?.token === 'string') return req.params.token;
+  if (typeof req.cookies?.[env.refreshCookieName] === 'string') return req.cookies[env.refreshCookieName];
+  return '';
+};
+
+const getActiveRecord = (store, key, now) => {
+  const record = store.get(key);
+  if (!record) return null;
+  if (now - record.lastAttemptAt >= attemptWindowMs) {
+    store.delete(key);
+    return null;
   }
+  return record;
+};
 
-  for (const [key, record] of ipAttempts.entries()) {
-    if (now - record.lastAttemptAt > windowMs) {
-      ipAttempts.delete(key);
-    }
+const pruneStore = (store, now) => {
+  for (const [key, record] of store) {
+    if (now - record.lastAttemptAt >= attemptWindowMs) store.delete(key);
   }
-}, 10 * 60 * 1000).unref();
+  while (store.size >= maxEntries) {
+    const oldestKey = store.keys().next().value;
+    if (oldestKey === undefined) break;
+    store.delete(oldestKey);
+  }
+};
 
-/**
- * Middleware: Per-Account Rate Limiting & Exponential Backoff.
- * Applied before login to enforce progressive backoff delays and per-account thresholds.
- */
-const authAccountAndBackoffLimiter = async (req, res, next) => {
-  const email = (req.body?.email || '').trim().toLowerCase();
+const authAccountAndBackoffLimiter = (req, res, next) => {
+  const identity = requestIdentity(req);
   const ip = req.ip || req.socket?.remoteAddress || 'unknown';
+  const scope = authScope(req);
   const now = Date.now();
-  const windowMs = env.rateLimit.authWindowMs;
-  const maxAttemptsPerAccount = env.rateLimit.authMax;
+  const records = [
+    identity ? getActiveRecord(accountAttempts, accountKey(identity, scope), now) : null,
+    getActiveRecord(ipAttempts, `${scope}:${ip}`, now),
+  ].filter(Boolean);
+  const blockedUntil = Math.max(0, ...records.map((record) => record.blockedUntil || 0));
 
-  // 1. Check Per-Account lockout threshold
-  if (email) {
-    const acctRecord = accountAttempts.get(email);
-    if (acctRecord) {
-      // If outside window, reset
-      if (now - acctRecord.firstAttemptAt > windowMs) {
-        accountAttempts.delete(email);
-      } else if (acctRecord.count >= maxAttemptsPerAccount) {
-        const retryAfterSeconds = Math.ceil((acctRecord.firstAttemptAt + windowMs - now) / 1000);
-        res.setHeader('Retry-After', retryAfterSeconds);
-        return res.status(429).json({
-          message: `Too many failed attempts for this account. Please wait ${Math.ceil(retryAfterSeconds / 60)} minute(s) before trying again or reset your password.`,
-          retryAfter: retryAfterSeconds,
-        });
-      }
-    }
+  if (blockedUntil > now) {
+    const retryAfter = Math.max(1, Math.ceil((blockedUntil - now) / 1000));
+    res.setHeader('Retry-After', retryAfter);
+    return res.status(429).json({ message: 'Unable to sign in right now. Please try again later.', retryAfter });
   }
 
-  // 2. Exponential Backoff Check (based on combined IP / Account failures)
-  const acctFailures = email ? (accountAttempts.get(email)?.count || 0) : 0;
-  const ipFailures = ipAttempts.get(ip)?.count || 0;
-  const consecutiveFailures = Math.max(acctFailures, ipFailures);
-
-  // If 3 or more consecutive failures, enforce exponential backoff delay
-  if (consecutiveFailures >= 3) {
-    // 3 failures: 1.5s, 4 failures: 3s, 5 failures: 6s, 6+ failures: 12s (capped at 20s)
-    const backoffExponent = Math.min(consecutiveFailures - 2, 4);
-    const delayMs = Math.min(1500 * Math.pow(2, backoffExponent - 1), 20000);
-
-    // Enforce sleep delay to throttle automated credential stuffers
-    await new Promise((resolve) => setTimeout(resolve, delayMs));
-  }
-
-  next();
+  return next();
 };
 
-/**
- * Record a failed authentication attempt to increment backoff counter.
- */
-const recordFailedAuth = (email, ip) => {
+const recordFailure = (store, key, threshold, now) => {
+  if (!key) return;
+  let record = getActiveRecord(store, key, now);
+  if (!record) {
+    pruneStore(store, now);
+    record = { count: 0, firstAttemptAt: now, lastAttemptAt: now, blockedUntil: 0 };
+  }
+  record.count += 1;
+  record.lastAttemptAt = now;
+  if (record.count >= threshold) {
+    const exponent = Math.min(record.count - threshold, 30);
+    const delay = Math.min(env.rateLimit.authBackoffBaseMs * (2 ** exponent), env.rateLimit.authBackoffMaxMs);
+    record.blockedUntil = Math.max(record.blockedUntil, now + delay);
+  }
+  store.set(key, record);
+};
+
+const recordAuthAttempt = (identity, ip, scope = 'login') => {
   const now = Date.now();
-  const normEmail = (email || '').trim().toLowerCase();
-
-  if (normEmail) {
-    const acct = accountAttempts.get(normEmail) || {
-      count: 0,
-      firstAttemptAt: now,
-      lastAttemptAt: now,
-    };
-    acct.count += 1;
-    acct.lastAttemptAt = now;
-    accountAttempts.set(normEmail, acct);
+  const normalizedIdentity = typeof identity === 'string' ? identity.trim().toLowerCase() : '';
+  if (normalizedIdentity) {
+    recordFailure(accountAttempts, accountKey(normalizedIdentity, scope), env.rateLimit.authAccountFailureMax, now);
   }
-
-  if (ip) {
-    const ipRec = ipAttempts.get(ip) || {
-      count: 0,
-      firstAttemptAt: now,
-      lastAttemptAt: now,
-    };
-    ipRec.count += 1;
-    ipRec.lastAttemptAt = now;
-    ipAttempts.set(ip, ipRec);
-  }
+  recordFailure(ipAttempts, `${scope}:${ip || 'unknown'}`, env.rateLimit.authIpFailureMax, now);
 };
 
-/**
- * Clear failed attempts upon successful authentication.
- */
-const recordSuccessfulAuth = (email, ip) => {
-  const normEmail = (email || '').trim().toLowerCase();
-  if (normEmail) accountAttempts.delete(normEmail);
-  if (ip) ipAttempts.delete(ip);
+const recordFailedAuth = (identity, ip, scope = 'login') => recordAuthAttempt(identity, ip, scope);
+
+const recordSuccessfulAuth = (identity, ip, scope = 'login') => {
+  const normalizedIdentity = typeof identity === 'string' ? identity.trim().toLowerCase() : '';
+  if (normalizedIdentity) accountAttempts.delete(accountKey(normalizedIdentity, scope));
+  if (ip) ipAttempts.delete(`${scope}:${ip}`);
 };
+
+const cleanupTimer = setInterval(() => {
+  const now = Date.now();
+  pruneStore(accountAttempts, now);
+  pruneStore(ipAttempts, now);
+}, Math.min(attemptWindowMs, 10 * 60 * 1000));
+cleanupTimer.unref();
 
 module.exports = {
   globalLimiter,
@@ -204,5 +172,6 @@ module.exports = {
   uploadLimiter,
   authAccountAndBackoffLimiter,
   recordFailedAuth,
+  recordAuthAttempt,
   recordSuccessfulAuth,
 };

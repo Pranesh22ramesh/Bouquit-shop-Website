@@ -6,13 +6,13 @@ const orderValidators = [
   body('shippingAddress')
     .isObject().withMessage('Shipping address is required'),
   body('shippingAddress.address')
-    .isString().bail().trim().notEmpty().isLength({ max: 180 }).withMessage('Enter a valid shipping address'),
+    .isString().bail().trim().notEmpty().isLength({ min: 3, max: 180 }).withMessage('Enter a valid shipping address'),
   body('shippingAddress.city')
-    .isString().bail().trim().notEmpty().isLength({ max: 180 }).withMessage('Enter a valid city'),
+    .isString().bail().trim().notEmpty().isLength({ min: 2, max: 100 }).matches(/^[\p{L}\p{M} .'-]+$/u).withMessage('Enter a valid city'),
   body('shippingAddress.postalCode')
-    .isString().bail().trim().notEmpty().isLength({ max: 40 }).withMessage('Enter a valid postal code'),
+    .isString().bail().trim().notEmpty().isLength({ min: 3, max: 16 }).matches(/^[a-zA-Z0-9 -]+$/).withMessage('Enter a valid postal code'),
   body('shippingAddress.country')
-    .isString().bail().trim().notEmpty().isLength({ max: 100 }).withMessage('Enter a valid country'),
+    .isString().bail().trim().notEmpty().isLength({ min: 2, max: 100 }).matches(/^[\p{L}\p{M} .'-]+$/u).withMessage('Enter a valid country'),
   body('paymentMethod')
     .equals('Cash on Delivery').withMessage('Cash on Delivery is the only available payment method'),
   body('deliveryDate')
@@ -24,7 +24,7 @@ const orderIdValidator = [
   param('id')
     .trim()
     .notEmpty().withMessage('Order ID is required')
-    .isLength({ min: 1, max: 64 }).withMessage('Invalid order ID format'),
+    .isUUID().withMessage('Invalid order ID format'),
 ];
 
 const createOrder = asyncHandler(async (req, res) => {

@@ -13,38 +13,46 @@ const pageKeyValidator = [
 const updateConfigValidators = [
   body('siteTitle')
     .optional()
-    .trim()
     .isString().withMessage('Site title must be a string')
+    .bail()
+    .trim()
     .isLength({ max: 120 }).withMessage('Site title must not exceed 120 characters'),
   body('siteDescription')
     .optional()
-    .trim()
     .isString().withMessage('Site description must be a string')
+    .bail()
+    .trim()
     .isLength({ max: 500 }).withMessage('Site description must not exceed 500 characters'),
   body('defaultOgImage')
     .optional()
-    .trim()
     .isString().withMessage('Default OG image must be a string')
-    .isLength({ max: 500 }).withMessage('Image URL too long'),
+    .bail()
+    .trim()
+    .isLength({ max: 500 })
+    .matches(/^(?:|\/(?!\/)[^\s]*|https:\/\/[^\s]+)$/i).withMessage('Image URL must be HTTPS or a local path'),
 ];
 
 const upsertPageValidators = [
   ...pageKeyValidator,
   body('title')
     .optional()
-    .trim()
     .isString().withMessage('Title must be a string')
+    .bail()
+    .trim()
     .isLength({ max: 120 }).withMessage('Title must not exceed 120 characters'),
   body('description')
     .optional()
-    .trim()
     .isString().withMessage('Description must be a string')
+    .bail()
+    .trim()
     .isLength({ max: 500 }).withMessage('Description must not exceed 500 characters'),
   body('canonical')
     .optional()
-    .trim()
     .isString().withMessage('Canonical URL must be a string')
-    .isLength({ max: 300 }).withMessage('Canonical URL too long'),
+    .bail()
+    .trim()
+    .isLength({ max: 300 })
+    .matches(/^(?:|\/(?!\/)[^\s]*|https:\/\/[^\s]+)$/i).withMessage('Canonical URL must be HTTPS or a local path'),
 ];
 
 const getConfig = asyncHandler(async (req, res) => {

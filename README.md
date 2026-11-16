@@ -87,6 +87,8 @@ Use unique random JWT secrets with at least 32 characters in production. Do not 
 
 ## Useful Commands
 
+See [the security review](./SECURITY_REVIEW.md) for rate-limit settings, audit results, repeatable security/database/browser tests, and the remaining administrator credential rotation step.
+
 ```bash
 cd backend && npx prisma generate
 cd backend && npx prisma db push

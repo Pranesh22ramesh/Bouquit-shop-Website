@@ -3,10 +3,11 @@ const { protect, adminOnly } = require('../middleware/authMiddleware');
 const { validateRequest } = require('../middleware/validateRequest');
 const { strictRequest } = require('../middleware/strictRequest');
 const { upload } = require('../middleware/uploadMiddleware');
-const { uploadLimiter, authenticatedLimiter } = require('../middleware/rateLimiter');
+const { uploadLimiter, publicLimiter, authenticatedLimiter } = require('../middleware/rateLimiter');
 const productController = require('../controllers/productController');
 
 const router = express.Router();
+router.use((req, res, next) => ['GET', 'HEAD'].includes(req.method) ? publicLimiter(req, res, next) : next());
 
 router.get('/', strictRequest({ query: ['keyword', 'search', 'category', 'filter', 'sort', 'limit', 'featured', 'status'] }), productController.productListValidators, validateRequest, productController.listProducts);
 router.get('/categories', strictRequest(), productController.listCategories);

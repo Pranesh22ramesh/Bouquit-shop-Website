@@ -66,7 +66,7 @@ const CheckoutPage = () => {
       const orderData = {
         shippingAddress: shipping,
         paymentMethod,
-        deliveryDate: deliveryDate || null,
+        deliveryDate: deliveryDate || undefined,
       };
 
       if (!user?.address) {
@@ -139,7 +139,7 @@ const CheckoutPage = () => {
       {/* WhatsApp Confirmation Popup */}
       {showWhatsAppPopup && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
-          <div className={`w-full max-w-lg rounded-3xl p-8 shadow-2xl text-center relative overflow-hidden ${isDarkMode ? "bg-[#231722] text-[#FAF5EE] border border-[#493640]" : "bg-white text-[#30232A] border border-[#E8DDD5]"}`}>
+          <div role="dialog" aria-modal="true" aria-labelledby="order-received-title" className={`w-full max-w-lg max-h-[90dvh] rounded-3xl p-8 shadow-2xl text-center relative overflow-y-auto ${isDarkMode ? "bg-[#231722] text-[#FAF5EE] border border-[#493640]" : "bg-white text-[#30232A] border border-[#E8DDD5]"}`}>
             
             <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <svg className="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -147,11 +147,11 @@ const CheckoutPage = () => {
               </svg>
             </div>
             
-            <h2 className="text-2xl font-bold font-serif mb-4">Almost Done!</h2>
+            <h2 id="order-received-title" className="text-2xl font-bold font-serif mb-4">Order received!</h2>
             
             <div className={`p-4 rounded-xl mb-6 text-sm font-medium ${isDarkMode ? "bg-[#171116]" : "bg-[#F5EAE9]"}`}>
-              <p className="mb-2">Once you have successfully placed the order here, please send the order details to us on WhatsApp.</p>
-              <p className="text-[#651F3C] font-bold dark:text-[#D5B36C]">After sending the message, verify and confirm your order by calling this number: <br/><span className="text-lg">+91 9942071721</span></p>
+              <p className="mb-2">Your order has been saved. Send the details to our team on WhatsApp to confirm delivery.</p>
+              <p className="text-[#651F3C] font-bold dark:text-[#D5B36C]">You can also call us at <br/><a href="tel:+919942071721" className="text-lg underline">+91 9942071721</a></p>
             </div>
 
             <button 
@@ -162,6 +162,9 @@ const CheckoutPage = () => {
                 <path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/>
               </svg>
               Send to WhatsApp
+            </button>
+            <button type="button" onClick={() => navigate('/my-orders')} className="mt-4 w-full rounded-xl border border-[#651F3C] px-6 py-3 font-semibold text-[#651F3C] dark:border-[#D5B36C] dark:text-[#D5B36C]">
+              View my orders
             </button>
           </div>
         </div>

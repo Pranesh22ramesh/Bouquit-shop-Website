@@ -1,9 +1,8 @@
-const { body, param } = require('express-validator');
+const { body, param, cookie } = require('express-validator');
 const { asyncHandler } = require('../utils/asyncHandler');
 const authService = require('../services/authService');
 const { refreshCookieOptions } = require('../utils/cookies');
 const { env } = require('../config/env');
-const { recordAuthAttempt, recordFailedAuth, recordSuccessfulAuth } = require('../middleware/rateLimiter');
 
 // Strict input validation schemas
 const signupValidators = [
@@ -27,6 +26,7 @@ const signupValidators = [
     .matches(/^\+?[0-9]{10,15}$/).withMessage('Enter a valid phone number (10 to 15 digits)'),
   body('password')
     .isString().withMessage('Password must be a string')
+    .bail().custom((value) => Buffer.byteLength(value, 'utf8') <= 72).withMessage('Password must not exceed 72 UTF-8 bytes')
     .isLength({ min: 8, max: 100 }).withMessage('Password must be between 8 and 100 characters'),
   body('confirmPassword')
     .isString().withMessage('Password confirmation must be text').bail()
@@ -45,6 +45,7 @@ const loginValidators = [
     .isLength({ max: 100 }).withMessage('Email address is too long'),
   body('password')
     .isString().withMessage('Password must be a string')
+    .bail().custom((value) => Buffer.byteLength(value, 'utf8') <= 72).withMessage('Password must not exceed 72 UTF-8 bytes')
     .notEmpty().withMessage('Password is required')
     .isLength({ max: 100 }).withMessage('Password exceeds maximum length'),
 ];
@@ -65,9 +66,10 @@ const resetValidators = [
     .trim()
     .notEmpty().withMessage('Reset token is required')
     .matches(/^[A-Za-z0-9._-]+$/).withMessage('Invalid reset token format')
-    .isLength({ min: 16, max: 256 }).withMessage('Invalid reset token format'),
+    .isLength({ min: 16, max: 4096 }).withMessage('Invalid reset token format'),
   body('password')
     .isString().withMessage('Password must be a string')
+    .bail().custom((value) => Buffer.byteLength(value, 'utf8') <= 72).withMessage('Password must not exceed 72 UTF-8 bytes')
     .isLength({ min: 8, max: 100 }).withMessage('Password must be between 8 and 100 characters'),
   body('confirmPassword')
     .optional()
@@ -86,36 +88,18 @@ const sendSession = (res, session) => {
 };
 
 const signup = asyncHandler(async (req, res) => {
-  try {
-    const session = await authService.signup(req.body);
-    recordSuccessfulAuth(req.body.email, req.ip, 'signup');
-    sendSession(res.status(201), session);
-  } catch (error) {
-    if (error.statusCode === 409 || error.statusCode === 400) recordFailedAuth(req.body.email, req.ip, 'signup');
-    throw error;
-  }
+  const session = await authService.signup(req.body);
+  sendSession(res.status(201), session);
 });
 
 const login = asyncHandler(async (req, res) => {
-  try {
-    const session = await authService.login(req.body);
-    recordSuccessfulAuth(req.body.email, req.ip);
-    sendSession(res, session);
-  } catch (error) {
-    if (error.statusCode === 401) recordFailedAuth(req.body.email, req.ip);
-    throw error;
-  }
+  const session = await authService.login(req.body);
+  sendSession(res, session);
 });
 
 const adminLogin = asyncHandler(async (req, res) => {
-  try {
-    const session = await authService.login({ ...req.body, adminOnly: true });
-    recordSuccessfulAuth(req.body.email, req.ip);
-    sendSession(res, session);
-  } catch (error) {
-    if (error.statusCode === 401) recordFailedAuth(req.body.email, req.ip);
-    throw error;
-  }
+  const session = await authService.login({ ...req.body, adminOnly: true });
+  sendSession(res, session);
 });
 
 const me = asyncHandler(async (req, res) => {
@@ -136,7 +120,6 @@ const logout = asyncHandler(async (req, res) => {
 
 const forgotPassword = asyncHandler(async (req, res) => {
   const token = await authService.beginPasswordReset(req.body.email);
-  recordAuthAttempt(req.body.email, req.ip, 'password-reset-request');
   const response = {
     message: 'If that email exists, a password reset link has been processed.',
   };
@@ -149,20 +132,16 @@ const forgotPassword = asyncHandler(async (req, res) => {
 });
 
 const resetPassword = asyncHandler(async (req, res) => {
-  try {
-    const session = await authService.resetPassword({
-      token: req.params.token,
-      password: req.body.password,
-    });
-    recordSuccessfulAuth(req.params.token, req.ip, 'password-reset');
-    sendSession(res, session);
-  } catch (error) {
-    if (error.statusCode === 400 || error.statusCode === 401) recordFailedAuth(req.params.token, req.ip, 'password-reset');
-    throw error;
-  }
+  const session = await authService.resetPassword({ token: req.params.token, password: req.body.password });
+  sendSession(res, session);
 });
 
+const cookieValidators = [cookie(env.refreshCookieName).optional().isString().bail()
+  .isLength({ min: 16, max: 4096 }).matches(/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/)
+  .withMessage('Invalid session cookie')];
+
 module.exports = {
+  cookieValidators,
   adminLogin,
   forgotPassword,
   forgotPasswordValidators,

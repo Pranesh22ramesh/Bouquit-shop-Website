@@ -1,19 +1,22 @@
 const UNSAFE_TEXT = /(?:<\s*\/?\s*(?:script|iframe|object|embed)\b|javascript\s*:|<[^>]+\bon[a-z]+\s*=)/i;
 const FORBIDDEN_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
 
-const inspectValue = (value, path, invalid) => {
+const inspectValue = (value, path, invalid, depth = 0) => {
+  if (invalid.length >= 20) return;
+  if (depth > 12) { invalid.push(path); return; }
   if (typeof value === 'string') {
-    if (UNSAFE_TEXT.test(value)) invalid.push(path);
+    // Passwords are opaque credentials, never rendered as markup.
+    if (!/\.(?:password|confirmPassword)$/.test(path) && UNSAFE_TEXT.test(value)) invalid.push(path);
     return;
   }
   if (Array.isArray(value)) {
-    value.forEach((item, index) => inspectValue(item, `${path}[${index}]`, invalid));
+    value.forEach((item, index) => inspectValue(item, `${path}[${index}]`, invalid, depth + 1));
     return;
   }
   if (value && typeof value === 'object') {
     for (const [key, child] of Object.entries(value)) {
       if (FORBIDDEN_KEYS.has(key)) invalid.push(`${path}.${key}`);
-      inspectValue(child, `${path}.${key}`, invalid);
+      inspectValue(child, `${path}.${key}`, invalid, depth + 1);
     }
   }
 };

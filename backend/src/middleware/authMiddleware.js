@@ -8,8 +8,11 @@ const protect = async (req, res, next) => {
 
   if (!token) return next(new ApiError(401, 'Not authorized, no token'));
 
+  let payload;
+  try { payload = verifyAccessToken(token); } catch (_) {
+    return next(new ApiError(401, 'Not authorized, token failed'));
+  }
   try {
-    const payload = verifyAccessToken(token);
     const user = await prisma.user.findUnique({
       where: { id: payload.sub },
       select: {
@@ -29,7 +32,7 @@ const protect = async (req, res, next) => {
     req.user = user;
     return next();
   } catch (error) {
-    return next(new ApiError(401, 'Not authorized, token failed'));
+    return next(error);
   }
 };
 
@@ -44,8 +47,12 @@ const optionalAuth = async (req, res, next) => {
 
   if (!token) return next();
 
+  let payload;
+  try { payload = verifyAccessToken(token); } catch (_) {
+    req.user = null;
+    return next();
+  }
   try {
-    const payload = verifyAccessToken(token);
     const user = await prisma.user.findUnique({
       where: { id: payload.sub },
       select: {
@@ -60,7 +67,7 @@ const optionalAuth = async (req, res, next) => {
     });
     req.user = user?.isActive === false ? null : user || null;
   } catch (error) {
-    req.user = null;
+    return next(error);
   }
 
   return next();

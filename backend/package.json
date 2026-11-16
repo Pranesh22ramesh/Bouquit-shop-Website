@@ -6,6 +6,9 @@
   "scripts": {
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
+    "test": "node --test test/*.test.cjs",
+    "test:db": "node scripts/test-checkout.cjs",
+    "security:rotate-admin": "node scripts/rotate-admin.cjs",
     "build": "prisma generate && prisma db push && node prisma/seed.js",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
@@ -20,7 +23,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.6.1",
     "express": "^4.22.2",
-    "express-rate-limit": "^7.5.1",
+    "express-rate-limit": "^8.7.4",
     "express-validator": "^7.2.1",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",

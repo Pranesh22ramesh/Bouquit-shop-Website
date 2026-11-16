@@ -23,22 +23,23 @@ const profileValidators = [
     .normalizeEmail()
     .isLength({ max: 100 }).withMessage('Email address is too long'),
   body('phoneNumber')
-    .optional({ values: 'falsy' })
+    .optional()
     .isString().bail()
     .trim()
     .matches(/^\+?[0-9]{10,15}$/).withMessage('Enter a valid phone number (10 to 15 digits)'),
   body('mobile')
-    .optional({ values: 'falsy' })
+    .optional()
     .isString().bail()
     .trim()
     .matches(/^\+?[0-9]{10,15}$/).withMessage('Enter a valid phone number (10 to 15 digits)'),
   body('address')
-    .optional({ values: 'falsy' })
-    .isString().withMessage('Address must be a string')
+    .optional()
+    .isString().withMessage('Address must be a string').bail()
     .isLength({ max: 300 }).withMessage('Address must not exceed 300 characters'),
   body('password')
-    .optional({ values: 'falsy' })
-    .isString().withMessage('Password must be a string')
+    .optional()
+    .isString().withMessage('Password must be a string').bail()
+    .custom((value) => Buffer.byteLength(value, 'utf8') <= 72).withMessage('Password must not exceed 72 UTF-8 bytes')
     .isLength({ min: 8, max: 100 }).withMessage('Password must be between 8 and 100 characters'),
 ];
 
@@ -50,12 +51,13 @@ const userListValidators = [
 
 const adminProfileValidators = [
   ...profileValidators,
-  body('role').optional().isIn(['admin', 'user']).withMessage('Role must be admin or user'),
+  body('role').optional().isString().bail().isIn(['admin', 'user']).withMessage('Role must be admin or user'),
 ];
 
 const passwordValidators = [
   body('password')
     .isString().withMessage('Password must be a string')
+    .bail().custom((value) => Buffer.byteLength(value, 'utf8') <= 72).withMessage('Password must not exceed 72 UTF-8 bytes')
     .notEmpty().withMessage('Password is required')
     .isLength({ min: 8, max: 100 }).withMessage('Password must be between 8 and 100 characters'),
 ];
@@ -73,7 +75,7 @@ const cartValidators = [
     .isInt({ min: 1, max: 99 }).withMessage('Quantity must be between 1 and 99'),
   body('customization')
     .optional()
-    .isObject({ strict: true }).withMessage('Customization must be an object')
+    .isObject({ strict: true }).withMessage('Customization must be an object').bail()
     .custom((value) => {
       const allowed = new Set(['variant', 'primaryColor', 'secondaryColors', 'selectedFlowers', 'stones', 'notes', 'referenceImageName', 'mainColor', 'secondaryColor', 'beads', 'hasReferencePhoto', 'quantity']);
       if (Object.keys(value).some((key) => !allowed.has(key))) throw new Error('Unsupported customization field');
@@ -91,6 +93,13 @@ const cartValidators = [
         } else if (entry !== null && (typeof entry !== 'string' || entry.length > 500)) {
           throw new Error('Customization values must be short strings');
         }
+        if (['mainColor', 'secondaryColor'].includes(key) && (typeof entry !== 'string' || !/^#[0-9a-f]{6}$/i.test(entry))) throw new Error('Invalid color format');
+        if (key === 'variant' && entry !== null && !['classic', 'premium', 'luxury'].includes(entry)) throw new Error('Invalid variant');
+        if (key === 'primaryColor' && !['Classic Red', 'Soft Pastel', 'Ivory & Gold', 'Multicolor'].includes(entry)) throw new Error('Invalid primary color');
+        if (key === 'secondaryColors' && (!Array.isArray(entry) || entry.length > 6 || entry.some((color) => !['Classic Red', 'Soft Pastel', 'Ivory & Gold'].includes(color)))) throw new Error('Invalid secondary colors');
+        if (key === 'stones' && Array.isArray(entry) && entry.some((stone) => !['Crystals', 'Pearl Beads', 'Kundan Highlights'].includes(stone))) throw new Error('Invalid stone option');
+        if (key === 'selectedFlowers' && Array.isArray(entry) && entry.some((flower) => !/^[\p{L}\p{M} .'-]{1,40}$/u.test(flower))) throw new Error('Invalid flower name');
+        if (key === 'referenceImageName' && entry !== null && entry.length > 120) throw new Error('Reference filename is too long');
       }
       return true;
     }),
@@ -110,10 +119,11 @@ const updateCartValidators = [
 ];
 
 const statusValidators = [
-  body('isActive').optional().isBoolean({ strict: true }).withMessage('isActive must be a boolean value'),
-  body('status').optional().isIn(['ACTIVE', 'INACTIVE', 'SUSPENDED']).withMessage('Invalid status value'),
+  body('isActive').optional().custom((value) => typeof value === 'boolean').withMessage('isActive must be a boolean value'),
+  body('status').optional().isString().bail().isIn(['ACTIVE', 'INACTIVE', 'SUSPENDED']).withMessage('Invalid status value'),
   body().custom((value) => {
     if (value.isActive === undefined && value.status === undefined) throw new Error('A status value is required');
+    if (value.isActive !== undefined && value.status !== undefined) throw new Error('Provide one status field');
     return true;
   }),
 ];

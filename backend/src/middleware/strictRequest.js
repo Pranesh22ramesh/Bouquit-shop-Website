@@ -7,7 +7,7 @@ const isPlainObject = (value) => {
 const strictRequest = ({ body = [], query = [], params = [], nestedBody = {}, bodyStrings = false } = {}) => (req, res, next) => {
   const invalid = [];
   const check = (value, allowed, source, nested = {}) => {
-    if (value === undefined || value === null) return;
+    if (value === undefined) return;
     if (!isPlainObject(value)) {
       invalid.push(source);
       return;
@@ -18,7 +18,7 @@ const strictRequest = ({ body = [], query = [], params = [], nestedBody = {}, bo
         invalid.push(`${source}.${key}`);
         continue;
       }
-      if (source === 'query' && typeof value[key] !== 'string') invalid.push(`query.${key}`);
+      if (['query', 'params'].includes(source) && typeof value[key] !== 'string') invalid.push(`${source}.${key}`);
       if (source === 'body' && bodyStrings && typeof value[key] !== 'string') invalid.push(`body.${key}`);
       if (nested[key]) {
         const child = value[key];

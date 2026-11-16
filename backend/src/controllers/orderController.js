@@ -14,10 +14,12 @@ const orderValidators = [
   body('shippingAddress.country')
     .isString().bail().trim().notEmpty().isLength({ min: 2, max: 100 }).matches(/^[\p{L}\p{M} .'-]+$/u).withMessage('Enter a valid country'),
   body('paymentMethod')
+    .isString().bail()
     .equals('Cash on Delivery').withMessage('Cash on Delivery is the only available payment method'),
   body('deliveryDate')
-    .optional({ values: 'falsy' })
-    .isISO8601().toDate().withMessage('Invalid delivery date format (ISO 8601 expected)'),
+    .optional()
+    .isString().bail().isLength({ min: 10, max: 35 }).bail()
+    .isISO8601({ strict: true, strictSeparator: true }).withMessage('Invalid delivery date format (ISO 8601 expected)').bail().toDate(),
 ];
 
 const orderIdValidator = [

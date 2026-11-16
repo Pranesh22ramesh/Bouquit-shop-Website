@@ -1,9 +1,13 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
+import { validatePublicEnv } from './build/validatePublicEnv.mjs'
+import { zodCommentAnnotations } from './build/zodCommentAnnotations.mjs'
 
 // https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [react()],
+export default defineConfig(({ mode }) => {
+  validatePublicEnv(loadEnv(mode, process.cwd(), 'VITE_'));
+  return {
+  plugins: [zodCommentAnnotations(), react()],
   server: {
     proxy: {
       '/api': {
@@ -33,4 +37,5 @@ export default defineConfig({
       },
     },
   },
+  };
 })

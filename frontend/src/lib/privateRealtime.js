@@ -1,7 +1,7 @@
 import { getAccessToken } from "./authStorage";
 
 const getApiBaseUrl = () => {
-  const configured = import.meta.env.VITE_API_BASE_URL;
+  const configured = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL;
   return configured || `${window.location.origin}/api`;
 };
 

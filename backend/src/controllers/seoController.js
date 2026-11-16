@@ -2,6 +2,7 @@
 const { body, param } = require('express-validator');
 const { asyncHandler } = require('../utils/asyncHandler');
 const seoService = require('../services/seoService');
+const { isSafeUrl } = require('../utils/safeUrl');
 
 const pageKeyValidator = [
   param('pageKey')
@@ -29,7 +30,7 @@ const updateConfigValidators = [
     .bail()
     .trim()
     .isLength({ max: 500 })
-    .matches(/^(?:|\/(?!\/)[^\s]*|https:\/\/[^\s]+)$/i).withMessage('Image URL must be HTTPS or a local path'),
+    .custom(isSafeUrl).withMessage('Image URL must be HTTPS or a local path'),
 ];
 
 const upsertPageValidators = [
@@ -52,7 +53,7 @@ const upsertPageValidators = [
     .bail()
     .trim()
     .isLength({ max: 300 })
-    .matches(/^(?:|\/(?!\/)[^\s]*|https:\/\/[^\s]+)$/i).withMessage('Canonical URL must be HTTPS or a local path'),
+    .custom(isSafeUrl).withMessage('Canonical URL must be HTTPS or a local path'),
 ];
 
 const getConfig = asyncHandler(async (req, res) => {

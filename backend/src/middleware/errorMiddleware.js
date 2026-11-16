@@ -11,9 +11,14 @@ const { env } = require('../config/env');
  */
 const errorHandler = (error, req, res, next) => {
   const errorId = crypto.randomUUID().slice(0, 8);
+  if (res.headersSent) {
+    console.error(`[STREAM_ERROR][${errorId}]`, error.stack || error);
+    return next(error);
+  }
+  res.removeHeader('Cache-Control');
 
   // 1. Handled Operational Errors (ApiError)
-  if (error instanceof ApiError) {
+  if (error instanceof ApiError && error.statusCode >= 400 && error.statusCode < 500) {
     return res.status(error.statusCode).json({
       message: error.message,
     });
@@ -54,7 +59,7 @@ const errorHandler = (error, req, res, next) => {
   }
 
   // 3. JWT Token Verification Errors
-  if (error.name === 'JsonWebTokenError') {
+  if (error.name === 'JsonWebTokenError' || error.name === 'NotBeforeError') {
     return res.status(401).json({
       message: 'Invalid or malformed authentication token. Please log in again.',
     });

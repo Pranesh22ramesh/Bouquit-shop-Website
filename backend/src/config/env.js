@@ -67,7 +67,7 @@ const env = {
   jwtRefreshSecret,
   jwtResetSecret,
   accessTokenTtl: process.env.ACCESS_TOKEN_TTL || '15m',
-  refreshTokenTtlDays: Number(process.env.REFRESH_TOKEN_TTL_DAYS || 30),
+  refreshTokenTtlDays: positiveInteger('REFRESH_TOKEN_TTL_DAYS', 30, 365),
   refreshCookieName: process.env.REFRESH_COOKIE_NAME || 'bb_refresh_token',
   uploadDir,
   upload: {
@@ -83,21 +83,20 @@ const env = {
   // Configurable Rate Limiting Thresholds (all overridable via env vars)
   rateLimit: {
     globalWindowMs: positiveInteger('RATE_LIMIT_GLOBAL_WINDOW_MS', 15 * 60 * 1000),
-    globalMax: positiveInteger('RATE_LIMIT_GLOBAL_MAX', 300),
+    globalMax: positiveInteger('RATE_LIMIT_GLOBAL_MAX', 3000),
+    ipv6Subnet: positiveInteger('RATE_LIMIT_IPV6_SUBNET', 56, 64),
 
     publicWindowMs: positiveInteger('RATE_LIMIT_PUBLIC_WINDOW_MS', 15 * 60 * 1000),
     publicMax: positiveInteger('RATE_LIMIT_PUBLIC_MAX', 200),
 
     authWindowMs: positiveInteger('RATE_LIMIT_AUTH_WINDOW_MS', 15 * 60 * 1000),
-    authMax: positiveInteger('RATE_LIMIT_AUTH_MAX', 10),
-    authAccountFailureMax: positiveInteger('RATE_LIMIT_AUTH_ACCOUNT_FAILURE_MAX', 3),
-    authIpFailureMax: positiveInteger('RATE_LIMIT_AUTH_IP_FAILURE_MAX', 5),
+    authAccountAttemptMax: positiveInteger('RATE_LIMIT_AUTH_ACCOUNT_ATTEMPT_MAX', 3),
+    authIpAttemptMax: positiveInteger('RATE_LIMIT_AUTH_IP_ATTEMPT_MAX', 10),
     authBackoffBaseMs: positiveInteger('RATE_LIMIT_AUTH_BACKOFF_BASE_MS', 1500),
     authBackoffMaxMs: positiveInteger('RATE_LIMIT_AUTH_BACKOFF_MAX_MS', 60000),
     authAttemptMapMaxEntries: positiveInteger('RATE_LIMIT_AUTH_ATTEMPT_MAP_MAX_ENTRIES', 20000),
 
-    signupWindowMs: positiveInteger('RATE_LIMIT_SIGNUP_WINDOW_MS', 60 * 60 * 1000),
-    signupMax: positiveInteger('RATE_LIMIT_SIGNUP_MAX', 5),
+    signupAccountAttemptMax: positiveInteger('RATE_LIMIT_SIGNUP_ACCOUNT_ATTEMPT_MAX', 2),
 
     userWindowMs: positiveInteger('RATE_LIMIT_USER_WINDOW_MS', 15 * 60 * 1000),
     userMax: positiveInteger('RATE_LIMIT_USER_MAX', 500),
@@ -106,5 +105,10 @@ const env = {
     uploadMax: positiveInteger('RATE_LIMIT_UPLOAD_MAX', 30),
   },
 };
+
+if (env.rateLimit.authBackoffMaxMs < env.rateLimit.authBackoffBaseMs) {
+  throw new Error('RATE_LIMIT_AUTH_BACKOFF_MAX_MS must be at least RATE_LIMIT_AUTH_BACKOFF_BASE_MS');
+}
+if (env.rateLimit.ipv6Subnet < 32) throw new Error('RATE_LIMIT_IPV6_SUBNET must be between 32 and 64');
 
 module.exports = { env };

@@ -1,4 +1,5 @@
 const { ApiError } = require('../utils/apiError');
+const { isSafeUrl } = require('../utils/safeUrl');
 
 const text = (max, pattern) => ({ type: 'string', max, pattern });
 const boolean = { type: 'boolean' };
@@ -6,16 +7,18 @@ const integer = { type: 'integer' };
 const list = (item, max) => ({ type: 'array', item, max });
 const object = (fields) => ({ type: 'object', fields });
 
-const link = text(1000, /^(?:|\/(?!\/)[^\s]*|https:\/\/[^\s]+)$/i);
-const image = text(1000, /^(?:|\/(?!\/)[^\s]*|https:\/\/[^\s]+)$/i);
+const link = { ...text(1000), check: isSafeUrl };
+const image = link;
 const categoryTile = object({ id: text(100, /^[\w-]+$/), name: text(120), note: text(500), image });
 const contentSchemas = {
   'home-highlight': object({
     heroText: text(180), heroDescription: text(1500), badgeText: text(120),
+    heroHeadline1: text(180), heroHeadline2: text(180), heroHeadline3: text(180),
+    collections: list(object({ id: text(100, /^[\w-]+$/), title: text(120), startingPrice: text(80), image, link }), 30),
     primaryButtonLabel: text(80), primaryButtonLink: link, secondaryButtonLabel: text(80), secondaryButtonLink: link,
     features: list(text(120), 20), floatingBadgeTitle: text(120), floatingBadgeSubtitle: text(300),
-    homeImagesEditableVersion: integer, banners: list(image, 20), featuredProductIds: list(text(36, /^[0-9a-f-]{36}$/i), 100),
-    categoryTiles: list(categoryTile, 30), occasionTiles: list(object({ id: text(100, /^[\w-]+$/), name: text(120), note: text(500), image, link }), 30),
+    homeImagesEditableVersion: integer, banners: list(image, 20), featuredProductIds: list(text(36, /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i), 100),
+    categoryTiles: list(categoryTile, 30), occasionTiles: list(object({ id: text(100, /^[\w-]+$/), name: text(120), note: text(500), icon: text(80), image, link }), 30),
     whyChooseUs: list(object({ id: text(100, /^[\w-]+$/), title: text(120), note: text(500), icon: text(80, /^[A-Za-z][A-Za-z0-9]*$/) }), 30),
     deliveryBanner: object({ title: text(180), subtitle: text(1500), buttonLabel: text(80), buttonLink: link, image }),
     midBanner: object({ eyebrow: text(120), title: text(180), subtitle: text(1500), buttonLabel: text(80), buttonLink: link, badgeText: text(120), image }),
@@ -42,7 +45,7 @@ const unsafeText = /(?:<\s*\/?\s*(?:script|iframe|object|embed)\b|javascript\s*:
 
 const validate = (value, schema, field, errors) => {
   if (schema.type === 'string') {
-    if (typeof value !== 'string' || value.length > schema.max || (schema.pattern && !schema.pattern.test(value)) || unsafeText.test(value)) {
+    if (typeof value !== 'string' || value.length > schema.max || (schema.pattern && !schema.pattern.test(value)) || (schema.check && !schema.check(value)) || unsafeText.test(value)) {
       errors.push({ field, message: 'Invalid string value or format' });
     }
     return;
@@ -93,6 +96,18 @@ const validateContentPayload = (key, value, files = []) => {
   };
   if (files.some((file) => !validFileField(file.fieldname))) {
     errors.push({ field: 'files', message: 'Unsupported upload field' });
+  }
+  const fileFields = new Set();
+  for (const file of files) {
+    if (fileFields.has(file.fieldname) && !['bannerFiles', 'galleryFiles'].includes(file.fieldname)) {
+      errors.push({ field: 'files', message: 'Duplicate image field' });
+    }
+    fileFields.add(file.fieldname);
+    const indexed = /^home(Occasion|Category|Inspiration|FallbackProduct)Image_(\d+)$/.exec(file.fieldname);
+    if (indexed) {
+      const field = { Occasion: 'occasionTiles', Category: 'categoryTiles', Inspiration: 'inspirationTiles', FallbackProduct: 'fallbackProductImages' }[indexed[1]];
+      if (!Array.isArray(value[field]) || Number(indexed[2]) >= value[field].length) errors.push({ field: 'files', message: 'Image index must refer to an existing tile' });
+    }
   }
   if (key === 'contact' && files.length) errors.push({ field: 'files', message: 'Contact content does not support uploads' });
 

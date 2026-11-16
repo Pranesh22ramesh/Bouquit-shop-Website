@@ -73,7 +73,7 @@ const MyOrdersPage = () => {
   const handleProfileSubmit = async (event) => {
     event.preventDefault();
     try {
-      const updated = await userService.updateProfile(profileForm);
+      const updated = await userService.updateProfile({ ...profileForm, password: profileForm.password || undefined, mobile: profileForm.mobile || undefined });
       toast.success("Profile updated successfully!");
       updateUser(updated);
       setShowEditProfile(false);

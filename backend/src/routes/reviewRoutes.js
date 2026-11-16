@@ -16,7 +16,7 @@ router.post(
   authenticatedLimiter,
   uploadLimiter,
   upload.single('image'),
-  strictRequest({ body: ['rating', 'comment', 'author', 'productId'], bodyStrings: true }),
+  strictRequest({ body: ['rating', 'comment', 'author', 'productId'] }),
   reviewController.createValidators,
   validateRequest,
   reviewController.createReview

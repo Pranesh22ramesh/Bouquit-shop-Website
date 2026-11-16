@@ -6,10 +6,11 @@ const { env } = require('../config/env');
 const maxImageSize = env.upload.maxFileBytes;
 const allowedMimeTypes = new Set(['image/jpeg', 'image/png', 'image/webp']);
 const allowedExtensions = new Set(['.jpg', '.jpeg', '.png', '.webp']);
+const extensionsByFormat = { jpeg: ['.jpg', '.jpeg'], png: ['.png'], webp: ['.webp'] };
 
 /**
  * Validates the true binary magic numbers of an image buffer
- * to prevent disguised executables or malicious polyglots.
+ * as an early filter. Full decoding and re-encoding in storage removes original bytes.
  */
 const isValidImageSignature = (buffer) => {
   if (!buffer || buffer.length < 12) return false;
@@ -99,7 +100,8 @@ const verifyUploadedFiles = (req, res, next) => {
       const metadata = await sharp(file.buffer, { limitInputPixels: env.upload.maxImagePixels }).metadata();
       const expectedFormat = { 'image/jpeg': 'jpeg', 'image/png': 'png', 'image/webp': 'webp' }[file.mimetype];
       const extension = path.extname(file.originalname).toLowerCase();
-      if (!metadata.format || metadata.format !== expectedFormat || !allowedExtensions.has(extension) || !metadata.width || !metadata.height || metadata.width * metadata.height > env.upload.maxImagePixels) {
+      if (!metadata.format || metadata.format !== expectedFormat || !extensionsByFormat[metadata.format]?.includes(extension) ||
+          !metadata.width || !metadata.height || metadata.width * metadata.height > env.upload.maxImagePixels || (metadata.pages || 1) !== 1) {
         const error = new Error('Invalid image content');
         error.code = 'INVALID_IMAGE_CONTENT';
         throw error;

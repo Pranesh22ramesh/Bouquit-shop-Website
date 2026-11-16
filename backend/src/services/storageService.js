@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const sharp = require('sharp');
+const crypto = require('crypto');
 const { env } = require('../config/env');
 const { supabase, hasSupabaseConfig } = require('../config/supabase');
 const { ApiError } = require('../utils/apiError');
@@ -29,7 +30,7 @@ const optimizeImage = async (fileBuffer) => {
     throw new ApiError(400, 'Uploaded file is not a valid image.');
   }
 
-  if (!['jpeg', 'png', 'webp'].includes(metadata.format) || !metadata.width || !metadata.height || metadata.width * metadata.height > env.upload.maxImagePixels) {
+  if (!['jpeg', 'png', 'webp'].includes(metadata.format) || !metadata.width || !metadata.height || metadata.width * metadata.height > env.upload.maxImagePixels || (metadata.pages || 1) !== 1) {
     throw new ApiError(400, 'Uploaded file is not a valid image.');
   }
 
@@ -83,8 +84,9 @@ const optimizeImage = async (fileBuffer) => {
 };
 
 const buildStoragePath = (folder, filenameBase) => {
-  const safeName = filenameBase.replace(/[^a-zA-Z0-9-_]/g, '-').toLowerCase();
-  return `${folder}/${Date.now()}-${safeName}.webp`;
+  if (!/^[a-zA-Z0-9_-]+(?:\/[a-zA-Z0-9_-]+)*$/.test(folder)) throw new Error('Invalid storage folder');
+  const safeName = String(filenameBase || 'image').replace(/[^a-zA-Z0-9-_]/g, '-').toLowerCase().slice(0, 80);
+  return `${folder}/${crypto.randomUUID()}-${safeName}.webp`;
 };
 
 const getPublicStorageUrl = (storagePath) => {
@@ -96,16 +98,21 @@ const getPublicStorageUrl = (storagePath) => {
 };
 
 const extractStoragePath = (url) => {
-  if (!url) return null;
+  if (typeof url !== 'string') return null;
 
   const marker = `/storage/v1/object/public/${env.supabaseStorageBucket}/`;
-  if (url.includes(marker)) {
-    return safeStoragePath(url.split(marker).pop());
+  if (hasSupabaseConfig) {
+    try {
+      const parsed = new URL(url);
+      if (parsed.origin === new URL(env.supabaseUrl).origin && parsed.pathname.startsWith(marker) && !parsed.search && !parsed.hash) {
+        return safeStoragePath(parsed.pathname.slice(marker.length));
+      }
+    } catch (_) { /* A local relative path may still be valid below. */ }
   }
 
   const localMarker = `/${env.uploadDir}/`;
-  if (url.includes(localMarker)) {
-    return safeStoragePath(url.split(localMarker).pop());
+  if (url.startsWith(localMarker)) {
+    return safeStoragePath(url.slice(localMarker.length));
   }
 
   return null;
@@ -140,7 +147,7 @@ const uploadImage = async ({ file, folder, filenameBase }) => {
 
   const fullFolderPath = await ensureLocalDirectory(folder);
   const fullFilePath = path.join(fullFolderPath, path.basename(storagePath));
-  await fs.promises.writeFile(fullFilePath, optimizedBuffer);
+  await fs.promises.writeFile(fullFilePath, optimizedBuffer, { flag: 'wx' });
   return { url: getPublicStorageUrl(storagePath), path: storagePath };
 };
 

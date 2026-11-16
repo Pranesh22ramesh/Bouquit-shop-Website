@@ -88,7 +88,13 @@ app.use(morgan(':method :safe-path :status :response-time ms'));
 // - nosniff header enforced
 // - sandboxed Content-Security-Policy to prevent script execution
 app.use(
-  '/uploads',
+  `/${env.uploadDir}`,
+  (req, res, next) => {
+    if (!['GET', 'HEAD'].includes(req.method) || !/^\/(?:[a-zA-Z0-9_-]+\/)*[a-zA-Z0-9_-]+\.webp$/.test(req.path)) {
+      return res.status(404).json({ message: 'Image not found.' });
+    }
+    return next();
+  },
   express.static(path.join(__dirname, '..', env.uploadDir), {
     dotfiles: 'ignore',
     index: false,
@@ -96,6 +102,7 @@ app.use(
     maxAge: '7d',
     setHeaders: (res) => {
       res.setHeader('X-Content-Type-Options', 'nosniff');
+      res.setHeader('Content-Type', 'image/webp');
       res.setHeader('Content-Security-Policy', "default-src 'none'; style-src 'unsafe-inline'; sandbox");
     },
   })
@@ -114,8 +121,8 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/admin', adminRoutes);
 
 // Public browse endpoints (moderate rate limits)
-app.use('/api/products', publicLimiter, productRoutes);
-app.use('/api/gallery', publicLimiter, productRoutes);
+app.use('/api/products', productRoutes);
+app.use('/api/gallery', productRoutes);
 app.get('/api/categories', publicLimiter, strictRequest(), productController.listCategories);
 app.get('/api/categories/list', publicLimiter, strictRequest(), productController.listCategories);
 app.use('/api/reviews', reviewRoutes); // Has internal publicLimiter / authenticatedLimiter by method

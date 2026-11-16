@@ -406,7 +406,7 @@ const AdminDashboardPage = () => {
       await userService.adminUpdateUser(selectedUser._id, {
         fullName: editUserForm.name,
         email: editUserForm.email,
-        phoneNumber: editUserForm.phone,
+        phoneNumber: editUserForm.phone || undefined,
         password: editUserForm.password || undefined,
         role: editUserForm.role,
       });

@@ -18,10 +18,10 @@ const defaultHomeOccasionTiles = [
 ];
 
 const defaultHomeWhyChooseUs = [
-  { id: 'why-1', title: 'Farm Fresh Flowers', note: 'Sourced from trusted growers every single morning', icon: 'FiFeather' },
-  { id: 'why-2', title: 'Fast & Reliable Delivery', note: 'On-time delivery across Karur and all Tamil Nadu', icon: 'FiTruck' },
-  { id: 'why-3', title: 'Beautiful Arrangements', note: 'Handcrafted by expert florists with love and passion', icon: 'FiHeart' },
-  { id: 'why-4', title: 'Perfect For Every Occasion', note: 'Bespoke designs tailored to your cherished moments', icon: 'FiGift' },
+  { id: 'why-1', title: 'Flower selections', note: 'Browse available designs and ask us about seasonal options', icon: 'FiFeather' },
+  { id: 'why-2', title: 'Order arrangements', note: 'Contact the shop to confirm timing and delivery availability', icon: 'FiTruck' },
+  { id: 'why-3', title: 'Personal requests', note: 'Share your preferred colours and occasion with the shop', icon: 'FiHeart' },
+  { id: 'why-4', title: 'Talk to us', note: 'Ask about flowers for your gift or ceremony', icon: 'FiGift' },
 ];
 
 const defaultDeliveryBanner = {
@@ -48,10 +48,10 @@ const defaultOfferPopup = {
   title: 'Flat 15% OFF On Your Order',
   subtitle: 'Welcome to MIDHUNYAS Petals & Bridal Flowers',
   description: 'Handcrafted bridal flowers, luxury bouquets, and elegant stage decor. Fresh blossoms harvested daily and delivered across Karur & Tamil Nadu.',
-  couponCode: 'MIDHUNYAS15',
+  couponCode: '',
   buttonLabel: 'Claim 15% Off & Shop Now →',
   buttonLink: '/gallery',
-  whatsappMessage: 'Hello MIDHUNYAS! I would like to claim 15% OFF with coupon code MIDHUNYAS15 for my order.',
+  whatsappMessage: '',
   image: '/gallery/bouquet/bouquet13.jpg',
 };
 
@@ -107,7 +107,7 @@ const defaultContent = {
     title: 'About Our Studio',
     description: 'We create wedding florals with a focus on freshness, color harmony, and personal detail.',
     mission: 'Design floral work that feels deeply personal to every celebration.',
-    vision: 'Become the most trusted wedding floral studio in our region.',
+    vision: 'Help customers choose flowers for gifts, weddings and ceremonies.',
     companyStory:
       'Our team works closely with couples and families to create garlands, bouquets, and decor that feel special from the first sketch to the final delivery.',
     heroImage: '',
@@ -125,11 +125,11 @@ const defaultContent = {
     title: 'Contact Us',
     description: 'Reach out for custom floral orders, wedding packages, and event support.',
     shopName: 'Midhunya Wedding Flowers',
-    workingHours: '9:00 AM - 8:00 PM',
+    workingHours: '',
     phonePrimary: '+91 9942071721',
     phoneSecondary: '',
     whatsapp: '+91 9942071721',
-    email: 'hello@midhunyaflowers.com',
+    email: '',
     instaUrl: '',
     facebookUrl: '',
     youtubeUrl: '',

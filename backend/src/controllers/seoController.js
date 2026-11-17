@@ -11,49 +11,27 @@ const pageKeyValidator = [
     .matches(/^[a-z0-9_-]{2,60}$/).withMessage('Invalid page key format (alphanumeric, hyphens and underscores only)'),
 ];
 
+const configText = ['businessName', 'businessSlogan', 'address', 'city', 'state', 'country', 'postalCode', 'phone', 'whatsapp', 'email', 'latitude', 'longitude', 'gscVerificationCode', 'bingVerificationCode', 'facebookAppId', 'twitterHandle', 'robotsCustomRules'];
+const configUrls = ['googleMapsUrl', 'logoUrl', 'faviconUrl', 'defaultOgImage', 'instagramUrl', 'facebookUrl', 'siteUrl'];
+const pageText = ['pageTitle', 'metaTitle', 'metaDescription', 'keywords', 'ogTitle', 'ogDescription', 'twitterTitle', 'twitterDescription'];
+const pageUrls = ['canonicalUrl', 'ogImage', 'twitterImage'];
+const configFields = [...configText, ...configUrls, 'businessHours', 'ga4MeasurementId', 'gtmContainerId'];
+const pageFields = [...pageText, ...pageUrls, 'robots', 'schemaType', 'customJsonLd', 'isActive'];
+const textRules = (fields) => fields.map((key) => body(key).optional().isString().bail().isLength({ max: key === 'robotsCustomRules' ? 2000 : 500 }));
+const urlRules = (fields) => fields.map((key) => body(key).optional().isString().bail().isLength({ max: 1000 }).custom(isSafeUrl));
 const updateConfigValidators = [
-  body('siteTitle')
-    .optional()
-    .isString().withMessage('Site title must be a string')
-    .bail()
-    .trim()
-    .isLength({ max: 120 }).withMessage('Site title must not exceed 120 characters'),
-  body('siteDescription')
-    .optional()
-    .isString().withMessage('Site description must be a string')
-    .bail()
-    .trim()
-    .isLength({ max: 500 }).withMessage('Site description must not exceed 500 characters'),
-  body('defaultOgImage')
-    .optional()
-    .isString().withMessage('Default OG image must be a string')
-    .bail()
-    .trim()
-    .isLength({ max: 500 })
-    .custom(isSafeUrl).withMessage('Image URL must be HTTPS or a local path'),
+  ...textRules(configText), ...urlRules(configUrls),
+  body('email').optional().custom((value) => value === '' || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)),
+  body('siteUrl').optional().custom((value) => { const url = new URL(value); return url.protocol === 'https:' && url.pathname === '/' && !url.search && !url.hash; }),
+  ...['ga4MeasurementId', 'gtmContainerId'].map((key) => body(key).optional().equals('').withMessage('External analytics scripts are disabled')),
+  body('businessHours').optional().isObject({ strict: true }).bail().custom((value) => Object.entries(value).every(([day, hours]) => ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'].includes(day) && typeof hours === 'string' && (hours === '' || /^(?:[01][0-9]|2[0-3]):[0-5][0-9]-(?:[01][0-9]|2[0-3]):[0-5][0-9]$/.test(hours)))),
 ];
-
 const upsertPageValidators = [
-  ...pageKeyValidator,
-  body('title')
-    .optional()
-    .isString().withMessage('Title must be a string')
-    .bail()
-    .trim()
-    .isLength({ max: 120 }).withMessage('Title must not exceed 120 characters'),
-  body('description')
-    .optional()
-    .isString().withMessage('Description must be a string')
-    .bail()
-    .trim()
-    .isLength({ max: 500 }).withMessage('Description must not exceed 500 characters'),
-  body('canonical')
-    .optional()
-    .isString().withMessage('Canonical URL must be a string')
-    .bail()
-    .trim()
-    .isLength({ max: 300 })
-    .custom(isSafeUrl).withMessage('Canonical URL must be HTTPS or a local path'),
+  ...pageKeyValidator, ...textRules(pageText), ...urlRules(pageUrls),
+  body('robots').optional().isIn(['index, follow', 'noindex, follow', 'noindex, nofollow']),
+  body('schemaType').optional().isIn(['WebPage', 'WebSite', 'CollectionPage', 'Product', 'AboutPage', 'ContactPage']),
+  body('isActive').optional().custom((value) => typeof value === 'boolean'),
+  body('customJsonLd').optional().isString().bail().isLength({ max: 20000 }).bail().custom((value) => { if (!value) return true; const parsed = JSON.parse(value); return parsed !== null && typeof parsed === 'object'; }),
 ];
 
 const getConfig = asyncHandler(async (req, res) => {
@@ -102,6 +80,7 @@ const getHealthCheck = asyncHandler(async (req, res) => {
 });
 
 module.exports = {
+  configFields, pageFields,
   getConfig,
   getHealthCheck,
   getPage,

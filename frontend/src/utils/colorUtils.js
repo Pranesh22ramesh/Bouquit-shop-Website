@@ -26,16 +26,16 @@ export function hexToColorName(hex) {
   const r = parseInt(hex.slice(1, 3), 16);
   const g = parseInt(hex.slice(3, 5), 16);
   const b = parseInt(hex.slice(5, 7), 16);
-  
+
   if (isNaN(r) || isNaN(g) || isNaN(b)) return hex;
 
   let closest = colors[0];
   let minDistance = Infinity;
-  
+
   for (const c of colors) {
     const dist = Math.sqrt(
-      Math.pow(r - c.rgb[0], 2) + 
-      Math.pow(g - c.rgb[1], 2) + 
+      Math.pow(r - c.rgb[0], 2) +
+      Math.pow(g - c.rgb[1], 2) +
       Math.pow(b - c.rgb[2], 2)
     );
     if (dist < minDistance) {

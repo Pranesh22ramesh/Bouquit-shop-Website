@@ -29,7 +29,7 @@ const AdminProductCard = ({ product, onEdit, onDelete }) => (
         <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${product.status === 'Available' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300' : 'bg-red-100 text-red-800 dark:bg-red-950/50 dark:text-red-300'}`}>{product.status}</span>
         {(product.analytics?.tags || []).map((tag) => <span key={tag} className="rounded-full bg-violet-100 px-2.5 py-1 text-xs font-semibold text-violet-700 dark:bg-violet-950/50 dark:text-violet-300">{tag}</span>)}
       </div>
-      {product.analytics && <p className="mt-3 text-[11px] text-gray-500 dark:text-gray-400">{product.analytics.unitsSold} sold · {product.analytics.reviewCount} reviews · {product.analytics.averageRating || 0}★</p>}
+      {product.analytics && <p className="mt-3 text-[11px] text-gray-500 dark:text-gray-400">{product.analytics.unitsSold} sold · {product.analytics.reviewCount} reviews · {product.analytics.averageRating || 0}</p>}
       <div className="mt-auto flex gap-2 pt-4">
         <button type="button" onClick={() => onEdit(product)} className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-blue-50 py-2 font-semibold text-blue-700 hover:bg-blue-100 dark:bg-blue-950/30 dark:text-blue-300"><FaEdit /> Edit</button>
         <button type="button" onClick={() => onDelete(product)} className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-red-50 py-2 font-semibold text-red-700 hover:bg-red-100 dark:bg-red-950/30 dark:text-red-300"><FaTrash /> Delete</button>

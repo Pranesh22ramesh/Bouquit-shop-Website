@@ -6,7 +6,7 @@ const { seedAdminUser } = require('./services/authService');
 const start = async () => {
   try {
     await prisma.$connect();
-    await seedAdminUser();
+    if (process.env.BOOTSTRAP_ADMIN === 'true') await seedAdminUser();
     app.listen(env.port, () => {
       console.log(`Backend listening on http://localhost:${env.port}`);
     });

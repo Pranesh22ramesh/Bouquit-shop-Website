@@ -1,3 +1,4 @@
+import { useTheme } from "../hooks/useTheme";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
@@ -5,6 +6,7 @@ import { FaEdit } from "react-icons/fa";
 import { useAuth } from "../context/AuthContext";
 import { userService } from "../api/userService";
 import api from "../api/axios";
+import PasswordInput from "../components/PasswordInput";
 import { SITE_EVENTS, subscribeToSiteEvent } from "../lib/siteEvents";
 
 const MyOrdersPage = () => {
@@ -18,9 +20,9 @@ const MyOrdersPage = () => {
     name: "",
     email: "",
     mobile: "",
-    password: "",
+    password: "", currentPassword: "",
   });
-  const [isDarkMode] = React.useState(() => document.documentElement.classList.contains("dark"));
+  const isDarkMode = useTheme();
 
   const loadData = async () => {
     if (!isAuthenticated || !user?._id) return;
@@ -49,7 +51,7 @@ const MyOrdersPage = () => {
       name: user?.name || "",
       email: user?.email || "",
       mobile: user?.mobile || "",
-      password: "",
+      password: "", currentPassword: "",
     });
 
     loadData();
@@ -73,11 +75,11 @@ const MyOrdersPage = () => {
   const handleProfileSubmit = async (event) => {
     event.preventDefault();
     try {
-      const updated = await userService.updateProfile({ ...profileForm, password: profileForm.password || undefined, mobile: profileForm.mobile || undefined });
+      const updated = await userService.updateProfile({ ...profileForm, password: profileForm.password || undefined, currentPassword: profileForm.currentPassword || undefined, mobile: profileForm.mobile || undefined });
       toast.success("Profile updated successfully!");
-      updateUser(updated);
+      if (profileForm.password || profileForm.email !== user.email) { await logout(); toast.success("Please sign in again with your updated details."); } else updateUser(updated);
       setShowEditProfile(false);
-      setProfileForm((current) => ({ ...current, password: "" }));
+      setProfileForm((current) => ({ ...current, password: "", currentPassword: "" }));
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to update profile");
     }
@@ -87,7 +89,7 @@ const MyOrdersPage = () => {
     return (
       <div className="p-10 text-center">
         <p>Please login to view your profile.</p>
-        <Link to="/login" className="text-[#651F3C] font-semibold underline">
+        <Link to="/login" className="text-[#254F3C] font-semibold underline">
           Login here
         </Link>
       </div>
@@ -95,11 +97,11 @@ const MyOrdersPage = () => {
   }
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${isDarkMode ? "bg-[#171116] text-[#FAF5EF]" : "bg-[#FAF5EF] text-[#30232A]"}`}>
+    <div className={`min-h-screen transition-colors duration-300 ${isDarkMode ? "bg-[#141D18] text-[#F8F7F2]" : "bg-[#F8F7F2] text-[#24382F]"}`}>
       <div className="max-w-6xl mx-auto px-4 py-10">
-        <div className={`p-8 rounded-3xl shadow-lg mb-8 flex flex-col md:flex-row items-center gap-6 border ${isDarkMode ? "bg-[#261B22] border-[#493640]" : "bg-white border-[#E8DDD5]"}`}>
-          <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-[#651F3C] to-[#C5A15B] p-1 shadow-md">
-            <div className={`w-full h-full rounded-full flex items-center justify-center text-3xl font-bold font-serif ${isDarkMode ? "bg-[#171116] text-[#D5B36C]" : "bg-white text-[#651F3C]"}`}>
+        <div className={`p-8 rounded-3xl shadow-lg mb-8 flex flex-col md:flex-row items-center gap-6 border ${isDarkMode ? "bg-[#1D2921] border-[#3F5144]" : "bg-white border-[#D7DDD4]"}`}>
+          <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-[#254F3C] to-[#C5A15B] p-1 shadow-md">
+            <div className={`w-full h-full rounded-full flex items-center justify-center text-3xl font-bold font-serif ${isDarkMode ? "bg-[#141D18] text-[#D5B36C]" : "bg-white text-[#254F3C]"}`}>
               {user?.name?.charAt(0)}
             </div>
           </div>
@@ -109,15 +111,15 @@ const MyOrdersPage = () => {
             <p className="opacity-70 text-sm">
               @{user?.email?.split("@")[0] || "user"} • {user?.email}
             </p>
-            {user?.mobile && <p className="opacity-70 text-sm mt-1">📞 {user.mobile}</p>}
+            {user?.mobile && <p className="opacity-70 text-sm mt-1"> {user.mobile}</p>}
             <div className="mt-4 flex flex-wrap gap-2 justify-center md:justify-start">
               {user?.role === "admin" && <span className="px-3 py-1 bg-[#C5A15B]/20 text-[#C5A15B] rounded-full text-xs font-bold">Admin</span>}
               <span className={`px-3 py-1 rounded-full text-xs font-bold ${user?.isActive === false ? "bg-red-100 text-red-700" : "bg-[#78836B]/20 text-[#78836B]"}`}>
                 {user?.isActive === false ? "Disabled" : "Active Member"}
               </span>
-              <span className="px-3 py-1 bg-[#651F3C]/10 text-[#651F3C] dark:text-[#D5B36C] rounded-full text-xs font-bold">{orders.length} Orders</span>
-              <span className="px-3 py-1 bg-[#30232A]/10 dark:bg-white/10 rounded-full text-xs font-bold">{myReviews.length} Reviews</span>
-              <span className="px-3 py-1 bg-[#F5EAE9] text-[#651F3C] rounded-full text-xs font-bold">{user?.likes?.length || 0} Likes</span>
+              <span className="px-3 py-1 bg-[#254F3C]/10 text-[#254F3C] dark:text-[#D5B36C] rounded-full text-xs font-bold">{orders.length} Orders</span>
+              <span className="px-3 py-1 bg-[#24382F]/10 dark:bg-white/10 rounded-full text-xs font-bold">{myReviews.length} Reviews</span>
+              <span className="px-3 py-1 bg-[#F5EAE9] text-[#254F3C] rounded-full text-xs font-bold">{user?.likes?.length || 0} Likes</span>
               <span className="px-3 py-1 border border-[#C5A15B]/40 text-[#C5A15B] rounded-full text-xs font-bold">{user?.wishlist?.length || 0} Wishlist</span>
             </div>
           </div>
@@ -125,7 +127,7 @@ const MyOrdersPage = () => {
           <div className="flex gap-3">
             <button
               onClick={() => setShowEditProfile(true)}
-              className={`px-4 py-2 border rounded-xl flex items-center gap-2 transition ${isDarkMode ? "border-[#493640] hover:bg-[#30232A]" : "border-[#E8DDD5] hover:bg-[#FAF5EF]"}`}
+              className={`px-4 py-2 border rounded-xl flex items-center gap-2 transition ${isDarkMode ? "border-[#3F5144] hover:bg-[#24382F]" : "border-[#D7DDD4] hover:bg-[#F8F7F2]"}`}
             >
               <FaEdit /> Edit Profile
             </button>
@@ -136,9 +138,9 @@ const MyOrdersPage = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className={`p-6 rounded-3xl shadow-sm border ${isDarkMode ? "bg-[#261B22] border-[#493640]" : "bg-white border-[#E8DDD5]"}`}>
+          <div className={`p-6 rounded-3xl shadow-sm border ${isDarkMode ? "bg-[#1D2921] border-[#3F5144]" : "bg-white border-[#D7DDD4]"}`}>
             <h2 className="text-xl font-serif font-bold mb-4 flex items-center gap-2">
-              <span>🕒</span> Recent Activity
+              <span></span> Recent Activity
             </h2>
 
             {loading ? (
@@ -148,7 +150,7 @@ const MyOrdersPage = () => {
             ) : (
               <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                 {activities.map((log) => (
-                  <div key={log._id} className={`p-3 rounded-xl text-sm border-l-4 ${isDarkMode ? "bg-[#171116] border-[#651F3C]" : "bg-[#FAF5EF] border-[#651F3C]"}`}>
+                  <div key={log._id} className={`p-3 rounded-xl text-sm border-l-4 ${isDarkMode ? "bg-[#141D18] border-[#254F3C]" : "bg-[#F8F7F2] border-[#254F3C]"}`}>
                     <p className="font-semibold capitalize">{log.action.replace(/_/g, " ")}</p>
                     <p className="opacity-70 text-xs mt-1">{new Date(log.createdAt).toLocaleString()}</p>
                   </div>
@@ -158,31 +160,31 @@ const MyOrdersPage = () => {
           </div>
 
           <div className="space-y-8">
-            <div className={`p-6 rounded-3xl shadow-sm border ${isDarkMode ? "bg-[#261B22] border-[#493640]" : "bg-white border-[#E8DDD5]"}`}>
+            <div className={`p-6 rounded-3xl shadow-sm border ${isDarkMode ? "bg-[#1D2921] border-[#3F5144]" : "bg-white border-[#D7DDD4]"}`}>
               <h2 className="text-xl font-serif font-bold mb-4 flex items-center gap-2">
-                <span>📦</span> Orders
+                <span></span> Orders
               </h2>
 
               {orders.length === 0 ? (
-                <div className="text-center py-6 opacity-60 border-2 border-dashed border-[#E8DDD5] dark:border-[#493640] rounded-2xl">
+                <div className="text-center py-6 opacity-60 border-2 border-dashed border-[#D7DDD4] dark:border-[#3F5144] rounded-2xl">
                   <p className="font-medium">No orders yet</p>
-                  <Link to="/gallery" className="inline-block mt-2 text-[#651F3C] dark:text-[#D5B36C] hover:underline text-sm font-semibold">
+                  <Link to="/gallery" className="inline-block mt-2 text-[#254F3C] dark:text-[#D5B36C] hover:underline text-sm font-semibold">
                     Start Shopping
                   </Link>
                 </div>
               ) : (
                 <div className="space-y-4 max-h-[250px] overflow-y-auto pr-2 custom-scrollbar">
                   {orders.map((order) => (
-                    <div key={order._id} className={`p-4 rounded-xl border ${isDarkMode ? "border-[#493640] bg-[#171116]" : "border-[#E8DDD5] bg-[#FAF5EF]"}`}>
+                    <div key={order._id} className={`p-4 rounded-xl border ${isDarkMode ? "border-[#3F5144] bg-[#141D18]" : "border-[#D7DDD4] bg-[#F8F7F2]"}`}>
                       <div className="flex justify-between items-start mb-2">
                         <div>
                           <span className="font-bold text-sm block">Order #{order._id.slice(-6).toUpperCase()}</span>
                           <span className="text-xs opacity-60">{new Date(order.createdAt).toLocaleDateString()}</span>
                         </div>
-                        <span className="font-bold text-[#651F3C] dark:text-[#D5B36C]">₹{order.totalPrice?.toLocaleString("en-IN")}</span>
+                        <span className="font-bold text-[#254F3C] dark:text-[#D5B36C]">₹{order.totalPrice?.toLocaleString("en-IN")}</span>
                       </div>
                       <div className="flex items-center justify-between mt-2">
-                        <span className="px-2 py-0.5 rounded text-xs font-semibold bg-[#F5EAE9] text-[#651F3C] dark:bg-[#30232A] dark:text-[#FAF5EF]">{order.status}</span>
+                        <span className="px-2 py-0.5 rounded text-xs font-semibold bg-[#F5EAE9] text-[#254F3C] dark:bg-[#24382F] dark:text-[#F8F7F2]">{order.status}</span>
                         <span className="text-xs opacity-70">{order.orderItems?.length} items</span>
                       </div>
                     </div>
@@ -191,26 +193,26 @@ const MyOrdersPage = () => {
               )}
             </div>
 
-            <div className={`p-6 rounded-3xl shadow-sm border ${isDarkMode ? "bg-[#261B22] border-[#493640]" : "bg-white border-[#E8DDD5]"}`}>
+            <div className={`p-6 rounded-3xl shadow-sm border ${isDarkMode ? "bg-[#1D2921] border-[#3F5144]" : "bg-white border-[#D7DDD4]"}`}>
               <h2 className="text-xl font-serif font-bold mb-4 flex items-center gap-2">
                 <span>⭐</span> My Reviews
               </h2>
 
               {myReviews.length === 0 ? (
-                <div className="text-center py-6 opacity-60 border-2 border-dashed border-[#E8DDD5] dark:border-[#493640] rounded-2xl">
+                <div className="text-center py-6 opacity-60 border-2 border-dashed border-[#D7DDD4] dark:border-[#3F5144] rounded-2xl">
                   <p className="font-medium">No reviews written</p>
-                  <Link to="/reviews" className="inline-block mt-2 text-[#651F3C] dark:text-[#D5B36C] hover:underline text-sm font-semibold">
+                  <Link to="/reviews" className="inline-block mt-2 text-[#254F3C] dark:text-[#D5B36C] hover:underline text-sm font-semibold">
                     Write a Review
                   </Link>
                 </div>
               ) : (
                 <div className="space-y-4 max-h-[250px] overflow-y-auto pr-2 custom-scrollbar">
                   {myReviews.map((review) => (
-                    <div key={review._id} className={`p-4 rounded-xl border ${isDarkMode ? "border-[#493640] bg-[#171116]" : "border-[#E8DDD5] bg-white"}`}>
+                    <div key={review._id} className={`p-4 rounded-xl border ${isDarkMode ? "border-[#3F5144] bg-[#141D18]" : "border-[#D7DDD4] bg-white"}`}>
                       <div className="flex justify-between items-start">
                         <div>
                           <h4 className="font-bold text-sm">{review.userName || user?.name}</h4>
-                          <div className="text-[#C5A15B] text-xs mt-1">{"★".repeat(review.rating)}{"☆".repeat(5 - review.rating)}</div>
+                          <div className="text-[#C5A15B] text-xs mt-1">{"".repeat(review.rating)}{"".repeat(5 - review.rating)}</div>
                         </div>
                         <span className="text-xs opacity-50">{new Date(review.createdAt).toLocaleDateString()}</span>
                       </div>
@@ -225,7 +227,7 @@ const MyOrdersPage = () => {
 
         {showEditProfile && (
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className={`w-full max-w-md rounded-2xl shadow-2xl p-6 border ${isDarkMode ? "bg-[#261B22] border-[#493640]" : "bg-white border-[#E8DDD5]"}`}>
+            <div className={`w-full max-w-md rounded-2xl shadow-2xl p-6 border ${isDarkMode ? "bg-[#1D2921] border-[#3F5144]" : "bg-white border-[#D7DDD4]"}`}>
               <h2 className="text-2xl font-serif font-bold mb-6">Edit Profile</h2>
               <form onSubmit={handleProfileSubmit} className="space-y-4">
                 <div>
@@ -234,7 +236,7 @@ const MyOrdersPage = () => {
                     type="text"
                     value={profileForm.name}
                     onChange={(event) => setProfileForm((current) => ({ ...current, name: event.target.value }))}
-                    className={`w-full p-2.5 rounded-lg border focus:ring-2 focus:ring-[#651F3C] outline-none ${isDarkMode ? "bg-[#171116] border-[#493640] text-white" : "bg-[#FAF5EF] border-[#E8DDD5]"}`}
+                    className={`w-full p-2.5 rounded-lg border focus:ring-2 focus:ring-[#254F3C] outline-none ${isDarkMode ? "bg-[#141D18] border-[#3F5144] text-white" : "bg-[#F8F7F2] border-[#D7DDD4]"}`}
                     required
                   />
                 </div>
@@ -244,7 +246,7 @@ const MyOrdersPage = () => {
                     type="email"
                     value={profileForm.email}
                     onChange={(event) => setProfileForm((current) => ({ ...current, email: event.target.value }))}
-                    className={`w-full p-2.5 rounded-lg border focus:ring-2 focus:ring-[#651F3C] outline-none ${isDarkMode ? "bg-[#171116] border-[#493640] text-white" : "bg-[#FAF5EF] border-[#E8DDD5]"}`}
+                    className={`w-full p-2.5 rounded-lg border focus:ring-2 focus:ring-[#254F3C] outline-none ${isDarkMode ? "bg-[#141D18] border-[#3F5144] text-white" : "bg-[#F8F7F2] border-[#D7DDD4]"}`}
                     required
                   />
                 </div>
@@ -254,24 +256,16 @@ const MyOrdersPage = () => {
                     type="tel"
                     value={profileForm.mobile}
                     onChange={(event) => setProfileForm((current) => ({ ...current, mobile: event.target.value }))}
-                    className={`w-full p-2.5 rounded-lg border focus:ring-2 focus:ring-[#651F3C] outline-none ${isDarkMode ? "bg-[#171116] border-[#493640] text-white" : "bg-[#FAF5EF] border-[#E8DDD5]"}`}
+                    className={`w-full p-2.5 rounded-lg border focus:ring-2 focus:ring-[#254F3C] outline-none ${isDarkMode ? "bg-[#141D18] border-[#3F5144] text-white" : "bg-[#F8F7F2] border-[#D7DDD4]"}`}
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1 opacity-80">New Password (leave blank to keep current)</label>
-                  <input
-                    type="password"
-                    value={profileForm.password}
-                    onChange={(event) => setProfileForm((current) => ({ ...current, password: event.target.value }))}
-                    className={`w-full p-2.5 rounded-lg border focus:ring-2 focus:ring-[#651F3C] outline-none ${isDarkMode ? "bg-[#171116] border-[#493640] text-white" : "bg-[#FAF5EF] border-[#E8DDD5]"}`}
-                    minLength="8"
-                  />
-                </div>
+                <PasswordInput id="profile-new-password" label="New password (optional)" autoComplete="new-password" value={profileForm.password} onChange={(event) => setProfileForm((current) => ({ ...current, password: event.target.value }))} minLength={8} />
+                <PasswordInput id="profile-current-password" label="Current password (required to change email or password)" autoComplete="current-password" value={profileForm.currentPassword} onChange={(event) => setProfileForm((current) => ({ ...current, currentPassword: event.target.value }))} />
                 <div className="flex justify-end gap-3 mt-8">
-                  <button type="button" onClick={() => setShowEditProfile(false)} className="px-5 py-2 border border-[#E8DDD5] dark:border-[#493640] rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition">
+                  <button type="button" onClick={() => setShowEditProfile(false)} className="px-5 py-2 border border-[#D7DDD4] dark:border-[#3F5144] rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition">
                     Cancel
                   </button>
-                  <button type="submit" className="px-5 py-2 bg-[#651F3C] hover:bg-[#4D172D] text-white rounded-lg transition shadow-md shadow-[#651F3C]/20">
+                  <button type="submit" className="px-5 py-2 bg-[#254F3C] hover:bg-[#183D2B] text-white rounded-lg transition shadow-md shadow-[#254F3C]/20">
                     Save Changes
                   </button>
                 </div>

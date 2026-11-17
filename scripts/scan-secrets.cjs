@@ -5,7 +5,7 @@ const { execFileSync, spawn } = require('node:child_process');
 const root = path.resolve(__dirname, '..');
 const git = (...args) => execFileSync('git', args, { cwd: root, maxBuffer: 64 * 1024 * 1024, encoding: 'utf8', windowsHide: true });
 const isTemplate = (value) => /^(?:<.*>|\$\{.*\}|(?:your|replace|generate|example|placeholder|change-me)[\w <>:/?.=&-]*)$/i.test(value);
-const sensitiveName = /(?:PASSWORD|SECRET|SERVICE_ROLE|PRIVATE_KEY|ACCESS_TOKEN|REFRESH_TOKEN|DATABASE_URL|DIRECT_URL)/i;
+const sensitiveName = /(?:PASSWORD|SECRET|SERVICE_ROLE|PRIVATE_KEY|API_KEY|ACCESS_TOKEN|REFRESH_TOKEN|DATABASE_URL|DIRECT_URL)/i;
 const configured = new Set();
 for (const directory of ['', 'backend', 'frontend']) {
   const folder = path.join(root, directory);

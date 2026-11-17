@@ -41,6 +41,7 @@ const upsertPage = async (pageKey, data) => {
   return seoRepository.upsertPage(pageKey, sanitized);
 };
 
+const xmlEscape = (value) => String(value).replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' }[char]));
 const generateSitemap = async () => {
   const config = await seoRepository.getOrCreateConfig();
   const siteUrl = (config.siteUrl || 'https://karurflowershop.vercel.app').replace(/\/$/, '');
@@ -69,7 +70,7 @@ const generateSitemap = async () => {
 
   for (const page of staticPages) {
     xml += `  <url>
-    <loc>${siteUrl}${page.url}</loc>
+    <loc>${xmlEscape(siteUrl + page.url)}</loc>
     <lastmod>${now}</lastmod>
     <changefreq>${page.changefreq}</changefreq>
     <priority>${page.priority}</priority>
@@ -80,7 +81,7 @@ const generateSitemap = async () => {
   for (const product of products) {
     const slug = product.id;
     xml += `  <url>
-    <loc>${siteUrl}/product/${slug}</loc>
+    <loc>${xmlEscape(siteUrl + "/product/" + slug)}</loc>
     <lastmod>${product.updatedAt.toISOString()}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>

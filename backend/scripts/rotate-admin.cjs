@@ -27,7 +27,7 @@ async function main() {
   try {
     const passwordHash = await bcrypt.hash(nextPassword, 12);
     await prisma.$transaction(async (transaction) => {
-      await transaction.user.update({ where: { id: user.id }, data: { passwordHash } });
+      await transaction.user.update({ where: { id: user.id }, data: { passwordHash, authVersion: { increment: 1 } } });
       await transaction.refreshToken.deleteMany({ where: { userId: user.id } });
       await transaction.passwordResetToken.deleteMany({ where: { userId: user.id } });
     });

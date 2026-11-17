@@ -5,6 +5,16 @@ const crypto = require('crypto');
 dotenv.config({ path: path.join(__dirname, '..', '..', '.env') });
 
 const nodeEnv = process.env.NODE_ENV || 'development';
+if (!['development', 'test', 'production'].includes(nodeEnv)) throw new Error('Invalid NODE_ENV');
+if (nodeEnv === 'production') {
+  for (const name of ['DATABASE_URL', 'DIRECT_URL']) {
+    let url;
+    try { url = new URL(process.env[name]); } catch { throw new Error(`${name} must be a PostgreSQL connection URL`); }
+    if (!['postgres:', 'postgresql:'].includes(url.protocol) || !url.username || !url.password || !['require', 'verify-full'].includes(url.searchParams.get('sslmode'))) {
+      throw new Error(`${name} must use PostgreSQL authentication and TLS (sslmode=require or verify-full)`);
+    }
+  }
+}
 
 const secret = (name) => {
   const value = process.env[name];
@@ -54,6 +64,8 @@ const booleanFromEnv = (name, fallback) => {
 };
 
 const env = {
+  streamMaxPerUser: positiveInteger('STREAM_MAX_PER_USER', 5, 100),
+  streamMaxTotal: positiveInteger('STREAM_MAX_TOTAL', 1000, 100000),
   nodeEnv,
   port: positiveInteger('PORT', 5000, 65535),
   frontendUrl: process.env.FRONTEND_URL || 'http://localhost:5173',

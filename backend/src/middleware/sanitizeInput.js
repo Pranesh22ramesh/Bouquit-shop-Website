@@ -6,7 +6,7 @@ const inspectValue = (value, path, invalid, depth = 0) => {
   if (depth > 12) { invalid.push(path); return; }
   if (typeof value === 'string') {
     // Passwords are opaque credentials, never rendered as markup.
-    if (!/\.(?:password|confirmPassword)$/.test(path) && UNSAFE_TEXT.test(value)) invalid.push(path);
+    if (!/\.(?:password|confirmPassword|currentPassword)$/.test(path) && UNSAFE_TEXT.test(value)) invalid.push(path);
     return;
   }
   if (Array.isArray(value)) {

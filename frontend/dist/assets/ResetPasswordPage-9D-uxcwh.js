@@ -1,0 +1,1 @@
+import{j as o}from"./vendor-query-B3vcLMlZ.js";import"./vendor-react-O4Eh-hd2.js";import{A as r}from"./AccountFormPage-CtiX2ao7.js";import"./index-2HG3VWoA.js";import"./vendor-seo-Daa3xQDx.js";import"./vendor-ui-DnBzsPGe.js";import"./PasswordInput-DdQMC_Lx.js";function n(){return o.jsx(r,{mode:"reset"})}export{n as default};

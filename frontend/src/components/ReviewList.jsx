@@ -11,21 +11,21 @@ const ReviewList = ({ reviews, currentUser, onDelete, onEdit }) => {
         const canManage = currentUser && (currentUser.isAdmin || (rev.userId && currentUser._id === rev.userId));
 
         return (
-          <div key={rev.id} className="rounded-xl border border-[#E8DDD5] dark:border-[#493640] bg-white dark:bg-[#171116] p-4 flex gap-4 transition shadow-xs">
+          <div key={rev.id} className="rounded-xl border border-[#D7DDD4] dark:border-[#3F5144] bg-white dark:bg-[#141D18] p-4 flex gap-4 transition shadow-xs">
             {rev.imagePreview && (
               <img
                 src={rev.imagePreview}
                 alt="Customer order"
-                className="h-16 w-16 rounded-lg object-cover border border-[#E8DDD5] dark:border-[#493640] flex-shrink-0"
+                className="h-16 w-16 rounded-lg object-cover border border-[#D7DDD4] dark:border-[#3F5144] flex-shrink-0"
               />
             )}
 
             <div className="flex-1">
               <div className="flex items-center justify-between text-base">
                 <div className="flex items-center gap-2">
-                  <span className="font-semibold text-[#30232A] dark:text-[#FAF5EF]">{rev.author}</span>
+                  <span className="font-semibold text-[#24382F] dark:text-[#F8F7F2]">{rev.author}</span>
                   {rev.isPinned && (
-                    <span className="rounded-full bg-[#FAF5EF] border border-[#C5A15B]/40 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[#C5A15B]">
+                    <span className="rounded-full bg-[#F8F7F2] border border-[#C5A15B]/40 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[#C5A15B]">
                       Featured
                     </span>
                   )}
@@ -35,7 +35,7 @@ const ReviewList = ({ reviews, currentUser, onDelete, onEdit }) => {
               <div className="flex mt-1 text-base">
                 {[...Array(5)].map((_, index) => (
                   <span key={index} className={`${index < rev.rating ? "text-[#C5A15B]" : "text-gray-300 dark:text-gray-700"}`}>
-                    ★
+
                   </span>
                 ))}
               </div>

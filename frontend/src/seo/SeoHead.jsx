@@ -59,7 +59,7 @@ function buildSchemas({ schemaType, config, seo, product, canonicalUrl }) {
     image: config.logoUrl || config.defaultOgImage || undefined,
     priceRange: '₹₹',
     currenciesAccepted: 'INR',
-    paymentAccepted: 'Cash, Online',
+    paymentAccepted: 'Cash',
     openingHoursSpecification: config.businessHours ? buildOpeningHours(config.businessHours) : undefined,
   };
   schemas.push(localSchema);
@@ -149,10 +149,10 @@ export default function SeoHead({ pageKey, seoOverride = {}, product, breadcrumb
   const seo = { ...seoOverride };
 
   const title = seo.metaTitle || seo.title || `${config.businessName} | Flower Shop in Karur`;
-  const description = seo.metaDescription || seo.description || `${config.businessName} — ${config.businessSlogan}`;
+  const description = seo.metaDescription || seo.description || `${config.businessName} ,  ${config.businessSlogan}`;
   const keywords = seo.keywords || 'flower shop karur, MIDHUNYAS petals, bouquet karur';
   const robots = seo.robots || 'index, follow';
-  const ogImage = seo.ogImage || seo.image || config.defaultOgImage || `${siteUrl}/og-default.jpg`;
+  const ogImage = seo.ogImage || seo.image || config.defaultOgImage || `${siteUrl}/gallery/bouquet/bouquet13.jpg`;
   const ogTitle = seo.ogTitle || title;
   const ogDescription = seo.ogDescription || description;
   const schemaType = seo.schemaType || 'WebPage';
@@ -216,7 +216,7 @@ export default function SeoHead({ pageKey, seoOverride = {}, product, breadcrumb
       {/* JSON-LD Schemas */}
       {schemas.map((schema, idx) => (
         <script key={idx} type="application/ld+json">
-          {JSON.stringify(schema)}
+          {JSON.stringify(schema).replace(/</g, '\\u003c')}
         </script>
       ))}
     </Helmet>

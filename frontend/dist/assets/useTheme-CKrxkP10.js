@@ -1,0 +1,1 @@
+import{a as s}from"./vendor-react-O4Eh-hd2.js";const r=t=>{const e=new MutationObserver(t);return e.observe(document.documentElement,{attributes:!0,attributeFilter:["class"]}),()=>e.disconnect()},o=()=>s.useSyncExternalStore(r,()=>document.documentElement.classList.contains("dark"),()=>!1);export{o as u};

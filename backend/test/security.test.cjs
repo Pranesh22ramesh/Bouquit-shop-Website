@@ -38,13 +38,13 @@ const password = crypto.randomBytes(18).toString('hex');
 let server, base, ipNumber = 0;
 const newIp = () => `198.18.${Math.floor(++ipNumber / 250)}.${ipNumber % 250 + 1}`;
 const actor = (role = 'USER') => {
-  const user = { id: crypto.randomUUID(), email: `${crypto.randomUUID()}@example.com`, role, isActive: true, fullName: 'Test User' };
+  const user = { id: crypto.randomUUID(), email: `${crypto.randomUUID()}@example.com`, role, authVersion: 0, isActive: true, fullName: 'Test User' };
   users.set(user.id, user);
   return { user, token: tokens.signAccessToken(user) };
 };
 async function request(url, { method = 'GET', json, raw, form, token, ip = newIp(), headers = {} } = {}) {
   const response = await fetch(`${base}${url}`, {
-    method, headers: { 'X-Forwarded-For': ip, ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    method, headers: { 'X-Requested-With': 'shop-web', 'X-Forwarded-For': ip, ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(json !== undefined || raw !== undefined ? { 'Content-Type': 'application/json' } : {}), ...headers },
     body: form || raw || (json === undefined ? undefined : JSON.stringify(json)), signal: AbortSignal.timeout(5000),
   });
@@ -53,6 +53,29 @@ async function request(url, { method = 'GET', json, raw, form, token, ip = newIp
 }
 before(async () => { server = app.listen(0, '127.0.0.1'); await once(server, 'listening'); base = `http://127.0.0.1:${server.address().port}`; });
 after(async () => { server.closeAllConnections(); await new Promise((resolve) => server.close(resolve)); });
+
+test('cookie session endpoints require a CSRF header and exact trusted origins', async () => {
+  const missing = await request('/api/auth/logout', { method: 'POST', headers: { 'X-Requested-With': '' } });
+  assert.equal(missing.status, 403);
+  const foreign = await request('/api/auth/logout', { method: 'POST', headers: { Origin: 'https://attacker.example' } });
+  assert.equal(foreign.status, 403);
+  assert.equal(foreign.headers.get('access-control-allow-origin'), null);
+  const allowed = await request('/api/health', { headers: { Origin: 'http://localhost:4173' } });
+  assert.equal(allowed.status, 200);
+  assert.equal(allowed.headers.get('access-control-allow-origin'), 'http://localhost:4173');
+  assert.match(allowed.headers.get('content-security-policy'), /default-src 'none'/);
+  assert.equal(allowed.headers.get('x-powered-by'), null);
+  assert.equal(allowed.headers.get('x-content-type-options'), 'nosniff');
+  for (const filename of ['/.env', '/.git/config', '/package.json']) assert.equal((await request(filename)).status, 404);
+});
+
+test('sub-admin cannot manage accounts and incrementing authVersion revokes access immediately', async () => {
+  const subadmin = actor('SUBADMIN');
+  assert.equal((await request('/api/users', { token: subadmin.token })).status, 403);
+  assert.equal((await request(`/api/users/${crypto.randomUUID()}/password`, { method: 'PUT', token: subadmin.token, json: { password } })).status, 403);
+  subadmin.user.authVersion += 1;
+  assert.equal((await request('/api/users/cart', { token: subadmin.token })).status, 401);
+});
 
 test('concurrent login aliases and normalized email variants share one account budget across IPs', async () => {
   const spy = mock.method(authService, 'login', async () => {
@@ -148,7 +171,7 @@ test('strict JSON types, unknown keys, query arrays and nested payloads are reje
     assert.equal((await request('/api/products?limit=1&limit=2')).status, 400);
     assert.equal((await request('/api/products?limit=100000')).status, 400);
     assert.equal((await request('/api/users/cart', { method: 'POST', token, json: { productId: crypto.randomUUID(), quantity: 1, customization: { mainColor: 'red', extraPrice: 0 } } })).status, 400);
-    assert.equal((await request('/api/users/profile', { method: 'PUT', token, json: { password: '🌸'.repeat(20) } })).status, 400);
+    assert.equal((await request('/api/users/profile', { method: 'PUT', token, json: { password: 'ðŸŒ¸'.repeat(20) } })).status, 400);
     assert.equal((await request('/api/auth/login', { method: 'POST', raw: '{"__proto__":{"admin":true}}' })).status, 400);
     assert.equal((await request('/api/auth/login', { method: 'POST', raw: '{"email":' + '['.repeat(100) + '0' + ']'.repeat(100) + '}' })).status, 400);
   } finally { spy.mock.restore(); }

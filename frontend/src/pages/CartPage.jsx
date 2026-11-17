@@ -1,3 +1,4 @@
+import { useTheme } from "../hooks/useTheme";
 // src/pages/CartPage.jsx
 import React, { useState } from "react";
 import { getCartItemUnitPrice, useCart } from "../context/CartContext";
@@ -18,19 +19,19 @@ const CartPage = () => {
   const [editingItem, setEditingItem] = useState(null);
   const [editNote, setEditNote] = useState("");
   const [whatsappPopupUrl, setWhatsappPopupUrl] = useState(null);
-  
+
   const { user, updateUser, isAuthenticated } = useAuth();
   const [showAddressModal, setShowAddressModal] = useState(false);
-  const [contactInfo, setContactInfo] = useState({ phone: user?.phone || "", address: user?.address || "" });
+  const [contactInfo, setContactInfo] = useState({ phone: user?.phoneNumber || user?.mobile || "", address: user?.address || "" });
 
   React.useEffect(() => {
     if (user) {
-      setContactInfo({ phone: user.phone || "", address: user.address || "" });
+      setContactInfo({ phone: user.phoneNumber || user.mobile || "", address: user.address || "" });
     }
   }, [user]);
 
   const handleQtyChange = (id, newQty) => {
-    if (newQty < 1) return;
+    if (newQty < 1 || newQty > 99) return;
     updateQty(id, newQty);
   };
 
@@ -48,17 +49,17 @@ const CartPage = () => {
   };
 
   const proceedToWhatsApp = async (phone, address) => {
-    if (user && (!user.phone || !user.address)) {
+    if (user && (!user.phoneNumber || !user.address)) {
       try {
-        await userService.updateProfile({ phone, address });
-        if (updateUser) updateUser({ phone, address });
+        const updated = await userService.updateProfile({ phoneNumber: phone, address });
+        if (updateUser) updateUser(updated);
       } catch (e) {
         console.error("Failed to update profile", e);
       }
     }
 
     const phoneNumber = "919942071721";
-    let message = `🌸 *MIDHUNYAS Petals — New Order* 🌸\n\n`;
+    let message = ` *MIDHUNYAS Petals ,  New Order* \n\n`;
     message += `Hello! I would like to place an order for the following items:\n\n`;
 
     let calculatedSubtotal = 0;
@@ -86,11 +87,11 @@ const CartPage = () => {
         : "";
 
       message += `*${index + 1}. ${name}*\n`;
-      if (imageUrl) message += `   📷 Product Photo: ${imageUrl}\n`;
-      message += `   💰 Base Price: ₹${basePrice.toLocaleString("en-IN")}\n`;
+      if (imageUrl) message += `    Product Photo: ${imageUrl}\n`;
+      message += `    Base Price: ₹${basePrice.toLocaleString("en-IN")}\n`;
       if (stonesExtra) message += `   + Stones: ₹200\n`;
       if (beadsExtra) message += `   + Beads: ₹120\n`;
-      message += `   🔢 Qty: ${item.quantity} × ₹${unitTotal.toLocaleString("en-IN")} = *₹${lineTotal.toLocaleString("en-IN")}*\n`;
+      message += `    Qty: ${item.quantity} × ₹${unitTotal.toLocaleString("en-IN")} = *₹${lineTotal.toLocaleString("en-IN")}*\n`;
 
       if (item.customization) {
         if (stones.length) message += `   Stones: ${stones.join(", ")}\n`;
@@ -99,36 +100,36 @@ const CartPage = () => {
         if (item.customization.mainColor) {
           const c1 = hexToColorName(item.customization.mainColor);
           const c2 = item.customization.secondaryColor ? hexToColorName(item.customization.secondaryColor) : "None";
-          message += `   🎨 Colours: ${c1} / ${c2}\n`;
+          message += `    Colours: ${c1} / ${c2}\n`;
         }
-        if (item.customization.notes) message += `   📝 Note: ${item.customization.notes}\n`;
-        if (item.customization.referencePreview) message += `   ⚠️ Has Reference Photo — will send separately\n`;
+        if (item.customization.notes) message += `    Note: ${item.customization.notes}\n`;
+        if (item.customization.referencePreview) message += `    Has Reference Photo ,  will send separately\n`;
       }
       message += `\n`;
     });
 
     message += `━━━━━━━━━━━━━━━━━━━━━━\n`;
-    message += `🧾 *ORDER TOTAL: ₹${calculatedSubtotal.toLocaleString("en-IN")}*\n`;
+    message += ` *ORDER TOTAL: ₹${calculatedSubtotal.toLocaleString("en-IN")}*\n`;
     message += `━━━━━━━━━━━━━━━━━━━━━━\n`;
 
     if (user) {
-      message += `\n👤 *Customer Details:*\nName: ${user.name}\nEmail: ${user.email}\n`;
+      message += `\n *Customer Details:*\nName: ${user.name}\nEmail: ${user.email}\n`;
     }
-    message += `📞 Phone: ${phone}\n📍 Delivery Address: ${address}\n`;
+    message += ` Phone: ${phone}\n Delivery Address: ${address}\n`;
 
     const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     setWhatsappPopupUrl(url);
     setShowAddressModal(false);
   };
 
-  const [isDarkMode] = React.useState(() => document.documentElement.classList.contains("dark"));
+  const isDarkMode = useTheme();
 
   if (!items || items.length === 0) {
     return (
-      <div className={`min-h-[60vh] flex flex-col items-center justify-center text-center p-4 transition-colors duration-300 ${isDarkMode ? "bg-[#160F17] text-[#FAF5EE]" : "bg-[#FAF5EE] text-[#30232A]"}`}>
+      <div className={`min-h-[60vh] flex flex-col items-center justify-center text-center p-4 transition-colors duration-300 ${isDarkMode ? "bg-[#141D18] text-[#F8F7F2]" : "bg-[#F8F7F2] text-[#24382F]"}`}>
         <h1 className="text-2xl font-bold font-serif mb-3">Your Cart is Empty</h1>
         <p className={`mb-6 ${isDarkMode ? "text-[#8E7A83]" : "text-[#81747A]"}`}>Looks like you haven&apos;t added any floral designs yet.</p>
-        <Link to="/gallery" className="px-6 py-2.5 bg-[#651F3C] text-white rounded-full font-medium hover:bg-[#4D172D] transition shadow-md">
+        <Link to="/gallery" className="px-6 py-2.5 bg-[#254F3C] text-white rounded-full font-medium hover:bg-[#183D2B] transition shadow-md">
           Browse Gallery
         </Link>
       </div>
@@ -136,9 +137,9 @@ const CartPage = () => {
   }
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${isDarkMode ? "bg-[#160F17] text-[#FAF5EE]" : "bg-[#FAF5EE] text-[#30232A]"}`}>
+    <div className={`min-h-screen transition-colors duration-300 ${isDarkMode ? "bg-[#141D18] text-[#F8F7F2]" : "bg-[#F8F7F2] text-[#24382F]"}`}>
       <div className="max-w-6xl mx-auto px-4 py-10">
-        <h1 className={`text-3xl font-bold font-serif mb-8 ${isDarkMode ? "text-[#FAF5EE]" : "text-[#651F3C]"}`}>Your Cart</h1>
+        <h1 className={`text-3xl font-bold font-serif mb-8 ${isDarkMode ? "text-[#F8F7F2]" : "text-[#254F3C]"}`}>Your Cart</h1>
 
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Cart Items List */}
@@ -154,13 +155,13 @@ const CartPage = () => {
               const actionId = item._id || item.cartId;
 
               return (
-                <div key={actionId} className={`flex flex-col sm:flex-row gap-4 p-4 rounded-xl border shadow-sm ${isDarkMode ? "bg-[#261B22] border-[#493640]" : "bg-white border-[#E8DDD5]"}`}>
-                  <div className="w-full sm:w-24 h-24 flex-shrink-0 bg-[#F5EAE9] rounded-lg overflow-hidden border border-[#E8DDD5] dark:border-[#493640]">
+                <div key={actionId} className={`flex flex-col sm:flex-row gap-4 p-4 rounded-xl border shadow-sm ${isDarkMode ? "bg-[#1D2921] border-[#3F5144]" : "bg-white border-[#D7DDD4]"}`}>
+                  <div className="w-full sm:w-24 h-24 flex-shrink-0 bg-[#F5EAE9] rounded-lg overflow-hidden border border-[#D7DDD4] dark:border-[#3F5144]">
                     {image && <img src={image} alt={name} className="w-full h-full object-cover" />}
                   </div>
 
                   <div className="flex-1">
-                    <h3 className={`font-bold text-lg ${isDarkMode ? "text-[#FAF5EF]" : "text-[#30232A]"}`}>{name}</h3>
+                    <h3 className={`font-bold text-lg ${isDarkMode ? "text-[#F8F7F2]" : "text-[#24382F]"}`}>{name}</h3>
                     <div className="text-sm opacity-80 mt-1 space-y-1">
                       {item.customization?.mainColor && <p>Color: {item.customization.mainColor} / {item.customization.secondaryColor}</p>}
                       {item.customization?.stones && <span>• With Stones </span>}
@@ -176,14 +177,14 @@ const CartPage = () => {
                       <p className="text-sm opacity-60">Unit Price</p>
                       <PriceINR amount={unitPrice} />
                       {item.quantity > 1 && (
-                        <p className="text-xs font-bold text-[#651F3C] dark:text-[#D5B36C] mt-0.5">
+                        <p className="text-xs font-bold text-[#254F3C] dark:text-[#D5B36C] mt-0.5">
                           Total: <PriceINR amount={lineTotal} />
                         </p>
                       )}
                     </div>
 
                     <div className="flex items-center gap-3">
-                      <div className={`flex items-center rounded-lg border ${isDarkMode ? "border-[#493640]" : "border-[#E8DDD5]"}`}>
+                      <div className={`flex items-center rounded-lg border ${isDarkMode ? "border-[#3F5144]" : "border-[#D7DDD4]"}`}>
                         <button onClick={() => handleQtyChange(actionId, item.quantity - 1)} className="px-3 py-1 hover:bg-black/5 dark:hover:bg-white/5">-</button>
                         <span className="px-2 font-medium">{item.quantity}</span>
                         <button onClick={() => handleQtyChange(actionId, item.quantity + 1)} className="px-3 py-1 hover:bg-black/5 dark:hover:bg-white/5">+</button>
@@ -200,15 +201,15 @@ const CartPage = () => {
 
           {/* Summary */}
           <div className="w-full lg:w-80 flex-shrink-0">
-            <div className={`rounded-2xl p-6 shadow-lg sticky top-24 border ${isDarkMode ? "bg-[#261B22] border-[#493640]" : "bg-white border-[#E8DDD5]"}`}>
+            <div className={`rounded-2xl p-6 shadow-lg sticky top-24 border ${isDarkMode ? "bg-[#1D2921] border-[#3F5144]" : "bg-white border-[#D7DDD4]"}`}>
               <h2 className="text-xl font-bold mb-4 font-serif">Order Summary</h2>
-              <div className="space-y-3 text-sm border-b pb-4 opacity-80 border-[#E8DDD5] dark:border-[#493640]">
+              <div className="space-y-3 text-sm border-b pb-4 opacity-80 border-[#D7DDD4] dark:border-[#3F5144]">
                 <div className="flex justify-between">
                   <span>Items Total</span>
                   <PriceINR amount={subtotal} />
                 </div>
               </div>
-              <div className="flex justify-between text-lg font-bold mt-4 text-[#651F3C] dark:text-[#D5B36C]">
+              <div className="flex justify-between text-lg font-bold mt-4 text-[#254F3C] dark:text-[#D5B36C]">
                 <span>Total Amount</span>
                 <PriceINR amount={subtotal} />
               </div>
@@ -219,7 +220,7 @@ const CartPage = () => {
                   </svg>
                   Order via WhatsApp
                 </button>
-                <button onClick={() => navigate('/checkout')} className="w-full bg-transparent border-2 border-[#651F3C] text-[#651F3C] dark:text-[#D5B36C] dark:border-[#D5B36C] py-3 rounded-xl font-bold hover:bg-[#F5EAE9] dark:hover:bg-[#30232A] transition-colors">
+                <button onClick={() => navigate('/checkout')} className="w-full bg-transparent border-2 border-[#254F3C] text-[#254F3C] dark:text-[#D5B36C] dark:border-[#D5B36C] py-3 rounded-xl font-bold hover:bg-[#F5EAE9] dark:hover:bg-[#24382F] transition-colors">
                   Proceed to Standard Checkout
                 </button>
               </div>
@@ -230,8 +231,8 @@ const CartPage = () => {
       {/* WhatsApp Confirmation Popup */}
       {whatsappPopupUrl && (
         <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4" onClick={() => setWhatsappPopupUrl(null)}>
-          <div 
-            className={`rounded-2xl max-w-md w-full p-6 text-center shadow-2xl animate-scaleIn ${isDarkMode ? "bg-[#261B22] border border-[#493640] text-[#FAF5EF]" : "bg-white border border-[#E8DDD5] text-[#30232A]"}`}
+          <div
+            className={`rounded-2xl max-w-md w-full p-6 text-center shadow-2xl animate-scaleIn ${isDarkMode ? "bg-[#1D2921] border border-[#3F5144] text-[#F8F7F2]" : "bg-white border border-[#D7DDD4] text-[#24382F]"}`}
             onClick={e => e.stopPropagation()}
           >
             <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
@@ -242,20 +243,20 @@ const CartPage = () => {
             <h3 className="text-xl font-bold mb-2">Almost there!</h3>
             <p className={`text-sm mb-6 ${isDarkMode ? "text-[#C9B8BF]" : "text-[#51454B]"}`}>
               Once done placing and sending the order in WhatsApp, please verify and confirm your order by calling this number: <br/>
-              <span className="font-bold text-lg text-[#651F3C] dark:text-[#D5B36C] mt-2 block">+91 9942071721</span>
+              <span className="font-bold text-lg text-[#254F3C] dark:text-[#D5B36C] mt-2 block">+91 9942071721</span>
             </p>
             <div className="flex gap-3 justify-center">
-              <button 
-                onClick={() => setWhatsappPopupUrl(null)} 
-                className={`px-5 py-2.5 rounded-xl font-medium ${isDarkMode ? "bg-[#30232A] hover:bg-[#493640] text-white" : "bg-gray-100 hover:bg-gray-200 text-gray-700"}`}
+              <button
+                onClick={() => setWhatsappPopupUrl(null)}
+                className={`px-5 py-2.5 rounded-xl font-medium ${isDarkMode ? "bg-[#24382F] hover:bg-[#3F5144] text-white" : "bg-gray-100 hover:bg-gray-200 text-gray-700"}`}
               >
                 Cancel
               </button>
-              <button 
+              <button
                 onClick={() => {
-                  window.open(whatsappPopupUrl, '_blank');
+                  window.open(whatsappPopupUrl, '_blank', 'noopener,noreferrer');
                   setWhatsappPopupUrl(null);
-                }} 
+                }}
                 className="px-5 py-2.5 bg-[#25D366] hover:bg-[#20ba59] text-white rounded-xl font-medium shadow-lg"
               >
                 Proceed to WhatsApp
@@ -267,36 +268,36 @@ const CartPage = () => {
 
       {showAddressModal && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm" onClick={() => setShowAddressModal(false)}>
-          <div onClick={(e) => e.stopPropagation()} className={`w-full max-w-md rounded-3xl p-8 shadow-2xl transform scale-100 animate-scaleIn ${isDarkMode ? "bg-[#261B22] text-[#FAF5EF] border border-[#493640]" : "bg-white text-[#30232A] border border-[#E8DDD5]"}`}>
+          <div onClick={(e) => e.stopPropagation()} className={`w-full max-w-md rounded-3xl p-8 shadow-2xl transform scale-100 animate-scaleIn ${isDarkMode ? "bg-[#1D2921] text-[#F8F7F2] border border-[#3F5144]" : "bg-white text-[#24382F] border border-[#D7DDD4]"}`}>
             <h3 className="text-2xl font-black mb-2 font-serif">Delivery Details</h3>
             <p className="text-sm text-[#81747A] mb-6">Please provide your contact information to proceed with the WhatsApp order.</p>
-            
+
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-semibold mb-1">Phone Number</label>
-                <input 
-                  type="tel" 
+                <input
+                  type="tel"
                   value={contactInfo.phone}
                   onChange={(e) => setContactInfo({...contactInfo, phone: e.target.value})}
-                  className={`w-full rounded-xl border p-3 outline-none ${isDarkMode ? "border-[#493640] bg-[#171116] text-white" : "border-[#E8DDD5] bg-[#FAF5EF]"}`}
+                  className={`w-full rounded-xl border p-3 outline-none ${isDarkMode ? "border-[#3F5144] bg-[#141D18] text-white" : "border-[#D7DDD4] bg-[#F8F7F2]"}`}
                   placeholder="Enter your phone number"
                 />
               </div>
               <div>
                 <label className="block text-sm font-semibold mb-1">Delivery Address</label>
-                <textarea 
+                <textarea
                   value={contactInfo.address}
                   onChange={(e) => setContactInfo({...contactInfo, address: e.target.value})}
                   rows={3}
-                  className={`w-full rounded-xl border p-3 outline-none resize-none ${isDarkMode ? "border-[#493640] bg-[#171116] text-white" : "border-[#E8DDD5] bg-[#FAF5EF]"}`}
+                  className={`w-full rounded-xl border p-3 outline-none resize-none ${isDarkMode ? "border-[#3F5144] bg-[#141D18] text-white" : "border-[#D7DDD4] bg-[#F8F7F2]"}`}
                   placeholder="Enter your complete delivery address"
                 />
               </div>
             </div>
-            
+
             <div className="mt-8 flex justify-end gap-3">
               <button onClick={() => setShowAddressModal(false)} className="rounded-xl px-5 py-2.5 font-medium text-[#81747A] hover:bg-black/5 dark:hover:bg-white/5 transition">Cancel</button>
-              <button onClick={() => proceedToWhatsApp(contactInfo.phone, contactInfo.address)} className="rounded-xl bg-[#651F3C] hover:bg-[#4D172D] px-6 py-2.5 font-bold text-white transition disabled:opacity-50" disabled={!contactInfo.phone || !contactInfo.address}>Continue</button>
+              <button onClick={() => proceedToWhatsApp(contactInfo.phone, contactInfo.address)} className="rounded-xl bg-[#254F3C] hover:bg-[#183D2B] px-6 py-2.5 font-bold text-white transition disabled:opacity-50" disabled={!contactInfo.phone || !contactInfo.address}>Continue</button>
             </div>
           </div>
         </div>

@@ -10,6 +10,17 @@ const {
 const userRepository = require('../repositories/userRepository');
 const { logActivity } = require('./activityService');
 const { pushEventToUser } = require('./realtimeRelayService');
+const { env } = require('../config/env');
+const updateSensitiveUser = async (userId, data) => {
+  const user = await prisma.$transaction(async (tx) => {
+    const updated = await tx.user.update({ where: { id: userId }, data: { ...data, authVersion: { increment: 1 } } });
+    await tx.refreshToken.deleteMany({ where: { userId } });
+    await tx.passwordResetToken.deleteMany({ where: { userId } });
+    return updated;
+  });
+  require('./realtimeRelayService').disconnectUser(userId);
+  return user;
+};
 
 const getAllUsers = async (filters = {}) => {
   const users = await userRepository.listUsers(filters);
@@ -51,12 +62,19 @@ const getUserById = async (userId) => {
   };
 };
 
-const updateProfile = async (userId, { fullName, email, phoneNumber, address, password }) => {
+const updateProfile = async (userId, { fullName, email, phoneNumber, address, password, currentPassword }) => {
   const payload = {};
+  const current = await userRepository.findById(userId);
+  if (!current) throw new ApiError(404, 'User not found');
+  const sensitive = Boolean(password) || (email !== undefined && email.trim().toLowerCase() !== current.email);
+  if (sensitive && (!currentPassword || !await bcrypt.compare(currentPassword, current.passwordHash))) {
+    throw new ApiError(403, 'Enter your current password to change your email or password');
+  }
 
   if (fullName !== undefined) payload.fullName = fullName;
   if (email !== undefined) {
     const normalizedEmail = String(email).trim().toLowerCase();
+    if (normalizedEmail === env.adminEmail && current.email !== env.adminEmail) throw new ApiError(403, 'That email address is unavailable');
     const existing = await userRepository.findByEmail(normalizedEmail);
 
     if (existing && existing.id !== userId) {
@@ -70,7 +88,7 @@ const updateProfile = async (userId, { fullName, email, phoneNumber, address, pa
 
   if (password) payload.passwordHash = await bcrypt.hash(password, 12);
 
-  const user = await userRepository.updateUser(userId, payload);
+  const user = sensitive ? await updateSensitiveUser(userId, payload) : await userRepository.updateUser(userId, payload);
   await logActivity({
     userId,
     action: 'profile_updated',
@@ -86,24 +104,19 @@ const updateProfile = async (userId, { fullName, email, phoneNumber, address, pa
 
 const deleteUser = async (userId) => {
   pushEventToUser(userId, 'account.deleted', {});
+  require('./realtimeRelayService').disconnectUser(userId);
   await prisma.user.delete({ where: { id: userId } });
 };
 
 const updateUserPassword = async (userId, password) => {
-  await prisma.user.update({
-    where: { id: userId },
-    data: { passwordHash: await bcrypt.hash(password, 12) },
-  });
+  await updateSensitiveUser(userId, { passwordHash: await bcrypt.hash(password, 12) });
 
   pushEventToUser(userId, 'profile.changed', {});
   pushEventToUser(userId, 'activities.changed', {});
 };
 
 const setUserStatus = async (userId, isActive) => {
-  const user = await prisma.user.update({
-    where: { id: userId },
-    data: { isActive: Boolean(isActive) },
-  });
+  const user = await updateSensitiveUser(userId, { isActive });
 
   if (!isActive) {
     await prisma.refreshToken.deleteMany({ where: { userId } });
@@ -227,6 +240,7 @@ const removeCartItem = async (userId, itemId) => {
 };
 
 const toggleLike = async (userId, productId) => {
+  if (!await prisma.product.findUnique({ where: { id: productId } })) throw new ApiError(404, 'Product not found');
   const existing = await prisma.like.findUnique({
     where: { userId_productId: { userId, productId } },
   });
@@ -273,6 +287,7 @@ const toggleWishlist = async (userId, productId) => {
     await prisma.wishlistItem.delete({ where: { id: existing.id } });
   } else {
     const product = await prisma.product.findUnique({ where: { id: productId } });
+    if (!product) throw new ApiError(404, 'Product not found');
     await prisma.wishlistItem.create({
       data: {
         userId,
@@ -316,10 +331,7 @@ const adminUpdateUserDetails = async (adminUserId, targetUserId, { fullName, ema
     payload.passwordHash = await bcrypt.hash(password, 12);
   }
 
-  const user = await prisma.user.update({
-    where: { id: targetUserId },
-    data: payload
-  });
+  const user = await updateSensitiveUser(targetUserId, payload);
 
   await logActivity({
     userId: adminUserId,

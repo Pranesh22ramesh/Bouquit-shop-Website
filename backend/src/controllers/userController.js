@@ -3,6 +3,7 @@ const { asyncHandler } = require('../utils/asyncHandler');
 const userService = require('../services/userService');
 
 const profileValidators = [
+  body('currentPassword').optional().isString().bail().isLength({ min: 1, max: 100 }).custom((value) => Buffer.byteLength(value, 'utf8') <= 72),
   body('fullName')
     .optional()
     .isString().bail()
@@ -156,6 +157,7 @@ const updateProfile = asyncHandler(async (req, res) => {
     phoneNumber: req.body.phoneNumber || req.body.mobile,
     address: req.body.address,
     password: req.body.password,
+    currentPassword: req.body.currentPassword,
   });
   res.json(updated);
 });

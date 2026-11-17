@@ -5,15 +5,16 @@
   "main": "src/server.js",
   "scripts": {
     "dev": "nodemon src/server.js",
-    "start": "node src/server.js",
+    "start": "node scripts/start-production.cjs",
     "test": "node --test test/*.test.cjs",
     "test:db": "node scripts/test-checkout.cjs",
     "security:rotate-admin": "node scripts/rotate-admin.cjs",
-    "build": "prisma generate && prisma db push && node prisma/seed.js",
+    "build": "prisma generate",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:push": "prisma db push",
-    "seed": "node prisma/seed.js"
+    "seed": "node prisma/seed.js",
+    "security:database": "node scripts/check-database.cjs"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",

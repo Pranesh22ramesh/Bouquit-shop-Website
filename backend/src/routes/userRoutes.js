@@ -11,7 +11,7 @@ router.use(protect, authenticatedLimiter);
 
 router.get('/', adminOnly, strictRequest({ query: ['search', 'role', 'status'] }), userController.userListValidators, validateRequest, userController.getUsers);
 router.get('/activities', strictRequest(), userController.getActivities);
-router.put('/profile', strictRequest({ body: ['fullName', 'name', 'email', 'phoneNumber', 'mobile', 'address', 'password'] }), userController.profileValidators, validateRequest, userController.updateProfile);
+router.put('/profile', strictRequest({ body: ['fullName', 'name', 'email', 'phoneNumber', 'mobile', 'address', 'password', 'currentPassword'] }), userController.profileValidators, validateRequest, userController.updateProfile);
 router.get('/cart', strictRequest(), userController.getCart);
 router.post('/cart', strictRequest({ body: ['productId', 'quantity', 'customization'], nestedBody: { customization: ['variant', 'primaryColor', 'secondaryColors', 'selectedFlowers', 'stones', 'notes', 'referenceImageName', 'mainColor', 'secondaryColor', 'beads', 'hasReferencePhoto', 'quantity'] } }), userController.cartValidators, validateRequest, userController.addToCart);
 router.put('/cart', strictRequest({ body: ['itemId', 'quantity'] }), userController.updateCartValidators, validateRequest, userController.updateCart);

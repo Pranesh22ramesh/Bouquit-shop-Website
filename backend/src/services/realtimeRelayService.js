@@ -1,4 +1,14 @@
 const clientsByUserId = new Map();
+const { env } = require('../config/env');
+const { ApiError } = require('../utils/apiError');
+const assertCapacity = (userId) => {
+  const total = [...clientsByUserId.values()].reduce((sum, clients) => sum + clients.size, 0);
+  if ((clientsByUserId.get(userId)?.size || 0) >= env.streamMaxPerUser || total >= env.streamMaxTotal) throw new ApiError(429, 'Too many open connections');
+};
+const disconnectUser = (userId) => {
+  clientsByUserId.get(userId)?.forEach((res) => res.end());
+  clientsByUserId.delete(userId);
+};
 
 const formatEvent = (event, payload = {}) => `event: ${event}\ndata: ${JSON.stringify(payload)}\n\n`;
 
@@ -34,6 +44,8 @@ const pushEventToUser = (userId, event, payload = {}) => {
 };
 
 module.exports = {
+  assertCapacity,
+  disconnectUser,
   addClient,
   removeClient,
   pushEventToUser,

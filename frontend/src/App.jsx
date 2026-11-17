@@ -2,7 +2,9 @@ import React from "react";
 import { Navigate, Routes, Route, Outlet } from "react-router-dom";
 import Navbar from "./components/Navbar.jsx";
 import Footer from "./components/Footer.jsx";
-import AIChatbot from "./components/AIChatbot.jsx";
+import SiteUtilities from "./components/SiteUtilities.jsx";
+import PolicyPage from "./pages/PolicyPage.jsx";
+import FAQ from "./components/FAQ.jsx";
 
 import { Suspense, lazy } from "react";
 
@@ -25,53 +27,9 @@ const ForgotPasswordPage = lazy(() => import("./pages/ForgotPasswordPage.jsx"));
 const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage.jsx"));
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import ErrorBoundary from "./components/ErrorBoundary.jsx";
-import { galleryService } from "./api/galleryService.js";
 
-const Layout = () => {
-  const [isDarkMode, setIsDarkMode] = React.useState(() => {
-    return document.documentElement.classList.contains("dark");
-  });
 
-  React.useEffect(() => {
-    // Pre-warm backend and cache products in background on initial load
-    galleryService.list({ limit: 40 }).catch(() => {});
-  }, []);
-
-  React.useEffect(() => {
-    // Check theme on mount
-    setIsDarkMode(document.documentElement.classList.contains("dark"));
-
-    // Watch for theme changes
-    const observer = new MutationObserver(() => {
-      setIsDarkMode(document.documentElement.classList.contains("dark"));
-    });
-
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["class"],
-    });
-
-    return () => observer.disconnect();
-  }, []);
-
-  return (
-    <div className={`min-h-screen flex flex-col transition-colors duration-300 ${isDarkMode
-      ? "bg-gray-900 text-gray-100"
-      : "bg-[#fff7f3] text-slate-900"
-      }`}>
-      <Navbar />
-      <main className="flex-1 relative">
-        <ErrorBoundary>
-          <Suspense fallback={<div className="flex h-full w-full items-center justify-center min-h-[50vh]"><div className="h-10 w-10 animate-spin rounded-full border-4 border-rose-500 border-t-transparent"></div></div>}>
-            <Outlet />
-          </Suspense>
-        </ErrorBoundary>
-      </main>
-      <Footer />
-      <AIChatbot />
-    </div>
-  );
-};
+const Layout = () => <div className="site-shell"><Navbar /><main id="main-content" tabIndex={-1} className="flex-1"><ErrorBoundary><Suspense fallback={<div role="status" className="loading-state"><span className="loading-spinner" />Loading page...</div>}><Outlet /></Suspense></ErrorBoundary></main><Footer /><SiteUtilities /></div>;
 
 const App = () => {
   return (
@@ -80,12 +38,11 @@ const App = () => {
         <Route index element={<HomePage />} />
         <Route path="reviews" element={<ReviewPage />} />
         <Route path="cart" element={<CartPage />} />
-        <Route
-          path="order-confirmation"
-          element={<OrderConfirmationPage />}
-        />
         <Route path="about" element={<AboutPage />} />
         <Route path="contact" element={<ContactPage />} />
+        <Route path="privacy" element={<PolicyPage type="privacy" />} />
+        <Route path="terms" element={<PolicyPage type="terms" />} />
+        <Route path="faq" element={<div className="page-width"><h1 className="faq-page-title">Ordering questions</h1><FAQ /></div>} />
         <Route path="gallery" element={<GalleryPage />} />
         <Route path="shop" element={<GalleryPage />} />
         <Route path="product/:id" element={<ProductDetailsPage />} />
@@ -97,6 +54,7 @@ const App = () => {
         <Route path="reset-password/:token" element={<ResetPasswordPage />} />
         <Route path="signup" element={<SignupPage />} />
         <Route element={<ProtectedRoute />}>
+          <Route path="order-confirmation" element={<OrderConfirmationPage />} />
           <Route path="my-orders" element={<MyOrdersPage />} />
           <Route path="checkout" element={<CheckoutPage />} />
         </Route>

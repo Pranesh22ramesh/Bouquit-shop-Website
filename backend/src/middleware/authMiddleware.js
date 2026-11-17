@@ -22,14 +22,18 @@ const protect = async (req, res, next) => {
         phoneNumber: true,
         role: true,
         isActive: true,
+        authVersion: true,
         createdAt: true,
       },
     });
 
     if (!user) return next(new ApiError(401, 'User not found'));
+    if (payload.ver !== user.authVersion) return next(new ApiError(401, 'Please sign in again'));
     if (user.isActive === false) return next(new ApiError(403, 'Your account has been disabled'));
 
     req.user = user;
+    req.tokenExpiresAt = payload.exp * 1000;
+    res.setHeader('Cache-Control', 'no-store');
     return next();
   } catch (error) {
     return next(error);
@@ -37,7 +41,7 @@ const protect = async (req, res, next) => {
 };
 
 const adminOnly = (req, res, next) => {
-  if (req.user?.role === 'ADMIN' || req.user?.role === 'SUBADMIN') return next();
+  if (req.user?.role === 'ADMIN') return next();
   return next(new ApiError(403, 'Admin access required'));
 };
 
@@ -62,10 +66,11 @@ const optionalAuth = async (req, res, next) => {
         phoneNumber: true,
         role: true,
         isActive: true,
+        authVersion: true,
         createdAt: true,
       },
     });
-    req.user = user?.isActive === false ? null : user || null;
+    req.user = !user || user.isActive === false || payload.ver !== user.authVersion ? null : user;
   } catch (error) {
     return next(error);
   }

@@ -1,15 +1,15 @@
+import { useTheme } from "../hooks/useTheme";
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { galleryService } from "../api/galleryService";
 import { useAuth } from "../context/AuthContext";
-import { subscribeToTable } from "../lib/supabaseRealtime";
 
 const FavoritesPage = () => {
   const { user, isAuthenticated } = useAuth();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("likes");
-  const [isDarkMode] = React.useState(() => document.documentElement.classList.contains("dark"));
+  const isDarkMode = useTheme();
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -24,13 +24,7 @@ const FavoritesPage = () => {
     };
 
     fetchProducts();
-    const unsubscribe = subscribeToTable({
-      table: "Product",
-      onChange: fetchProducts,
-      channelName: "favorites-products",
-    });
 
-    return unsubscribe;
   }, []);
 
   const likedProductIds = useMemo(() => {
@@ -69,19 +63,19 @@ const FavoritesPage = () => {
     return (
       <div
         className={`min-h-[60vh] flex flex-col items-center justify-center text-center p-4 transition-colors duration-300 ${
-          isDarkMode ? "bg-[#160F17] text-[#FAF5EE]" : "bg-[#FAF5EE] text-[#30232A]"
+          isDarkMode ? "bg-[#141D18] text-[#F8F7F2]" : "bg-[#F8F7F2] text-[#24382F]"
         }`}
       >
-        <div className="mb-6 inline-flex rounded-full border border-[#E8DDD5] dark:border-[#493640] p-1 text-sm bg-white dark:bg-[#231722]">
+        <div className="mb-6 inline-flex rounded-full border border-[#D7DDD4] dark:border-[#3F5144] p-1 text-sm bg-white dark:bg-[#1D2921]">
           <button
             onClick={() => setActiveTab("likes")}
-            className={`rounded-full px-4 py-2 font-medium transition ${activeTab === "likes" ? "bg-[#651F3C] text-white shadow-sm" : "text-[#30232A] dark:text-[#FAF5EE]"}`}
+            className={`rounded-full px-4 py-2 font-medium transition ${activeTab === "likes" ? "bg-[#254F3C] text-white shadow-sm" : "text-[#24382F] dark:text-[#F8F7F2]"}`}
           >
             Likes ({likes.length})
           </button>
           <button
             onClick={() => setActiveTab("wishlist")}
-            className={`rounded-full px-4 py-2 font-medium transition ${activeTab === "wishlist" ? "bg-[#651F3C] text-white shadow-sm" : "text-[#30232A] dark:text-[#FAF5EE]"}`}
+            className={`rounded-full px-4 py-2 font-medium transition ${activeTab === "wishlist" ? "bg-[#254F3C] text-white shadow-sm" : "text-[#24382F] dark:text-[#F8F7F2]"}`}
           >
             Wishlist ({wishlist.length})
           </button>
@@ -90,7 +84,7 @@ const FavoritesPage = () => {
         <p className={`mb-6 max-w-md ${isDarkMode ? "text-[#8E7A83]" : "text-[#81747A]"}`}>
           Browse the gallery and save the floral designs you want to come back to later.
         </p>
-        <Link to="/gallery" className="px-6 py-2.5 bg-[#651F3C] text-white rounded-full font-medium hover:bg-[#4D172D] transition shadow-md">
+        <Link to="/gallery" className="px-6 py-2.5 bg-[#254F3C] text-white rounded-full font-medium hover:bg-[#183D2B] transition shadow-md">
           Go to Gallery
         </Link>
       </div>
@@ -98,26 +92,26 @@ const FavoritesPage = () => {
   }
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${isDarkMode ? "bg-[#160F17] text-[#FAF5EE]" : "bg-[#FAF5EE] text-[#30232A]"}`}>
+    <div className={`min-h-screen transition-colors duration-300 ${isDarkMode ? "bg-[#141D18] text-[#F8F7F2]" : "bg-[#F8F7F2] text-[#24382F]"}`}>
       <div className="max-w-6xl mx-auto px-4 py-10">
         <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <h1 className={`text-3xl font-serif font-bold mb-2 ${isDarkMode ? "text-[#FAF5EE]" : "text-[#651F3C]"}`}>Saved Products</h1>
+            <h1 className={`text-3xl font-serif font-bold mb-2 ${isDarkMode ? "text-[#F8F7F2]" : "text-[#254F3C]"}`}>Saved Products</h1>
             <p className={`${isDarkMode ? "text-[#8E7A83]" : "text-[#81747A]"}`}>
               Likes and wishlist items stay tied to your account.
             </p>
           </div>
 
-          <div className="inline-flex rounded-full border border-[#E8DDD5] dark:border-[#493640] bg-white dark:bg-[#231722] p-1 text-sm shadow-sm">
+          <div className="inline-flex rounded-full border border-[#D7DDD4] dark:border-[#3F5144] bg-white dark:bg-[#1D2921] p-1 text-sm shadow-sm">
             <button
               onClick={() => setActiveTab("likes")}
-              className={`rounded-full px-4 py-2 font-medium transition ${activeTab === "likes" ? "bg-[#651F3C] text-white shadow-sm" : "text-[#30232A] dark:text-[#FAF5EE]"}`}
+              className={`rounded-full px-4 py-2 font-medium transition ${activeTab === "likes" ? "bg-[#254F3C] text-white shadow-sm" : "text-[#24382F] dark:text-[#F8F7F2]"}`}
             >
               Likes ({likes.length})
             </button>
             <button
               onClick={() => setActiveTab("wishlist")}
-              className={`rounded-full px-4 py-2 font-medium transition ${activeTab === "wishlist" ? "bg-[#651F3C] text-white shadow-sm" : "text-[#30232A] dark:text-[#FAF5EE]"}`}
+              className={`rounded-full px-4 py-2 font-medium transition ${activeTab === "wishlist" ? "bg-[#254F3C] text-white shadow-sm" : "text-[#24382F] dark:text-[#F8F7F2]"}`}
             >
               Wishlist ({wishlist.length})
             </button>
@@ -129,14 +123,14 @@ const FavoritesPage = () => {
             <Link
               key={item._id}
               to={`/product/${item._id}`}
-              className={`rounded-xl overflow-hidden shadow-sm transition hover:shadow-lg border border-[#E8DDD5] dark:border-[#493640] ${isDarkMode ? "bg-[#261B22]" : "bg-white"}`}
+              className={`rounded-xl overflow-hidden shadow-sm transition hover:shadow-lg border border-[#D7DDD4] dark:border-[#3F5144] ${isDarkMode ? "bg-[#1D2921]" : "bg-white"}`}
             >
               <div className="aspect-[4/5] relative overflow-hidden">
                 <img src={item.image} alt={item.name} className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
               </div>
               <div className="p-3">
-                <h3 className={`font-bold truncate text-sm ${isDarkMode ? "text-[#FAF5EF]" : "text-[#30232A]"}`}>{item.name}</h3>
-                <p className="text-[#651F3C] dark:text-[#D5B36C] text-xs font-semibold mt-1">₹{item.price?.toLocaleString("en-IN")}</p>
+                <h3 className={`font-bold truncate text-sm ${isDarkMode ? "text-[#F8F7F2]" : "text-[#24382F]"}`}>{item.name}</h3>
+                <p className="text-[#254F3C] dark:text-[#D5B36C] text-xs font-semibold mt-1">₹{item.price?.toLocaleString("en-IN")}</p>
               </div>
             </Link>
           ))}

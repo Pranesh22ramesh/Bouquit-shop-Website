@@ -400,7 +400,7 @@ const ProductFormModal = ({
                       />
                       <h4 className="font-bold capitalize text-gray-800 dark:text-gray-100">{variant} Variant</h4>
                     </label>
-                    
+
                     {form.variants[variant].enabled && (
                       <div className="grid sm:grid-cols-3 gap-4 pl-6 border-l-2 border-rose-100 dark:border-rose-900/30 ml-2 mt-2">
                         <div className="col-span-3 sm:col-span-1">

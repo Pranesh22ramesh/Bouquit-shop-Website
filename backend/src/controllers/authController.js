@@ -3,6 +3,7 @@ const { asyncHandler } = require('../utils/asyncHandler');
 const authService = require('../services/authService');
 const { refreshCookieOptions } = require('../utils/cookies');
 const { env } = require('../config/env');
+const { assertResetDelivery, sendResetEmail } = require('../services/resetEmailService');
 
 // Strict input validation schemas
 const signupValidators = [
@@ -119,12 +120,14 @@ const logout = asyncHandler(async (req, res) => {
 });
 
 const forgotPassword = asyncHandler(async (req, res) => {
+  assertResetDelivery();
   const token = await authService.beginPasswordReset(req.body.email);
+  if (token) await sendResetEmail(req.body.email, token);
   const response = {
     message: 'If that email exists, a password reset link has been processed.',
   };
 
-  if (token && env.nodeEnv !== 'production') {
+  if (token && env.nodeEnv === 'test') {
     response.resetUrl = `${env.frontendUrl}/reset-password/${token}`;
   }
 

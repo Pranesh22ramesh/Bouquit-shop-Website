@@ -17,6 +17,7 @@ Object.assign(process.env, {
   JWT_RESET_SECRET: crypto.randomBytes(48).toString('hex'), TRUST_PROXY_HOPS: '0', FRONTEND_URL: 'http://localhost:4173',
   RATE_LIMIT_AUTH_IP_ATTEMPT_MAX: '100', RATE_LIMIT_AUTH_ACCOUNT_ATTEMPT_MAX: '100', RATE_LIMIT_SIGNUP_ACCOUNT_ATTEMPT_MAX: '100',
   RATE_LIMIT_PUBLIC_MAX: '1000', RATE_LIMIT_USER_MAX: '1000',
+  ADMIN_EMAIL: 'security-owner@example.com', ADMIN_PASSWORD: crypto.randomBytes(24).toString('hex'),
 });
 const { app } = require('../src/app');
 const { prisma } = require('../src/config/prisma');
@@ -27,7 +28,7 @@ let base;
 const uploaded = [];
 const fixtures = { email: `checkout-${crypto.randomUUID()}@example.com`, password: crypto.randomBytes(18).toString('hex') };
 async function request(route, { method = 'GET', json, form, token, cookie } = {}) {
-  const response = await fetch(`${base}/api${route}`, { method, headers: {
+  const response = await fetch(`${base}/api${route}`, { method, headers: { 'X-Requested-With': 'shop-web',
     ...(json ? { 'Content-Type': 'application/json' } : {}), ...(token ? { Authorization: `Bearer ${token}` } : {}), ...(cookie ? { Cookie: cookie } : {}),
   }, body: form || (json ? JSON.stringify(json) : undefined), signal: AbortSignal.timeout(10000) });
   const data = await response.json();
@@ -46,6 +47,22 @@ async function main() {
   const login = await request('/auth/login', { method: 'POST', json: { email: fixtures.email, password: fixtures.password } });
   assert.equal(login.status, 200);
   const token = login.data.token;
+  const stolenProfile = { email: `changed-${crypto.randomUUID()}@example.com` };
+  assert.equal((await request('/users/profile', { method: 'PUT', token, json: stolenProfile })).status, 403);
+  assert.equal((await request('/users/profile', { method: 'PUT', token, json: { ...stolenProfile, currentPassword: crypto.randomBytes(18).toString('hex') } })).status, 403);
+  assert.equal((await request('/users/profile', { method: 'PUT', token, json: { email: env.adminEmail, currentPassword: fixtures.password } })).status, 403);
+  const owner = await prisma.user.upsert({ where: { email: env.adminEmail }, update: { role: 'USER' }, create: { email: env.adminEmail, fullName: 'Bootstrap Test', role: 'USER', passwordHash: await require('bcryptjs').hash(fixtures.password, 12) } });
+  await assert.rejects(() => require('../src/services/authService').seedAdminUser(), /bootstrap refused/);
+  assert.equal((await prisma.user.findUnique({ where: { id: owner.id } })).role, 'USER');
+  fixtures.adminEmail = env.adminEmail;
+  fixtures.adminPassword = crypto.randomBytes(24).toString('hex');
+  await prisma.user.update({ where: { id: owner.id }, data: { role: 'ADMIN', passwordHash: await require('bcryptjs').hash(fixtures.adminPassword, 12) } });
+  const adminSession = await request('/auth/admin/login', { method: 'POST', json: { email: fixtures.adminEmail, password: fixtures.adminPassword } });
+  assert.equal(adminSession.status, 200);
+  assert.equal((await request('/admin/dashboard', { token: adminSession.data.token })).status, 200);
+  const parallelRefresh = await Promise.all(Array.from({ length: 4 }, () => request('/auth/refresh', { method: 'POST', cookie: login.cookie })));
+  assert.equal(parallelRefresh.filter((response) => response.status === 200).length, 1);
+  assert.equal(parallelRefresh.filter((response) => response.status === 401).length, 3);
   assert.equal((await request('/users/profile', { method: 'PUT', token, json: { address: '12 Flower Street' } })).status, 200);
   assert.equal((await request('/users/cart', { method: 'POST', token, json: { productId: product.id, quantity: 2, customization: { stones: true, beads: true, mainColor: '#ff0000', secondaryColor: '#ffffff', notes: 'Test order only' } } })).status, 201);
   const orderBody = { shippingAddress: { address: '12 Flower Street', city: 'Karur', postalCode: '639001', country: 'India' }, paymentMethod: 'Cash on Delivery' };
@@ -73,8 +90,24 @@ async function main() {
   fixtures.password = crypto.randomBytes(18).toString('hex');
   assert.equal((await request(`/auth/resetpassword/${resetToken}`, { method: 'PUT', json: { password: fixtures.password, confirmPassword: fixtures.password } })).status, 200);
   assert.equal((await request('/auth/refresh', { method: 'POST', cookie: login.cookie })).status, 401);
+  assert.equal((await request('/users/cart', { token })).status, 401);
   assert.equal((await request(`/auth/resetpassword/${resetToken}`, { method: 'PUT', json: { password: fixtures.password } })).status, 400);
-  assert.equal((await request('/auth/login', { method: 'POST', json: { email: fixtures.email, password: fixtures.password } })).status, 200);
+  const reLogin = await request('/auth/login', { method: 'POST', json: { email: fixtures.email, password: fixtures.password } });
+  assert.equal(reLogin.status, 200);
+  const newPassword = crypto.randomBytes(18).toString('hex');
+  assert.equal((await request('/users/profile', { method: 'PUT', token: reLogin.data.token, json: { password: newPassword, currentPassword: fixtures.password } })).status, 200);
+  fixtures.password = newPassword;
+  assert.equal((await request('/users/cart', { token: reLogin.data.token })).status, 401);
+  assert.equal((await request('/auth/refresh', { method: 'POST', cookie: reLogin.cookie })).status, 401);
+  for (const role of ['anon', 'authenticated']) {
+    await assert.rejects(() => prisma.$transaction(async (tx) => {
+      await tx.$executeRawUnsafe(`SET LOCAL ROLE ${role}`);
+      await tx.$queryRaw`SELECT email FROM public."User" LIMIT 1`;
+    }), /permission denied/);
+  }
+  const rls = await prisma.$queryRaw`SELECT relname FROM pg_class JOIN pg_namespace ON pg_class.relnamespace = pg_namespace.oid WHERE nspname = 'public' AND relrowsecurity AND relname IN ('User','Order','RefreshToken','PasswordResetToken','CartItem','Like','WishlistItem','ActivityLog')`;
+  assert.equal(rls.length, 8);
+  console.log('New security checks passed: profile reauthentication, reserved admin email, bootstrap takeover prevention, concurrent refresh replay, access/refresh revocation, and private table denial for browser roles.');
   console.log('PostgreSQL checks passed: signup, login, profile, customized cart, checkout totals, empty-cart replay, order ownership, image review, reset and refresh revocation.');
   if (process.argv.includes('--serve')) {
     const filename = path.join(os.tmpdir(), 'shop-web-security-fixtures.json');

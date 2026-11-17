@@ -1,59 +1,10 @@
-// src/pages/OrderConfirmationPage.jsx
-import React, { useEffect, useState } from "react";
-import { useSearchParams, Link } from "react-router-dom";
-import axios from "../api/axios";
-
-const OrderConfirmationPage = () => {
-  const [searchParams] = useSearchParams();
-  const orderId = searchParams.get("order");
-  const [order, setOrder] = useState(null);
-
-  useEffect(() => {
-    if (orderId) {
-      axios.get(`/orders/${orderId}`)
-        .then(res => setOrder(res.data))
-        .catch(console.error);
-    }
-  }, [orderId]);
-
-  const [isDarkMode] = React.useState(() => document.documentElement.classList.contains("dark"));
-
-  return (
-    <div className={`min-h-screen flex flex-col items-center justify-center p-4 transition-colors duration-300 ${isDarkMode ? "bg-[#171116] text-[#FAF5EF]" : "bg-[#FAF5EF] text-[#30232A]"}`}>
-
-      <div className={`max-w-md w-full p-8 rounded-3xl shadow-xl text-center border ${isDarkMode ? "bg-[#261B22] border-[#493640]" : "bg-white border-[#E8DDD5]"}`}>
-        <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-          <svg className="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-          </svg>
-        </div>
-
-        <h1 className="text-3xl font-serif font-bold text-[#651F3C] dark:text-[#D5B36C] mb-2">Order Confirmed!</h1>
-        <p className="text-[#81747A] dark:text-[#8E7A83] mb-6 text-sm leading-relaxed">
-          Thank you for choosing MIDHUNYAS. Your floral order has been received successfully.
-        </p>
-
-        {order && (
-          <div className={`p-4 rounded-xl text-left text-sm mb-6 border ${isDarkMode ? "bg-[#171116] border-[#493640]" : "bg-[#F5EAE9] border-[#E8DDD5]"}`}>
-            <p><span className="font-semibold text-[#651F3C] dark:text-[#D5B36C]">Order ID:</span> {order._id}</p>
-            <p><span className="font-semibold">Amount:</span> ₹{order.totalPrice?.toLocaleString("en-IN")}</p>
-            <p><span className="font-semibold">Payment:</span> {order.paymentMethod}</p>
-            <p className="mt-2 text-xs opacity-60">We have sent a confirmation email to {order.user?.email}</p>
-          </div>
-        )}
-
-        <div className="space-y-3">
-          <Link to="/my-orders" className="block w-full py-3 bg-[#651F3C] text-white rounded-xl font-bold hover:bg-[#4D172D] shadow-lg shadow-[#651F3C]/20 transition">
-            Track Order
-          </Link>
-          <Link to="/gallery" className="block w-full py-3 border border-[#651F3C] text-[#651F3C] dark:text-[#D5B36C] dark:border-[#D5B36C] rounded-xl font-bold hover:bg-[#F5EAE9] dark:hover:bg-[#30232A] transition">
-            Continue Shopping
-          </Link>
-        </div>
-      </div>
-
-    </div>
-  );
-};
-
-export default OrderConfirmationPage;
+import React, { useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import api from '../api/axios';
+export default function OrderConfirmationPage() {
+ const [params] = useSearchParams(); const id = params.get('order') || ''; const [copyMessage, setCopyMessage] = useState('');
+ const valid = /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(id);
+ const { data: order, isLoading, isError } = useQuery({ queryKey: ['order', id], enabled: valid, retry: false, queryFn: async () => (await api.get(`/orders/${id}`)).data });
+ return <article className="page-width policy-page"><p className="eyebrow">YOUR ORDER</p>{isLoading ? <p role="status">Loading order...</p> : isError || !order ? <><h1>Order unavailable</h1><p>We could not find an order you can access. Check My orders or contact the shop for help.</p></> : <><h1>Order received</h1><p>Order number: <strong>{order._id}</strong></p><p>Status: {order.status}</p><p>Total: {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(order.totalPrice)}</p><p>Payment: {order.paymentMethod}</p><p>Last updated: <time dateTime={order.updatedAt}>{new Date(order.updatedAt || order.createdAt).toLocaleString('en-IN')}</time></p><div className="button-row"><button className="button secondary" onClick={async () => { try { await navigator.clipboard.writeText(order._id); setCopyMessage('Order number copied.'); } catch { setCopyMessage('Select the order number above to copy it.'); } }}>Copy order number</button><button className="button secondary" onClick={() => window.print()}>Print order</button></div><p role="status">{copyMessage}</p></>}<div className="button-row"><Link className="button" to="/my-orders">View my orders</Link><Link className="text-link" to="/gallery">Continue shopping</Link></div></article>;
+}

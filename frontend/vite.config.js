@@ -1,13 +1,14 @@
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
+import fs from 'node:fs'
 import { validatePublicEnv } from './build/validatePublicEnv.mjs'
-import { zodCommentAnnotations } from './build/zodCommentAnnotations.mjs'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   validatePublicEnv(loadEnv(mode, process.cwd(), 'VITE_'));
   return {
-  plugins: [zodCommentAnnotations(), react()],
+  plugins: [react()],
+  preview: { headers: (() => { const headers = Object.fromEntries(JSON.parse(fs.readFileSync(new URL('./vercel.json', import.meta.url))).headers[0].headers.map(({ key, value }) => [key, value])); headers['Content-Security-Policy'] = headers['Content-Security-Policy'].replace("wss://*.supabase.co;", "wss://*.supabase.co http://localhost:5000 http://127.0.0.1:5000;"); return headers; })() },
   server: {
     proxy: {
       '/api': {
@@ -30,7 +31,7 @@ export default defineConfig(({ mode }) => {
         manualChunks: {
           // Split heavy vendor libs into separate chunks
           'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-          'vendor-ui': ['framer-motion', 'react-hot-toast', 'react-icons'],
+          'vendor-ui': ['react-hot-toast', 'react-icons'],
           'vendor-query': ['@tanstack/react-query', 'axios'],
           'vendor-seo': ['react-helmet-async'],
         },

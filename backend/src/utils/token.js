@@ -3,12 +3,12 @@ const jwt = require('jsonwebtoken');
 const { env } = require('../config/env');
 
 const signAccessToken = (user) =>
-  jwt.sign({ sub: user.id, role: user.role, email: user.email }, env.jwtAccessSecret, {
+  jwt.sign({ sub: user.id, ver: user.authVersion ?? 0 }, env.jwtAccessSecret, {
     expiresIn: env.accessTokenTtl,
   });
 
 const signRefreshToken = (user) =>
-  jwt.sign({ sub: user.id, role: user.role, email: user.email, type: 'refresh' }, env.jwtRefreshSecret, {
+  jwt.sign({ sub: user.id, ver: user.authVersion ?? 0, type: 'refresh' }, env.jwtRefreshSecret, {
     expiresIn: `${env.refreshTokenTtlDays}d`,
     jwtid: crypto.randomUUID(),
   });

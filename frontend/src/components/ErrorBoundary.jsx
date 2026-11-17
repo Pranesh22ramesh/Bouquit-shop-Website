@@ -29,12 +29,12 @@ class ErrorBoundary extends React.Component {
       }
 
       return (
-        <div className="min-h-screen flex items-center justify-center bg-[#FAF5EF] text-[#30232A] px-4 dark:bg-[#171116] dark:text-[#FAF5EF]">
-          <div className="max-w-md w-full text-center p-8 rounded-3xl border border-[#E8DDD5] bg-white/90 shadow-2xl backdrop-blur-xl dark:border-[#493640] dark:bg-[#261B22]/90">
-            <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-[#F5EAE9] dark:bg-[#30232A] text-2xl flex items-center justify-center">
-              🌸
+        <div className="min-h-screen flex items-center justify-center bg-[#F8F7F2] text-[#24382F] px-4 dark:bg-[#141D18] dark:text-[#F8F7F2]">
+          <div className="max-w-md w-full text-center p-8 rounded-3xl border border-[#D7DDD4] bg-white/90 shadow-2xl backdrop-blur-xl dark:border-[#3F5144] dark:bg-[#1D2921]/90">
+            <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-[#F5EAE9] dark:bg-[#24382F] text-2xl flex items-center justify-center">
+
             </div>
-            <h1 className="text-2xl font-serif font-bold text-[#651F3C] dark:text-[#D5B36C] mb-2">
+            <h1 className="text-2xl font-serif font-bold text-[#254F3C] dark:text-[#D5B36C] mb-2">
               MIDHUNYAS Petals
             </h1>
             <p className="text-sm text-[#81747A] dark:text-[#8E7A83] mb-6">
@@ -44,14 +44,14 @@ class ErrorBoundary extends React.Component {
               <button
                 type="button"
                 onClick={this.handleReload}
-                className="px-6 py-2.5 rounded-full bg-[#651F3C] hover:bg-[#4D172D] text-white font-medium text-xs shadow-lg shadow-[#651F3C]/20 transition-all active:scale-95"
+                className="px-6 py-2.5 rounded-full bg-[#254F3C] hover:bg-[#183D2B] text-white font-medium text-xs shadow-lg shadow-[#254F3C]/20 transition-all active:scale-95"
               >
                 Reload Store
               </button>
               <button
                 type="button"
                 onClick={this.handleGoHome}
-                className="px-6 py-2.5 rounded-full border border-[#E8DDD5] dark:border-[#493640] font-medium text-xs hover:bg-[#F5EAE9] dark:hover:bg-[#30232A] transition-all active:scale-95"
+                className="px-6 py-2.5 rounded-full border border-[#D7DDD4] dark:border-[#3F5144] font-medium text-xs hover:bg-[#F5EAE9] dark:hover:bg-[#24382F] transition-all active:scale-95"
               >
                 Go to Home
               </button>

@@ -1,9 +1,10 @@
 const crypto = require('crypto');
-const { addClient, removeClient } = require('../services/realtimeRelayService');
+const { addClient, removeClient, assertCapacity } = require('../services/realtimeRelayService');
 
 const stream = (req, res) => {
   const clientId = crypto.randomUUID();
   const userId = req.user.id;
+  assertCapacity(userId);
 
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache, no-transform');
@@ -12,6 +13,7 @@ const stream = (req, res) => {
   res.flushHeaders?.();
 
   addClient(userId, clientId, res);
+  const expiry = setTimeout(() => res.end(), Math.max(1, req.tokenExpiresAt - Date.now()));
 
   res.write(`event: connected\ndata: ${JSON.stringify({ userId, connectedAt: new Date().toISOString() })}\n\n`);
 
@@ -23,7 +25,8 @@ const stream = (req, res) => {
     }
   }, 25000);
 
-  req.on('close', () => {
+  res.on('close', () => {
+    clearTimeout(expiry);
     clearInterval(heartbeat);
     removeClient(userId, clientId);
     res.end();

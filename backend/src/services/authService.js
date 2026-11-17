@@ -13,6 +13,7 @@ const {
 } = require('../utils/token');
 const { serializeUser } = require('../utils/serializers');
 const userRepository = require('../repositories/userRepository');
+const dummyPasswordHash = bcrypt.hash(require('node:crypto').randomBytes(32).toString('hex'), 12);
 
 const reserveAdminEmail = (email) => {
   if (env.adminEmail && String(email).trim().toLowerCase() === env.adminEmail) {
@@ -51,25 +52,12 @@ const seedAdminUser = async () => {
     return;
   }
 
-  await prisma.user.updateMany({
-    where: {
-      role: Role.ADMIN,
-      email: { not: env.adminEmail },
-    },
-    data: { role: Role.USER },
-  });
-
   const existing = await prisma.user.findUnique({
     where: { email: env.adminEmail },
   });
 
   if (existing) {
-    await prisma.user.update({
-      where: { id: existing.id },
-      data: {
-        role: Role.ADMIN,
-      },
-    });
+    if (existing.role !== Role.ADMIN) throw new Error('Administrator bootstrap refused: email already belongs to a non-admin account');
     return;
   }
 
@@ -106,17 +94,14 @@ const signup = async ({ fullName, email, phoneNumber, password }) => {
 
 const login = async ({ email, password, adminOnly = false }) => {
   const user = await userRepository.findByEmail(email);
-  if (!user) throw new ApiError(401, 'Invalid email or password');
-
-  const passwordMatches = await bcrypt.compare(password, user.passwordHash);
-  if (!passwordMatches) throw new ApiError(401, 'Invalid email or password');
+  const passwordMatches = await bcrypt.compare(password, user?.passwordHash || await dummyPasswordHash);
+  if (!user || !passwordMatches) throw new ApiError(401, 'Invalid email or password');
   if (user.isActive === false) {
     throw new ApiError(403, 'Your account has been disabled. Please contact the administrator.');
   }
 
   if (adminOnly) {
-    const isAllowedAdmin = user.email === env.adminEmail.toLowerCase() && user.role === Role.ADMIN;
-    if (!isAllowedAdmin) throw new ApiError(403, 'Only the configured administrator can access this area');
+    if (user.role !== Role.ADMIN) throw new ApiError(403, 'Admin access required');
   }
 
   return buildSession(user);
@@ -140,21 +125,15 @@ const refreshSession = async (rawRefreshToken) => {
     throw new ApiError(401, 'Invalid refresh token');
   }
 
-  const storedToken = await prisma.refreshToken.findUnique({
-    where: { tokenHash: hashToken(rawRefreshToken) },
-  });
-
-  if (!storedToken || storedToken.revokedAt || storedToken.expiresAt < new Date()) {
-    throw new ApiError(401, 'Refresh token has expired');
-  }
-
-  await prisma.refreshToken.update({
-    where: { id: storedToken.id },
+  const consumed = await prisma.refreshToken.updateMany({
+    where: { tokenHash: hashToken(rawRefreshToken), userId: payload.sub, revokedAt: null, expiresAt: { gt: new Date() } },
     data: { revokedAt: new Date() },
   });
+  if (consumed.count !== 1) throw new ApiError(401, 'Refresh token has expired');
 
   const user = await userRepository.findById(payload.sub);
   if (!user) throw new ApiError(401, 'User not found');
+  if (payload.ver !== user.authVersion) throw new ApiError(401, 'Please sign in again');
   if (user.isActive === false) {
     throw new ApiError(403, 'Your account has been disabled. Please contact the administrator.');
   }
@@ -195,18 +174,16 @@ const resetPassword = async ({ token, password }) => {
     throw new ApiError(400, 'Reset token is invalid or expired');
   }
 
-  const storedToken = await prisma.passwordResetToken.findUnique({
-    where: { tokenHash: hashToken(token) },
-  });
-
-  if (!storedToken || storedToken.expiresAt < new Date()) {
-    throw new ApiError(400, 'Reset token is invalid or expired');
-  }
-
   const passwordHash = await bcrypt.hash(password, 12);
-  const user = await userRepository.updateUser(payload.sub, { passwordHash });
-  await prisma.passwordResetToken.deleteMany({ where: { userId: user.id } });
-  await prisma.refreshToken.deleteMany({ where: { userId: user.id } });
+  const user = await prisma.$transaction(async (tx) => {
+    const consumed = await tx.passwordResetToken.deleteMany({ where: { tokenHash: hashToken(token), userId: payload.sub, expiresAt: { gt: new Date() } } });
+    if (consumed.count !== 1) throw new ApiError(400, 'Reset token is invalid or expired');
+    const updated = await tx.user.update({ where: { id: payload.sub }, data: { passwordHash, authVersion: { increment: 1 } } });
+    await tx.passwordResetToken.deleteMany({ where: { userId: updated.id } });
+    await tx.refreshToken.deleteMany({ where: { userId: updated.id } });
+    return updated;
+  });
+  require('./realtimeRelayService').disconnectUser(user.id);
 
   return buildSession(user);
 };

@@ -74,14 +74,14 @@ Use `backend/.env.example` as the source of truth. The key values are:
 - `ADMIN_EMAIL`
 - `ADMIN_PASSWORD`
 
-Use unique random JWT secrets with at least 32 characters in production. Do not use the placeholder values in `backend/.env.example`. There are no default administrator credentials: the admin account is created only when both `ADMIN_EMAIL` and `ADMIN_PASSWORD` are configured, and the password is not reset on later server starts.
+Use unique random JWT secrets with at least 32 characters in production. Do not use the placeholder values in `backend/.env.example`. There are no default administrator credentials: a new admin is created only during an explicit bootstrap with `BOOTSTRAP_ADMIN=true`, `ADMIN_EMAIL` and `ADMIN_PASSWORD` configured. Existing non-admin accounts are never promoted automatically. Disable bootstrap after setup.
 
 ## Auth Highlights
 
 - User signup and login are stored in PostgreSQL
 - Passwords are hashed with `bcryptjs`
 - Refresh tokens are stored server-side and sent via `httpOnly` cookies
-- Only the configured admin credentials can access admin routes
+- Only active accounts with the ADMIN role can access admin routes. SUBADMIN cannot manage accounts.
 - Order totals are calculated from the current product prices and the authenticated user's saved cart on the server
 - Likes, wishlist, cart items, reviews, ratings, orders, and profile data persist across sessions
 
@@ -96,3 +96,5 @@ cd backend && npm run dev
 cd frontend && npm run dev
 cd frontend && npm run build
 ```
+
+Review branch release requirements: [LAUNCH_CHECKLIST.md](./LAUNCH_CHECKLIST.md). Do not merge or deploy until its blockers are resolved.

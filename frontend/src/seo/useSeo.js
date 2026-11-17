@@ -8,7 +8,7 @@ const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
 export const DEFAULT_CONFIG = {
   businessName: 'MIDHUNYAS Petals',
-  businessSlogan: "Karur's Finest Flower Shop",
+  businessSlogan: "Bouquets and bridal flowers in Karur",
   address: 'Karur, Tamil Nadu, India',
   city: 'Karur',
   state: 'Tamil Nadu',
@@ -16,7 +16,7 @@ export const DEFAULT_CONFIG = {
   postalCode: '639001',
   phone: '+91 9942071721',
   whatsapp: '+91 9942071721',
-  email: 'miudhunyas2012karur@gmail.com',
+  email: '',
   latitude: '10.9601',
   longitude: '78.0766',
   googleMapsUrl: 'https://maps.google.com/?q=Karur,Tamil+Nadu',
@@ -36,31 +36,31 @@ export const DEFAULT_CONFIG = {
 export const PAGE_DEFAULTS = {
   home: {
     metaTitle: 'Flower Shop in Karur - MIDHUNYAS Petals | Fresh Bouquets & Bridal Flowers',
-    metaDescription: "MIDHUNYAS Petals — Karur's premier flower shop. Shop handcrafted bouquets, bridal flowers, wedding garlands & custom floral gifts. Order online with WhatsApp delivery.",
+    metaDescription: 'Browse bouquets, bridal flowers and garlands from Midhunyas Petals in Karur.',
     keywords: 'flower shop in karur, karur flower shop, bouquet shop karur, fresh flowers karur, MIDHUNYAS petals, bridal flowers karur',
     schemaType: 'WebSite',
   },
   gallery: {
     metaTitle: 'Bouquets & Flowers Gallery - Karur | MIDHUNYAS Petals',
-    metaDescription: "Browse our beautiful gallery of fresh bouquets, bridal flowers, anniversary arrangements, birthday bouquets and customized floral collections from Karur's best flower shop.",
+    metaDescription: 'Browse bouquets, bridal flowers and garlands from Midhunyas Petals in Karur.',
     keywords: 'flower gallery karur, bouquet photos, bridal flowers karur, birthday bouquet karur',
     schemaType: 'CollectionPage',
   },
   about: {
-    metaTitle: 'About MIDHUNYAS Petals - Karur Flower Shop Since 2012',
-    metaDescription: "Learn about MIDHUNYAS Petals, Karur's trusted flower shop creating handcrafted bouquets, bridal flowers, and customized floral arrangements with love.",
+    metaTitle: 'About MIDHUNYAS Petals - Flower Shop in Karur',
+    metaDescription: 'Browse bouquets, bridal flowers and garlands from Midhunyas Petals in Karur.',
     keywords: 'about midhunyas petals, karur flower shop',
     schemaType: 'AboutPage',
   },
   contact: {
     metaTitle: 'Contact Flower Shop Karur - MIDHUNYAS Petals | +91 9942071721',
-    metaDescription: 'Contact MIDHUNYAS Petals for flower orders, custom bouquets, bridal flowers and wedding arrangements in Karur, Tamil Nadu. Call or WhatsApp +91 9942071721.',
+    metaDescription: 'Browse bouquets, bridal flowers and garlands from Midhunyas Petals in Karur.',
     keywords: 'contact flower shop karur, flower delivery karur',
     schemaType: 'ContactPage',
   },
   reviews: {
     metaTitle: 'Customer Reviews - MIDHUNYAS Petals Karur Flower Shop',
-    metaDescription: "Read genuine customer reviews for MIDHUNYAS Petals, Karur's best flower shop.",
+    metaDescription: 'Browse bouquets, bridal flowers and garlands from Midhunyas Petals in Karur.',
     keywords: 'midhunyas petals reviews, karur flower shop reviews',
     schemaType: 'WebPage',
   },

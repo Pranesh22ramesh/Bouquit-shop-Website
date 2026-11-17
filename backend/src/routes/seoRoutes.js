@@ -16,8 +16,8 @@ router.get('/pages', publicLimiter, strictRequest(), seoController.getAllPages);
 router.get('/pages/:pageKey', publicLimiter, strictRequest({ params: ['pageKey'] }), seoController.pageKeyValidator, validateRequest, seoController.getPage);
 
 // Admin-protected endpoints
-router.put('/config', protect, authenticatedLimiter, adminOnly, strictRequest({ body: ['siteTitle', 'siteDescription', 'defaultOgImage'] }), seoController.updateConfigValidators, validateRequest, seoController.updateConfig);
-router.put('/pages/:pageKey', protect, authenticatedLimiter, adminOnly, strictRequest({ body: ['title', 'description', 'canonical'], params: ['pageKey'] }), seoController.upsertPageValidators, validateRequest, seoController.upsertPage);
+router.put('/config', protect, authenticatedLimiter, adminOnly, strictRequest({ body: seoController.configFields }), seoController.updateConfigValidators, validateRequest, seoController.updateConfig);
+router.put('/pages/:pageKey', protect, authenticatedLimiter, adminOnly, strictRequest({ body: seoController.pageFields, params: ['pageKey'] }), seoController.upsertPageValidators, validateRequest, seoController.upsertPage);
 router.get('/health', protect, authenticatedLimiter, adminOnly, strictRequest(), seoController.getHealthCheck);
 
 module.exports = router;

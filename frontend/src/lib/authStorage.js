@@ -1,15 +1,7 @@
-const ACCESS_TOKEN_KEY = "bb_access_token";
-
-export const getAccessToken = () => localStorage.getItem(ACCESS_TOKEN_KEY);
-
-export const setAccessToken = (token) => {
-  if (token) {
-    localStorage.setItem(ACCESS_TOKEN_KEY, token);
-  } else {
-    localStorage.removeItem(ACCESS_TOKEN_KEY);
-  }
-};
-
-export const clearAccessToken = () => {
-  localStorage.removeItem(ACCESS_TOKEN_KEY);
-};
+// Access tokens stay in memory; reloads restore sessions using the HttpOnly cookie.
+let accessToken = null;
+try { localStorage.removeItem('bb_access_token'); } catch { /* storage may be disabled */ }
+export const getAccessToken = () => accessToken;
+export const hasSessionHint = () => { try { return localStorage.getItem('shop-session') === '1'; } catch { return Boolean(accessToken); } };
+export const setAccessToken = (token) => { accessToken = token || null; try { if (token) localStorage.setItem('shop-session', '1'); else localStorage.removeItem('shop-session'); } catch {} };
+export const clearAccessToken = () => { setAccessToken(null); };

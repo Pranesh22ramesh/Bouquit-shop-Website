@@ -1,40 +1,38 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Poppins:wght@300;400;500;600&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* ============================================================
-   ROYAL BOTANICAL LUXURY DESIGN SYSTEM — CSS CUSTOM PROPERTIES
+   ROYAL BOTANICAL LUXURY DESIGN SYSTEM ,  CSS CUSTOM PROPERTIES
    ============================================================ */
 :root {
   /* Core Brand & Accents */
-  --color-burgundy: #651F3C;
-  --color-burgundy-hover: #4D172D;
+  --color-burgundy: #254F3C;
+  --color-burgundy-hover: #183D2B;
   --color-gold: #C5A15B;
   --color-gold-hover: #AD8946;
-  --color-ivory: #FAF5EE;
-  --color-plum: #30232A;
-  --color-dusty-rose: #D9B8B8;
+  --color-ivory: #F8F7F2;
+  --color-plum: #24382F;
+  --color-dusty-rose: #B8C7B6;
   --color-sage: #78836B;
 
   /* Background Hierarchy */
-  --bg-main: #FAF5EE;
+  --bg-main: #F8F7F2;
   --bg-secondary: #FFFFFF;
-  --bg-alt: #F6ECE7;
+  --bg-alt: #E9EEE5;
   --bg-dark-section: #261520;
 
   /* Typography */
-  --text-heading: #30232A;
+  --text-heading: #24382F;
   --text-body: #51454B;
   --text-secondary: #81747A;
-  --text-highlight: #651F3C;
-  --text-price: #651F3C;
+  --text-highlight: #254F3C;
+  --text-price: #254F3C;
   --text-discount: #78836B;
-  --text-on-dark: #FAF5EE;
+  --text-on-dark: #F8F7F2;
 
   /* Borders & Dividers */
-  --border-luxury: #E8DDD5;
+  --border-luxury: #D7DDD4;
   --border-gold: #C5A15B;
 
   /* Scrollbar */
@@ -43,29 +41,29 @@
 }
 
 .dark {
-  --color-burgundy: #A64B6B;
+  --color-burgundy: #9EBDA1;
   --color-burgundy-hover: #8A3D58;
   --color-gold: #D5B36C;
   --color-gold-hover: #C5A15B;
-  --color-ivory: #261B22;
-  --color-plum: #FAF5EE;
+  --color-ivory: #1D2921;
+  --color-plum: #F8F7F2;
 
-  --bg-main: #160F17;
-  --bg-secondary: #231722;
+  --bg-main: #141D18;
+  --bg-secondary: #1D2921;
   --bg-alt: #1F141E;
   --bg-dark-section: #120A13;
 
-  --text-heading: #FAF5EE;
+  --text-heading: #F8F7F2;
   --text-body: #C9B8BF;
   --text-secondary: #8E7A83;
   --text-highlight: #D5B36C;
   --text-price: #D5B36C;
-  --text-on-dark: #FAF5EE;
+  --text-on-dark: #F8F7F2;
 
-  --border-luxury: #493640;
+  --border-luxury: #3F5144;
   --border-gold: #634857;
 
-  --scrollbar-thumb: #493640;
+  --scrollbar-thumb: #3F5144;
   --scrollbar-thumb-hover: #D5B36C;
 }
 
@@ -151,7 +149,7 @@
         justify-content: center;
         gap: 0.5rem;
         border-radius: 9999px;
-        background: linear-gradient(135deg, #651F3C, #4D172D);
+        background: linear-gradient(135deg, #254F3C, #183D2B);
         padding-left: 1.75rem;
         padding-right: 1.75rem;
         font-size: 0.875rem;
@@ -164,7 +162,7 @@
     .btn-luxury:hover {
         transform: scale(1.04);
         box-shadow: 0 16px 40px rgba(101, 31, 60, 0.45);
-        background: linear-gradient(135deg, #4D172D, #651F3C);
+        background: linear-gradient(135deg, #183D2B, #254F3C);
     }
 
     .btn-luxury:active {
@@ -172,7 +170,7 @@
     }
 
     .btn-luxury-outline {
-        @apply inline-flex min-h-14 items-center justify-center rounded-full border border-[#C5A15B]/50 bg-white/45 px-7 text-sm font-semibold text-plum backdrop-blur transition duration-300 hover:border-burgundy hover:bg-white dark:border-[#493640] dark:bg-white/5 dark:text-[#FAF5EE] dark:hover:border-[#D5B36C];
+        @apply inline-flex min-h-14 items-center justify-center rounded-full border border-[#C5A15B]/50 bg-white/45 px-7 text-sm font-semibold text-plum backdrop-blur transition duration-300 hover:border-burgundy hover:bg-white dark:border-[#3F5144] dark:bg-white/5 dark:text-[#F8F7F2] dark:hover:border-[#D5B36C];
     }
 }
 

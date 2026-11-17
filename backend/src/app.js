@@ -9,6 +9,8 @@ const { notFound } = require('./middleware/notFound');
 const { errorHandler } = require('./middleware/errorMiddleware');
 const { sanitizeInput } = require('./middleware/sanitizeInput');
 const { strictRequest } = require('./middleware/strictRequest');
+const { isAllowedOrigin, requestSecurity } = require('./middleware/requestSecurity');
+const { ApiError } = require('./utils/apiError');
 const {
   globalLimiter,
   publicLimiter,
@@ -26,7 +28,7 @@ const eventRoutes = require('./routes/eventRoutes');
 const seoRoutes = require('./routes/seoRoutes');
 
 const app = express();
-const knownFrontendOrigins = new Set(['https://karurflowershop.vercel.app']);
+app.disable('x-powered-by');
 
 // Set the number of trusted reverse-proxy hops explicitly in production so IP limits
 // use the client address without trusting arbitrary forwarded headers.
@@ -35,7 +37,7 @@ app.set('trust proxy', env.trustProxyHops);
 // Security HTTP headers with Helmet
 app.use(
   helmet({
-    contentSecurityPolicy: false, // Allows cross-origin asset loading from CDNs/Supabase
+    contentSecurityPolicy: { directives: { defaultSrc: ["'none'"], frameAncestors: ["'none'"], baseUri: ["'none'"] } },
     crossOriginEmbedderPolicy: false,
     crossOriginResourcePolicy: { policy: 'cross-origin' },
   })
@@ -45,26 +47,15 @@ app.use(
 app.use(
   cors({
     origin: function (origin, callback) {
-      let configuredOrigin = '';
-      try {
-        configuredOrigin = new URL(env.frontendUrl).origin;
-      } catch (_) {
-        configuredOrigin = '';
-      }
-      const isLocalDevelopmentOrigin = env.nodeEnv !== 'production' &&
-        /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin || '');
-      if (
-        !origin ||
-        origin === configuredOrigin ||
-        knownFrontendOrigins.has(origin) ||
-        isLocalDevelopmentOrigin
-      ) {
+      if (!origin || isAllowedOrigin(origin)) {
         callback(null, true);
       } else {
-        callback(new Error('Not allowed by CORS'));
+        callback(new ApiError(403, 'Origin not allowed'));
       }
     },
     credentials: true,
+    methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   })
 );
 
@@ -75,6 +66,7 @@ app.use(globalLimiter);
 app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true, limit: '100kb', parameterLimit: 200 }));
 app.use(cookieParser());
+app.use(requestSecurity);
 
 // Global XSS and prototype pollution sanitizer
 app.use(sanitizeInput);
